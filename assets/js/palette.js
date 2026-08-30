@@ -206,7 +206,7 @@
     if (!results.length) {
       body.appendChild(U.el(
         '<div class="empty"><div class="empty__icon">' + I.svg("command", { size: 22, cls: "icon" }) + "</div>" +
-        "<h3>ابحث في " + U.plural(pool().length, U.COUNT_WORDS.screen) + "</h3>" +
+        "<h3>ابحث في الشاشات</h3>" +
         "<p>" + U.escapeHtml(scopeHint || "اكتب أي جزء من اسم الشاشة") +
         " — البحث يتجاهل الهمزات والتشكيل.</p></div>"
       ));
@@ -214,7 +214,7 @@
       return;
     }
 
-    footCount.textContent = U.plural(pool().length, U.COUNT_WORDS.screen) + " متاحة";
+    footCount.textContent = "";
     setActive(0);
   }
 

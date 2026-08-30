@@ -151,8 +151,7 @@
       var art = document.createElement("article");
       art.className = "doc__note";
       art.id = m.ref;
-      art.innerHTML = "<h3>" + esc(m.label) + " <span class='doc__count'>" +
-        ar(m._screenCount) + " شاشة مقترحة</span></h3>" +
+      art.innerHTML = "<h3>" + esc(m.label) + "</h3>" +
         "<p><b>لماذا:</b> " + esc(m.why || "") + "</p>";
 
       if ((m.gapFor || []).length) {

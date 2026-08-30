@@ -17,6 +17,11 @@
   var typeBuffer = "", typeTimer = null;
   var searchActive = false;
   var preSearchExpanded = null;
+  var autoTimer = null;          // مؤقّت الطي التلقائي
+  var hovering = false;          // هل الفأر داخل لوحة الشجرة؟
+
+  /* كم يبقى الفرع مفتوحاً قبل أن ينطوي وحده (مللي ثانية) — صفر يُعطّل الميزة */
+  var AUTO_COLLAPSE_MS = 15000;
 
   /* تسميات حالات التحقق في شجرة «الإعدادات الفعّالة» */
   var CFG_LABEL = {
@@ -36,9 +41,9 @@
     searchActive = false;
     preSearchExpanded = null;
 
-    /* استعادة حالة الفتح المحفوظة، أو فتح المستوى الأول افتراضياً */
-    var saved = S.getExpanded(mod._id);
-    expanded = new Set(saved || defaultExpanded(mod));
+    clearAutoCollapse();
+    /* الشجرة تبدأ مطويّة دائماً — لا استعادة لحالة محفوظة ولا فتح تلقائي */
+    expanded = new Set();
 
     listEl = document.createElement("ul");
     listEl.className = "tree";
@@ -51,19 +56,12 @@
     container.appendChild(listEl);
 
     listEl.addEventListener("keydown", onKeyDown);
-    setFocusKey(firstVisibleKey());
-  }
-
-  /* افتراضياً: افتح المجموعات المباشرة إن كانت قليلة */
-  function defaultExpanded(mod) {
-    var out = [];
-    var kids = mod.children || [];
-    if (kids.length && kids.length <= 8) {
-      kids.forEach(function (c) {
-        if (c.children && c.children.length && c.kind !== "submodule") out.push(c._key);
-      });
+    if (!container.__onyxHoverBound) {
+      container.__onyxHoverBound = true;
+      container.addEventListener("pointerenter", function () { hovering = true; });
+      container.addEventListener("pointerleave", function () { hovering = false; armAutoCollapse(); });
     }
-    return out;
+    setFocusKey(firstVisibleKey());
   }
 
   function buildNode(node) {
@@ -177,14 +175,6 @@
       row.appendChild(star);
     }
 
-    /* عدّاد الشاشات للفروع */
-    if (hasKids && node._screenCount) {
-      var c = document.createElement("span");
-      c.className = "count";
-      c.textContent = U.formatNum(node._screenCount, true);
-      c.title = U.plural(node._screenCount, U.COUNT_WORDS.screen);
-      row.appendChild(c);
-    }
 
     row.addEventListener("click", function (e) {
       if (e.target.closest(".node__star")) return;
@@ -222,7 +212,7 @@
     } else {
       setExpanded(node, open);
     }
-    persist();
+    armAutoCollapse();
   }
 
   function walkBranch(node, fn) {
@@ -234,28 +224,54 @@
     (moduleNode.children || []).forEach(function (c) {
       walkBranch(c, function (n) { if (!n._isLeaf) setExpanded(n, true); });
     });
-    persist();
+    armAutoCollapse();
   }
 
   function collapseAll() {
     (moduleNode.children || []).forEach(function (c) {
       walkBranch(c, function (n) { if (!n._isLeaf) setExpanded(n, false); });
     });
-    persist();
+    clearAutoCollapse();
     var f = firstVisibleKey();
     if (f) setFocusKey(f);
   }
 
-  function persist() {
-    if (!searchActive && moduleNode) S.setExpanded(moduleNode._id, Array.from(expanded));
+  /* ═════════ الطي التلقائي ═════════
+     الشجرة تبدأ مطويّة دائماً. أي فرع تفتحه بنفسك ينطوي وحده بعد AUTO_COLLAPSE_MS،
+     وعند الانتقال إلى شاشة أخرى ينطوي كل شيء عدا مسار الشاشة المفتوحة. */
+
+  function clearAutoCollapse() {
+    if (autoTimer) { clearTimeout(autoTimer); autoTimer = null; }
   }
 
-  /* افتح كل الأسلاف حتى عقدة معيّنة */
+  /* يُسلَّح من تفاعل المستخدم وحده — لا من البحث ولا من بناء الشجرة */
+  function armAutoCollapse() {
+    clearAutoCollapse();
+    if (searchActive || !AUTO_COLLAPSE_MS) return;
+    autoTimer = setTimeout(function () {
+      autoTimer = null;
+      /* لا تسحب الشجرة من تحت المؤشر — أجّل ما دام الفأر داخل اللوحة */
+      if (hovering) { armAutoCollapse(); return; }
+      collapseAll();
+    }, AUTO_COLLAPSE_MS);
+  }
+
+  /* اطوِ كل شيء دون نقل التركيز — تمهيداً لإعادة كشف مسار واحد */
+  function collapseSilently() {
+    if (!moduleNode) return;
+    (moduleNode.children || []).forEach(function (c) {
+      walkBranch(c, function (n) { if (!n._isLeaf) setExpanded(n, false); });
+    });
+  }
+
+  /* افتح أسلاف عقدة معيّنة — ويُطوى كل ما عداها */
   function revealPath(node) {
+    clearAutoCollapse();
+    if (!searchActive) collapseSilently();
     IDX.ancestors(node).forEach(function (a) {
       if (a._level >= 2) setExpanded(a, true);
     });
-    persist();
+    armAutoCollapse();
   }
 
   /* ═════════ التحديد ═════════ */
@@ -341,11 +357,11 @@
         break;
       /* RTL: اليسار = دخول/فتح  |  اليمين = طي/خروج */
       case "ArrowLeft":
-        if (!node._isLeaf && !expanded.has(node._key)) { setExpanded(node, true); persist(); }
+        if (!node._isLeaf && !expanded.has(node._key)) { setExpanded(node, true); armAutoCollapse(); }
         else if (!node._isLeaf) { move(rows, Math.min(idx + 1, rows.length - 1)); }
         break;
       case "ArrowRight":
-        if (!node._isLeaf && expanded.has(node._key)) { setExpanded(node, false); persist(); }
+        if (!node._isLeaf && expanded.has(node._key)) { setExpanded(node, false); clearAutoCollapse(); }
         else if (node._parent && node._parent._level >= 2) {
           var pKey = node._parent._key;
           var pIdx = rows.findIndex(function (r) { return r.dataset.key === pKey; });
@@ -361,7 +377,7 @@
         break;
       case "*":
         (moduleNode.children || []).forEach(function (c) { if (!c._isLeaf) setExpanded(c, true); });
-        persist();
+        armAutoCollapse();
         break;
       default:
         if (e.key.length === 1 && !e.ctrlKey && !e.metaKey && !e.altKey) typeAhead(e.key, rows, idx);
@@ -399,10 +415,12 @@
     var q = (query || "").trim();
 
     if (!q) {
-      if (searchActive && preSearchExpanded) {
-        expanded = new Set(preSearchExpanded);
-        applyExpandedToDom();
+      clearAutoCollapse();
+      if (searchActive) {
+        /* بعد البحث تعود الشجرة مطويّة — لا نستعيد ما كان مفتوحاً قبله */
         preSearchExpanded = null;
+        expanded = new Set();
+        applyExpandedToDom();
       }
       searchActive = false;
       Object.keys(liByKey).forEach(function (k) { liByKey[k].removeAttribute("hidden"); });

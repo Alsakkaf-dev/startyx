@@ -92,10 +92,10 @@
   </nav>
 
   <!-- ═══════════ منطقة العمل ═══════════ -->
-  <div class="body" id="appBody">
+  <div class="body no-anim" id="appBody" data-tree="collapsed">
 
     <!-- لوحة الشجرة -->
-    <aside class="treepane" aria-label="شجرة النظام">
+    <aside class="treepane" id="treePane" aria-label="شجرة النظام">
       <div class="resizer" id="resizer" role="separator" aria-orientation="vertical"
            aria-label="تغيير عرض لوحة الشجرة" tabindex="0"></div>
 
@@ -141,6 +141,13 @@
 
       <div class="treepane__scroll" id="treeScroll"></div>
     </aside>
+
+    <!-- زر طيّ اللوحة — يسافر مع حافتها فيبقى في المتناول وهي مطويّة -->
+    <button type="button" class="treetoggle" id="treeToggle"
+            aria-controls="treePane" aria-expanded="false" aria-label="إظهار لوحة الشجرة">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+           stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg>
+    </button>
 
     <!-- المحتوى -->
     <main class="main" id="mainScroll">

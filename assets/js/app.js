@@ -9,6 +9,7 @@
       Views = root.OnyxViews, Palette = root.OnyxPalette, Nav = root.OnyxNav;
 
   var app, railScroll, treeScroll, treeTitle, treeTools, searchInput, searchCount, treeSeg;
+  var treeToggleBtn = null;
   var currentModule = null, currentNode = null, currentTab = null;
   var treeMode = "tree";          // tree | fav | recent
   var suppressHash = false;
@@ -75,7 +76,7 @@
       "</button>"
     );
     b.addEventListener("click", onClick);
-    UI.tip(b, m.label + (m._screenCount ? " — " + U.plural(m._screenCount, U.COUNT_WORDS.screen) : ""), "inline-start");
+    UI.tip(b, m.label, "inline-start");
     return b;
   }
 
@@ -247,6 +248,7 @@
     document.getElementById("mainScroll").scrollTop = 0;
     if (!opts.silent) writeHash(null);
     S.setLastRoute("#/home");
+    if (Tree.moduleNode) Tree.collapseAll();
   }
 
   /* الإعدادات والمرجع صفحة مستقلة (settings.html) — هذه مجرد بوابة إليها */
@@ -273,6 +275,33 @@
     if (b.getAttribute("data-drawer") === "open") closeDrawer(); else openDrawer();
   }
 
+  /* ════════════════════ طيّ لوحة الشجرة ════════════════════
+     حالة واحدة على #appBody: data-tree="collapsed". الزر مموضَع على حافة
+     اللوحة فينزلق معها، فيبقى في المتناول وهي مطويّة. */
+  function isTreeCollapsed() {
+    return document.getElementById("appBody").getAttribute("data-tree") === "collapsed";
+  }
+
+  function setTreePane(collapsed, silent) {
+    var b = document.getElementById("appBody");
+    collapsed = !!collapsed;
+    if (collapsed) b.setAttribute("data-tree", "collapsed");
+    else b.removeAttribute("data-tree");
+
+    /* اللوحة المنزلقة تبقى في ترتيب التبويب — عطّلها صراحةً */
+    var pane = document.querySelector(".treepane");
+    if (pane) {
+      if ("inert" in pane) pane.inert = collapsed;
+      pane.setAttribute("aria-hidden", collapsed ? "true" : "false");
+    }
+    if (treeToggleBtn) {
+      treeToggleBtn.setAttribute("aria-expanded", collapsed ? "false" : "true");
+      treeToggleBtn.setAttribute("aria-label", collapsed ? "إظهار لوحة الشجرة" : "طيّ لوحة الشجرة");
+      treeToggleBtn.title = collapsed ? "إظهار لوحة الشجرة" : "طيّ لوحة الشجرة";
+    }
+    if (!silent) S.setTreeCollapsed(collapsed);
+  }
+
   /* ════════════════════ تغيير عرض اللوحة ════════════════════ */
   function initResizer() {
     var rz = document.getElementById("resizer");
@@ -294,7 +323,7 @@
       e.preventDefault();
     });
     rz.addEventListener("pointermove", function (e) {
-      if (!dragging) return;
+      if (!dragging || isTreeCollapsed()) return;
       var railW = document.querySelector(".rail").getBoundingClientRect().width;
       setW(window.innerWidth - railW - e.clientX);
     });
@@ -306,6 +335,7 @@
     });
     rz.addEventListener("dblclick", function () { setW(332); });
     rz.addEventListener("keydown", function (e) {
+      if (isTreeCollapsed()) return;
       var cur = parseInt(getComputedStyle(app).getPropertyValue("--tree-w"), 10) || 332;
       if (e.key === "ArrowLeft")  { setW(cur + 16); e.preventDefault(); }
       if (e.key === "ArrowRight") { setW(cur - 16); e.preventDefault(); }
@@ -328,7 +358,8 @@
 
       if (e.key === "/" && !inField) { e.preventDefault(); Palette.open(); return; }
       if ((e.ctrlKey || e.metaKey) && (e.key === "f" || e.key === "F") && !inField) {
-        e.preventDefault(); searchInput.focus(); searchInput.select(); return;
+        e.preventDefault(); setTreePane(false);
+        searchInput.focus(); searchInput.select(); return;
       }
       if (e.key === "Escape" && document.activeElement === searchInput && searchInput.value) {
         searchInput.value = ""; runSearch(""); return;
@@ -380,6 +411,22 @@
       var next = app.getAttribute("data-rail") !== "expanded";
       app.setAttribute("data-rail", next ? "expanded" : "collapsed");
       S.setRailExpanded(next);
+    });
+
+    /* ── زر طيّ لوحة الشجرة: يسافر مع اللوحة ويعيدها ── */
+    treeToggleBtn = document.getElementById("treeToggle");
+    if (treeToggleBtn) {
+      treeToggleBtn.addEventListener("click", function () {
+        if (window.innerWidth <= 900) { toggleDrawer(); return; }
+        setTreePane(!isTreeCollapsed());
+      });
+    }
+    setTreePane(S.getTreeCollapsed(), true);
+    /* ارفع مانع الحركة بعد أول رسم كي لا تنزلق اللوحة عند كل تحميل */
+    requestAnimationFrame(function () {
+      requestAnimationFrame(function () {
+        document.getElementById("appBody").classList.remove("no-anim");
+      });
     });
 
     document.getElementById("searchTrigger").addEventListener("click", function () { Palette.open(); });
@@ -444,14 +491,8 @@
         { icon: "grid", label: "نظرة عامة على النظام",
           run: function () { if (currentModule) open(currentModule); } },
         "-",
-        { icon: "panel", label: "إخفاء لوحة الشجرة",
-          run: function () {
-            document.getElementById("appBody").setAttribute("data-tree", "hidden");
-            UI.toast("أُخفيت لوحة الشجرة", {
-              action: { label: "إظهار", run: function () {
-                document.getElementById("appBody").removeAttribute("data-tree");
-              } } });
-          } }
+        { icon: "panel", label: "طيّ لوحة الشجرة",
+          run: function () { setTreePane(true); } }
       ], { alignStart: true });
     });
 
@@ -516,9 +557,7 @@
             '<div class="ltr" style="font-size:var(--text-xs);color:var(--text-subtle)">' + U.escapeHtml(meta.brand) + "</div></div>" +
           "</div>" +
           "<p style=\"font-size:var(--text-md);color:var(--text-muted);line-height:1.75\">" +
-            U.escapeHtml(meta.tagline) + " — " + U.escapeHtml(meta.version) + ".<br>" +
-            "متصفّح شجرة الأنظمة: " + U.plural(IDX.coreModules.length, U.COUNT_WORDS.system) + " · " +
-            U.plural(IDX.screens.length, U.COUNT_WORDS.screen) + "." +
+            U.escapeHtml(meta.tagline) + " — " + U.escapeHtml(meta.version) + "." +
           "</p>" +
           '<div style="padding:var(--space-3);background:var(--status-wip-bg);color:var(--status-wip-fg);' +
           'border-radius:var(--radius-sm);font-size:var(--text-sm)">' + U.escapeHtml(meta.note) + "</div>" +

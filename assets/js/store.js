@@ -54,6 +54,10 @@
     getRailExpanded: function () { return read("railExpanded", false); },
     setRailExpanded: function (v) { write("railExpanded", !!v); emit("rail", !!v); },
 
+    /* ---- لوحة الشجرة مطويّة؟ افتراضياً نعم ---- */
+    getTreeCollapsed: function () { return read("treeCollapsed", true); },
+    setTreeCollapsed: function (v) { write("treeCollapsed", !!v); emit("treePane", !!v); },
+
     /* ---- عرض لوحة الشجرة ---- */
     getTreeWidth: function () { return read("treeWidth", 320); },
     setTreeWidth: function (px) { write("treeWidth", px); },

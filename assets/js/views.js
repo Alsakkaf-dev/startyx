@@ -168,12 +168,6 @@
     } catch (e) { dateStr = ""; }
 
     h.appendChild(U.el(
-      '<div class="demo-note">' + I.svg("info", { size: 16, cls: "icon" }) +
-      "<span><b>كل ما يظهر هنا مأخوذ من نظام بتروسبيشل الفعلي أو محسوب من شجرته.</b> " +
-      "لا أرقام تقديرية ولا بيانات مُختلَقة — والبرنامج للتصفح والتخطيط، لا لتنفيذ عمليات.</span></div>"
-    ));
-
-    h.appendChild(U.el(
       '<header class="page-head"><div class="page-head__row">' +
         "<div><h1>" + esc(greet) + "</h1>" +
         '<div class="page-head__sub">' + esc(dateStr) + " · " + esc(M.org.name) + "</div></div>" +
@@ -185,43 +179,6 @@
         "</div>" +
       "</div></header>"
     ));
-
-    /* المؤشرات البنيوية — تُحسب من الشجرة، لا أرقام مخزّنة */
-    h.appendChild(U.el('<div class="section-head">' + I.svg("chart", { size: 18, cls: "icon" }) +
-      "<h2>ما الذي بين يديك</h2><span class=\"spacer\"></span>" +
-      '<span class="pill pill--ready">محسوبة من شجرتكم</span></div>'));
-
-    var stats = U.el('<div class="statgrid"></div>');
-    /* كل مؤشر يقود لمسكنه: الإعدادات لما يُضبَط، والوثيقة لما يُقرأ */
-    var HUB_STATS = {
-      accounts: "reference", gaps: "reference", bridges: "reference",
-      pending: "settings", blockers: "settings"
-    };
-    (M.structureStats || []).forEach(function (st) {
-      var v = computeStat(st.compute);
-      if (v == null) return;
-      var toHub = HUB_STATS[st.id];
-      var card = U.el(
-        '<article class="stat"' + (toHub ? ' role="button" tabindex="0" data-link="1"' : '') + '>' +
-          '<div class="stat__icon">' + I.svg(st.icon || "dot", { size: 18 }) + "</div>" +
-          '<div class="stat__body">' +
-            '<div class="stat__value">' + U.formatNum(v, true) + "</div>" +
-            '<div class="stat__label">' + esc(st.label) + "</div>" +
-          "</div>" +
-        "</article>");
-      if (toHub) {
-        var go = function () {
-          if (toHub === "settings") root.OnyxNav.goSettings();
-          else root.OnyxNav.goReference();
-        };
-        card.addEventListener("click", go);
-        card.addEventListener("keydown", function (e) {
-          if (e.key === "Enter" || e.key === " ") { e.preventDefault(); go(); }
-        });
-      }
-      stats.appendChild(card);
-    });
-    h.appendChild(stats);
 
     /* الوصول السريع */
     h.appendChild(U.el('<div class="section-head">' + I.svg("sparkle", { size: 18, cls: "icon" }) +
@@ -235,88 +192,25 @@
     });
     h.appendChild(qg);
 
-    /* حالة النظام — من الإعدادات الفعّالة */
-    h.appendChild(U.el('<div class="section-head">' + I.svg("settings", { size: 18, cls: "icon" }) +
-      "<h2>حالة النظام</h2><span class=\"spacer\"></span>" +
-      '<span class="pill pill--ready">مؤكدة من النظام</span></div>'));
-
-    var fx = U.el('<div class="cols2"></div>');
-
-    var onPanel = U.el(
-      '<section class="panel"><div class="panel__head">' +
-        I.svg("check", { size: 17, cls: "icon" }) + "<h3>مفعّل</h3>" +
-        '<span class="spacer"></span><span class="count">' +
-        U.formatNum(M.features.on.length, true) + "</span></div>" +
-        '<div class="panel__body"><div class="featlist"></div></div></section>'
-    );
-    M.features.on.forEach(function (t) {
-      onPanel.querySelector(".featlist").appendChild(U.el(
-        '<div class="feat feat--on">' + I.svg("check", { size: 14, cls: "icon-sm" }) +
-        "<span>" + esc(t) + "</span></div>"));
-    });
-
-    var offPanel = U.el(
-      '<section class="panel"><div class="panel__head">' +
-        I.svg("close", { size: 17, cls: "icon" }) + "<h3>معطّل — خارج نطاق العمل</h3>" +
-        '<span class="spacer"></span><span class="count">' +
-        U.formatNum(M.features.off.length, true) + "</span></div>" +
-        '<div class="panel__body"><div class="featlist"></div></div></section>'
-    );
-    M.features.off.forEach(function (t) {
-      offPanel.querySelector(".featlist").appendChild(U.el(
-        '<div class="feat feat--off">' + I.svg("close", { size: 14, cls: "icon-sm" }) +
-        "<span>" + esc(t) + "</span></div>"));
-    });
-
-    fx.appendChild(onPanel); fx.appendChild(offPanel);
-    h.appendChild(fx);
-
-    /* المفضلة + الأخيرة */
-    h.appendChild(U.el('<div class="section-head">' + I.svg("layers", { size: 18, cls: "icon" }) +
-      "<h2>مساحتك</h2></div>"));
-    var cols = U.el('<div class="cols2"></div>');
-    cols.appendChild(favPanel());
-    cols.appendChild(recentPanel());
-    h.appendChild(cols);
-
     /* كل الأنظمة */
     h.appendChild(U.el('<div class="section-head">' + I.svg("grid", { size: 18, cls: "icon" }) +
-      "<h2>الأنظمة التشغيلية</h2><span class=\"spacer\"></span>" +
-      '<span class="count">' + U.plural(IDX.coreModules.length, U.COUNT_WORDS.system) + "</span></div>"));
+      "<h2>الأنظمة التشغيلية</h2></div>"));
     var mg = U.el('<div class="modgrid"></div>');
     IDX.coreModules.forEach(function (m) {
-      var wip = m._effStatus === "wip";
       var card = U.el(
         '<button type="button" class="modcard" data-accent="' + esc(m.accent || "slate") + '"' +
-          (wip ? ' data-wip="1"' : "") + ">" +
+          ">" +
           '<div class="modcard__top">' +
             '<div class="modcard__icon">' + I.svg(m.icon || "grid", { size: 20 }) + "</div>" +
             '<div class="modcard__name">' + esc(m.label) + "</div>" +
           "</div>" +
           (m.note ? '<div class="modcard__note">' + esc(m.note) + "</div>" : "") +
-          '<div class="modcard__foot">' +
-            '<span class="count">' + U.plural(m._screenCount, U.COUNT_WORDS.screen) + "</span>" +
-            '<span class="pill pill--' + (m._effStatus === "proposed" ? 'proposed">مقترح'
-              : wip ? 'wip">قيد الإعداد' : 'ready">متاح') + "</span>" +
-          "</div>" +
         "</button>"
       );
       card.addEventListener("click", function () { root.OnyxApp.open(m); });
       mg.appendChild(card);
     });
     h.appendChild(mg);
-
-    /* الإعدادات والمرجع لا مدخل لهما هنا — مدخلهما أيقونة المستخدم بالشريط العلوي.
-       الرئيسية للأنظمة التسعة وحدها. */
-
-    h.appendChild(U.el(
-      '<footer style="margin-block-start:var(--space-9);padding-block-start:var(--space-5);' +
-      'border-block-start:1px solid var(--border-subtle);font-size:var(--text-xs);color:var(--text-subtle);' +
-      'display:flex;gap:var(--space-3);flex-wrap:wrap;align-items:center">' +
-        "<span>" + esc(root.ONYX_DATA.meta.company) + "</span><span>·</span>" +
-        "<span>" + esc(root.ONYX_DATA.meta.tagline) + "</span>" +
-      "</footer>"
-    ));
   }
 
 
@@ -743,9 +637,12 @@
     var h = host();
     h.innerHTML = "";
     var m = node._module;
-    var wip = node._effStatus === "wip";
 
     h.appendChild(crumbs(node));
+
+    /* العنوان الفرعي قد يخلو تماماً بعد إزالة العدّاد — لا تُخرج حاوية فارغة */
+    var sub = [node.labelEn ? '<span class="ltr">' + esc(node.labelEn) + "</span>" : "",
+               node.note ? esc(node.note) : ""].filter(Boolean).join(" · ");
 
     h.appendChild(U.el(
       '<header class="page-head" data-accent="' + esc(m.accent || "slate") + '"><div class="page-head__row">' +
@@ -753,50 +650,12 @@
           '<div class="modcard__icon" style="width:44px;height:44px">' +
             I.svg(node.icon || m.icon || "grid", { size: 22 }) + "</div>" +
           "<div><h1>" + esc(node.label) + "</h1>" +
-          '<div class="page-head__sub">' +
-            (node.labelEn ? '<span class="ltr">' + esc(node.labelEn) + "</span> · " : "") +
-            countOf(node, node._screenCount) +
-            (node.note ? " · " + esc(node.note) : "") +
-          "</div></div>" +
+          (sub ? '<div class="page-head__sub">' + sub + "</div>" : "") +
+          "</div>" +
         "</div>" +
         '<div class="page-head__spacer"></div>' +
-        '<div class="page-head__actions">' +
-          '<span class="pill pill--' + (node._effStatus === "proposed" ? 'proposed">مقترح'
-            : wip ? 'wip">قيد الإعداد' : 'ready">متاح') + "</span>" +
-        "</div>" +
       "</div></header>"
     ));
-
-    /* مدخل الدليل المحاسبي من نظام الحسابات — الدليل أساسه لا شقيقه في الشريط */
-    if (node === m && m.ref === "op.4") {
-      var accMod = IDX.modulesInZone("reference")[0];
-      if (accMod) {
-        var accBox = U.el(
-          '<div class="whybox" data-tone="ref">' +
-            '<div class="whybox__head">' + I.svg("book", { size: 17, cls: "icon" }) +
-            "<b>الدليل المحاسبي — أساس هذا النظام</b></div>" +
-            "<p>" + esc(U.formatNum(accMod._screenCount, true)) +
-            " حساباً في " + esc(U.formatNum((accMod.children || []).length, true)) +
-            " قائمة. الدليل شاشة تهيئة رقمها op.1.2.3 — تسبق كل نظام، " +
-            "وكل نظام يعود إليها عبر شاشة ربط صريحة.</p>" +
-            '<div class="whybox__accs"></div>' +
-          "</div>"
-        );
-        var goAcc = U.el('<button type="button" class="accchip accchip--lead">' +
-          I.svg("book", { size: 15, cls: "icon-sm" }) + "<span>افتح الدليل في وثيقة المرجع</span></button>");
-        goAcc.addEventListener("click", function () { root.OnyxNav.go(accMod); });
-        accBox.querySelector(".whybox__accs").appendChild(goAcc);
-        (accMod.children || []).forEach(function (c) {
-          var chip = U.el('<button type="button" class="accchip">' +
-            (c.code ? '<span class="accchip__code">' + esc(c.code) + "</span>" : "") +
-            "<span>" + esc(c.label) + "</span>" +
-            '<span class="count">' + U.formatNum(c._screenCount || 0, true) + "</span></button>");
-          chip.addEventListener("click", function () { root.OnyxNav.go(c); });
-          accBox.querySelector(".whybox__accs").appendChild(chip);
-        });
-        h.appendChild(accBox);
-      }
-    }
 
     /* بطاقة «لماذا هذا النظام» للأنظمة المقترحة */
     if (node.why) {
@@ -868,8 +727,6 @@
       '<article class="card groupcard" data-accent="' + esc(m.accent || "slate") + '">' +
         '<div class="groupcard__top">' + I.svg(g.icon || "folder", { size: 18, cls: "icon" }) +
           "<h3>" + esc(g.label) + "</h3>" +
-          '<span class="count" title="' + esc(countOf(g, g._screenCount)) + '">' +
-            U.formatNum(g._screenCount, true) + "</span>" +
           (g._effStatus === "wip" ? '<span class="pill pill--wip">قيد الإعداد</span>' : "") +
         "</div><ul></ul></article>"
     );
@@ -880,7 +737,7 @@
     show.forEach(function (n) {
       var li = document.createElement("li");
       var b = U.el("<button type=\"button\"><i></i><span>" + esc(n.label) + "</span>" +
-        (n._isLeaf ? "" : '<span class="count">' + U.formatNum(n._screenCount, true) + "</span>") + "</button>");
+        "</button>");
       b.addEventListener("click", function () { root.OnyxApp.open(n); });
       li.appendChild(b);
       ul.appendChild(li);
@@ -890,8 +747,7 @@
       ul.appendChild(U.el('<li style="font-size:var(--text-sm);color:var(--text-subtle);padding:var(--space-2)">' +
         "لا توجد شاشات موثقة بعد.</li>"));
     } else if (kids.length > show.length) {
-      var more = U.el('<button type="button" class="groupcard__more">عرض الكل (' +
-        U.formatNum(kids.length, true) + ") ←</button>");
+      var more = U.el('<button type="button" class="groupcard__more">عرض الكل ←</button>');
       more.addEventListener("click", function () { root.OnyxApp.open(g); });
       card.appendChild(more);
     }
@@ -1049,8 +905,7 @@
           (node.cfgStatus
             ? '<span class="pill pill--' + node.cfgStatus.replace(/_/g, "-") + '">' +
               esc(CFG_LABEL[node.cfgStatus]) + "</span>"
-            : '<span class="pill pill--' + (node._effStatus === "proposed" ? 'proposed">مقترح'
-              : wip ? 'wip">قيد الإعداد' : 'ready">متاح') + "</span>") +
+            : "") +
         "</div>" +
         '<div class="page-head__spacer"></div>' +
         '<div class="page-head__actions">' +
