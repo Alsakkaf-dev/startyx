@@ -1,0 +1,125 @@
+/* ============================================================================
+   ONYX ERP — الأساس: إعادة تعيين، طباعة، أدوات مشتركة
+   ========================================================================== */
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html, body { height: 100%; }
+
+html {
+  -webkit-text-size-adjust: 100%;
+  color-scheme: light dark;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: var(--text-base);
+  font-weight: var(--w-regular);
+  line-height: var(--leading-normal);
+  letter-spacing: 0;              /* لا تباعد حروف في العربية أبداً */
+  color: var(--text);
+  background: var(--bg-app);
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  transition: background-color var(--dur-4) var(--ease-standard),
+              color var(--dur-4) var(--ease-standard);
+}
+
+h1, h2, h3, h4, h5, h6 {
+  margin: 0;
+  font-weight: var(--w-semibold);
+  line-height: var(--leading-tight);
+  color: var(--text-strong);
+}
+
+p { margin: 0; }
+ul, ol { margin: 0; padding: 0; list-style: none; }
+
+button, input, select, textarea {
+  font: inherit;
+  color: inherit;
+  letter-spacing: inherit;
+}
+
+button {
+  margin: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+a { color: var(--brand-fg); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+mark {
+  background: var(--status-wip-bg);
+  color: inherit;
+  border-radius: 3px;
+  padding: 0 1px;
+}
+
+hr {
+  border: 0;
+  border-top: 1px solid var(--border-subtle);
+  margin: 0;
+}
+
+svg { display: block; flex: none; }
+
+/* ─────────── التركيز ─────────── */
+:focus { outline: none; }
+:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+  border-radius: var(--radius-sm);
+}
+
+/* ─────────── أشرطة التمرير ─────────── */
+* { scrollbar-width: thin; scrollbar-color: var(--border) transparent; }
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border: 2px solid transparent;
+  background-clip: padding-box;
+  border-radius: var(--radius-full);
+}
+::-webkit-scrollbar-thumb:hover { background: var(--border-strong); background-clip: padding-box; }
+::-webkit-scrollbar-corner { background: transparent; }
+
+/* ─────────── أدوات ─────────── */
+/* عزل النصوص اللاتينية/الأرقام داخل نص عربي */
+.ltr { direction: ltr; unicode-bidi: isolate; display: inline-block; }
+
+.num { font-variant-numeric: tabular-nums; }
+
+.truncate {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+[hidden] { display: none !important; }
+
+/* أيقونات */
+.icon { width: 20px; height: 20px; }
+.icon-sm { width: 16px; height: 16px; }
+
+/* ألوان تمييز الأنظمة عبر سمة data-accent */
+[data-accent="slate"]   { --sys-accent: var(--accent-slate); }
+[data-accent="indigo"]  { --sys-accent: var(--accent-indigo); }
+[data-accent="blue"]    { --sys-accent: var(--accent-blue); }
+[data-accent="violet"]  { --sys-accent: var(--accent-violet); }
+[data-accent="amber"]   { --sys-accent: var(--accent-amber); }
+[data-accent="teal"]    { --sys-accent: var(--accent-teal); }
+[data-accent="orange"]  { --sys-accent: var(--accent-orange); }
+[data-accent="green"]   { --sys-accent: var(--accent-green); }
+[data-accent="rose"]    { --sys-accent: var(--accent-rose); }
+[data-accent="fuchsia"] { --sys-accent: var(--accent-fuchsia); }
+[data-accent="cyan"]    { --sys-accent: var(--accent-cyan); }
+[data-accent="sky"]     { --sys-accent: var(--accent-sky); }
+[data-accent="emerald"] { --sys-accent: var(--accent-emerald); }

@@ -1,0 +1,285 @@
+/* ============================================================================
+   ONYX ERP — شريط الأنظمة + متصفح الشجرة
+   ========================================================================== */
+
+/* ═════════ عناصر شريط الأنظمة ═════════ */
+.rail__item {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+  height: 44px;
+  padding-inline: 15px;
+  border-radius: var(--radius-md);
+  color: var(--text-muted);
+  transition: background var(--dur-2) var(--ease-standard),
+              color var(--dur-2) var(--ease-standard);
+  margin-block-end: 2px;
+}
+.rail__item:hover { background: var(--bg-hover); color: var(--text-strong); }
+
+.rail__item .icon { flex: none; width: 21px; height: 21px; }
+
+.rail__item span {
+  font-size: var(--text-md);
+  font-weight: var(--w-medium);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  opacity: 0;
+  transition: opacity var(--dur-2) var(--ease-standard);
+}
+.app[data-rail="expanded"] .rail__item span { opacity: 1; }
+.app:not([data-rail="expanded"]) .rail__item {
+  padding-inline: 0;
+  justify-content: center;
+}
+.app:not([data-rail="expanded"]) .rail__item span { display: none; }
+
+/* النظام النشط */
+.rail__item[aria-selected="true"] {
+  background: var(--bg-active);
+  color: var(--sys-accent, var(--brand-fg));
+}
+.rail__item[aria-selected="true"] .icon { color: var(--sys-accent, var(--brand-fg)); }
+.rail__item[aria-selected="true"]::before {
+  content: "";
+  position: absolute;
+  inset-inline-end: -8px;
+  inset-block: 9px;
+  width: 3px;
+  border-radius: var(--radius-full);
+  background: var(--sys-accent, var(--accent));
+}
+.app:not([data-rail="expanded"]) .rail__item[aria-selected="true"]::before { inset-inline-end: -6px; }
+
+/* نظام قيد الإعداد */
+.rail__item[data-wip="1"] .icon { opacity: .62; }
+.rail__item[data-wip="1"]::after {
+  content: "";
+  position: absolute;
+  inset-block-start: 9px;
+  inset-inline-start: 11px;
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--status-wip-fg);
+  opacity: .85;
+}
+.app[data-rail="expanded"] .rail__item[data-wip="1"]::after { inset-inline-start: auto; inset-inline-end: 12px; }
+
+/* ═════════ الشجرة ═════════ */
+.tree, .tree ul { list-style: none; margin: 0; padding: 0; }
+
+.tree li { position: relative; }
+
+/* صف العقدة */
+.node {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  width: 100%;
+  min-height: var(--row-h);
+  padding-inline-end: var(--space-2);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  user-select: none;
+  transition: background var(--dur-1) var(--ease-standard);
+  position: relative;
+}
+.node:hover { background: var(--bg-hover); }
+.node:active { background: var(--bg-active); }
+.node[aria-selected="true"] { background: var(--bg-selected); }
+.node[aria-selected="true"]::before {
+  content: "";
+  position: absolute;
+  inset-inline-start: 0;
+  inset-block: 4px;
+  width: 2.5px;
+  border-radius: var(--radius-full);
+  background: var(--accent);
+}
+.node:focus-visible { box-shadow: var(--focus-ring); }
+
+/* المسافة البادئة + خط الإرشاد */
+.node__indent { flex: none; align-self: stretch; display: flex; }
+.node__guide {
+  width: var(--indent);
+  align-self: stretch;
+  flex: none;
+  position: relative;
+}
+.node__guide::after {
+  content: "";
+  position: absolute;
+  inset-block: 0;
+  inset-inline-start: 50%;
+  width: 1px;
+  background: var(--border-subtle);
+  opacity: .8;
+}
+
+/* السهم */
+.node__chevron {
+  width: 20px; height: 20px;
+  flex: none;
+  display: grid;
+  place-items: center;
+  color: var(--text-subtle);
+  border-radius: var(--radius-xs);
+  transition: transform var(--dur-2) var(--ease-standard),
+              color var(--dur-2) var(--ease-standard),
+              background var(--dur-1) var(--ease-standard);
+}
+.node__chevron svg { width: 15px; height: 15px; }
+.node__chevron:hover { background: var(--bg-active); color: var(--text-strong); }
+li[aria-expanded="true"] > .node > .node__chevron { transform: rotate(-90deg); }
+.node:hover .node__chevron { color: var(--text-muted); }
+
+/* نقطة الورقة */
+.node__dot {
+  width: 20px; height: 20px;
+  flex: none;
+  display: grid;
+  place-items: center;
+}
+.node__dot i {
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  background: var(--brand);
+  opacity: .55;
+  display: block;
+}
+.node[data-status="wip"] .node__dot i { background: var(--status-wip-fg); opacity: .8; }
+.node[aria-selected="true"] .node__dot i { opacity: 1; }
+
+/* أيقونة الفرع */
+.node__icon { flex: none; color: var(--text-subtle); display: grid; place-items: center; }
+.node__icon svg { width: 16px; height: 16px; }
+.node[data-kind="module"] .node__icon,
+.node[data-kind="submodule"] .node__icon,
+.node[data-kind="category"] .node__icon { color: var(--sys-accent, var(--brand-fg)); }
+
+/* التسمية */
+.node__label {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: var(--text-md);
+  color: var(--text);
+  padding-block: 6px;
+}
+.node[data-kind="group"] .node__label,
+.node[data-kind="submodule"] .node__label,
+.node[data-kind="category"] .node__label,
+.node[data-kind="module"] .node__label {
+  font-weight: var(--w-semibold);
+}
+.node[data-status="wip"] .node__label { color: var(--text-muted); }
+.node[aria-selected="true"] .node__label { color: var(--text-strong); font-weight: var(--w-medium); }
+
+/* النجمة */
+.node__star {
+  width: 22px; height: 22px;
+  flex: none;
+  display: grid;
+  place-items: center;
+  border-radius: var(--radius-xs);
+  color: var(--text-subtle);
+  opacity: 0;
+  transition: opacity var(--dur-2) var(--ease-standard),
+              color var(--dur-2) var(--ease-standard),
+              transform var(--dur-2) var(--ease-spring);
+}
+.node__star svg { width: 15px; height: 15px; }
+.node:hover .node__star,
+.node:focus-within .node__star,
+.node__star[aria-pressed="true"] { opacity: 1; }
+.node__star:hover { color: var(--accent); transform: scale(1.15); }
+.node__star[aria-pressed="true"] { color: var(--accent); }
+
+/* شارات نهاية الصف */
+.node .pill, .node .count { margin-inline-start: 2px; }
+.node:hover .count { opacity: .5; }
+
+/* طي/فتح الأبناء */
+.tree li > ul { overflow: hidden; }
+.tree li[aria-expanded="false"] > ul { display: none; }
+
+@keyframes branch-in {
+  from { opacity: 0; transform: translateY(-3px); }
+  to   { opacity: 1; transform: none; }
+}
+.tree li[aria-expanded="true"] > ul { animation: branch-in var(--dur-3) var(--ease-out); }
+
+/* أثناء البحث: إخفاء غير المطابق */
+.tree li[hidden] { display: none; }
+
+/* عدّاد نتائج البحث */
+.searchcount {
+  font-size: var(--text-2xs);
+  color: var(--text-subtle);
+  padding-inline: var(--space-1);
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+/* قائمة مسطّحة (المفضلة/الأخيرة داخل اللوحة) */
+.flatlist { display: flex; flex-direction: column; gap: 1px; }
+.flatlist__item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  width: 100%;
+  padding: var(--space-2) var(--space-2);
+  border-radius: var(--radius-sm);
+  text-align: start;
+  transition: background var(--dur-1) var(--ease-standard);
+}
+.flatlist__item:hover { background: var(--bg-hover); }
+.flatlist__item .icon { color: var(--sys-accent, var(--text-subtle)); flex: none; width: 17px; height: 17px; }
+.flatlist__body { flex: 1; min-width: 0; display: flex; flex-direction: column; line-height: 1.3; }
+.flatlist__body b {
+  font-size: var(--text-md);
+  font-weight: var(--w-medium);
+  color: var(--text);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.flatlist__body small {
+  font-size: var(--text-2xs);
+  color: var(--text-subtle);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.flatlist__item .btn--icon { opacity: 0; }
+.flatlist__item:hover .btn--icon, .flatlist__item:focus-within .btn--icon { opacity: 1; }
+
+/* ═════════ رقم الحساب داخل شجرة الدليل المحاسبي ═════════ */
+.node__code {
+  flex: none;
+  font-size: var(--text-2xs);
+  font-variant-numeric: tabular-nums;
+  font-weight: var(--w-semibold);
+  color: var(--sys-accent, var(--brand-fg));
+  background: var(--bg-sunken);
+  border-radius: var(--radius-xs);
+  padding: 1px 6px;
+  direction: ltr;
+  unicode-bidi: isolate;
+  min-width: 34px;
+  text-align: center;
+}
+.node[aria-selected="true"] .node__code { background: var(--bg-surface); }
+
+/* ═════════ شارات حالة التحقق (شجرة الإعدادات الفعّالة) ═════════ */
+.pill--verified-on   { background: var(--status-ready-bg); color: var(--status-ready-fg); }
+.pill--verified-off  { background: var(--accent-tint);     color: var(--danger-fg); }
+.pill--verified-info { background: var(--brand-tint);      color: var(--brand-fg); }
+.pill--inferred      { background: var(--status-wip-bg);   color: var(--status-wip-fg); }
+.pill--pending       { background: var(--bg-sunken);       color: var(--text-subtle); }
+
+/* شارة النظام المقترح */
+.pill--proposed { background: var(--status-wip-bg); color: var(--status-wip-fg); }
+.rail__item[data-proposed="1"] .icon { opacity: .8; }
+

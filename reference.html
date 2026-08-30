@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<title>وثيقة المرجع — أونيكس ERP | بتروسبيشل</title>
+
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%235b6472'/%3E%3Cpath d='M9 7h11l4 4v14H9z' fill='none' stroke='%23fff' stroke-width='1.8' stroke-linejoin='round'/%3E%3Cpath d='M12 14h9M12 18h9M12 22h6' stroke='%23fff' stroke-width='1.6' stroke-linecap='round'/%3E%3C/svg%3E">
+
+<script>
+(function () {
+  try {
+    var raw = localStorage.getItem("onyx.v1.themePref");
+    var pref = raw ? JSON.parse(raw) : "system";
+    var dark = pref === "dark" ||
+      (pref === "system" && window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches);
+    document.documentElement.setAttribute("data-theme", dark ? "dark" : "light");
+  } catch (e) {}
+})();
+</script>
+
+<link rel="stylesheet" href="assets/css/tokens.css">
+<link rel="stylesheet" href="assets/css/base.css">
+<link rel="stylesheet" href="assets/css/components.css">
+<link rel="stylesheet" href="assets/css/reference.css">
+</head>
+
+<body>
+
+<header class="doc__top">
+  <a class="btn btn--outline" href="index.html#/home">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"
+         stroke-linecap="round" stroke-linejoin="round"><path d="M14 6l-6 6 6 6"/></svg>
+    <span>الأنظمة</span>
+  </a>
+  <a class="btn btn--outline" href="settings.html">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+         stroke-linecap="round"><circle cx="12" cy="12" r="3.2"/><path d="M12 4v2M12 18v2M20 12h-2M6 12H4"/></svg>
+    <span>الإعدادات</span>
+  </a>
+  <div class="doc__topspacer"></div>
+  <div class="field doc__find">
+    <input type="search" id="docFind" placeholder="ابحث برقم الحساب أو اسمه…" aria-label="بحث في الوثيقة">
+    <span class="searchcount" id="docFindCount" aria-live="polite"></span>
+  </div>
+  <button type="button" class="btn btn--sm" id="docPrint">طباعة</button>
+</header>
+
+<main class="doc" id="doc"></main>
+
+<footer class="doc__foot" id="docFoot"></footer>
+
+<script src="assets/js/util.js"></script>
+<script src="assets/js/store.js"></script>
+<script src="assets/js/data.js"></script>
+<script src="assets/js/mock.js"></script>
+<script src="assets/js/links.js"></script>
+<script src="assets/js/proposed.js"></script>
+<script src="assets/js/spec-rules.js"></script>
+<script src="assets/js/index-data.js"></script>
+<script src="assets/js/reference.js"></script>
+</body>
+</html>

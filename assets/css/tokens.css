@@ -1,0 +1,244 @@
+/* ============================================================================
+   ONYX ERP — رموز التصميم (Design Tokens)
+   هوية أونكس: الكحلي والأحمر، مُعاد بناؤها كسلالم لونية كاملة.
+   السمة الفاتحة على :root — والداكنة عبر [data-theme="dark"] وتفضيل النظام.
+   ========================================================================== */
+
+:root {
+  /* ─────────── سلالم هوية أونكس ─────────── */
+  --onyx-navy-50:  #eef3fb;
+  --onyx-navy-100: #d9e4f5;
+  --onyx-navy-200: #b3c7e9;
+  --onyx-navy-300: #85a3d9;
+  --onyx-navy-400: #547cc4;
+  --onyx-navy-500: #2f57aa;
+  --onyx-navy-600: #244688;
+  --onyx-navy-700: #1d3a6b;   /* الكحلي الكلاسيكي */
+  --onyx-navy-800: #172d52;
+  --onyx-navy-900: #101f39;
+
+  --onyx-red-50:   #fdecec;
+  --onyx-red-100:  #fbd5d6;
+  --onyx-red-200:  #f4a8ab;
+  --onyx-red-300:  #ec777c;
+  --onyx-red-400:  #de484e;
+  --onyx-red-500:  #c8161d;   /* الأحمر الكلاسيكي */
+  --onyx-red-600:  #a51117;
+  --onyx-red-700:  #7f0d12;
+
+  --gray-0:   #ffffff;
+  --gray-25:  #fbfcfd;
+  --gray-50:  #f6f8fa;
+  --gray-100: #eef1f5;
+  --gray-200: #e2e6ec;
+  --gray-300: #cfd5df;
+  --gray-400: #a8b1c0;
+  --gray-500: #7b8698;
+  --gray-600: #5a6474;
+  --gray-700: #414a59;
+  --gray-800: #2a323f;
+  --gray-900: #1a212b;
+  --gray-950: #0f141b;
+
+  /* ─────────── ألوان دلالية — السمة الفاتحة ─────────── */
+  --bg-app:        var(--gray-50);
+  --bg-surface:    var(--gray-0);
+  --bg-surface-2:  var(--gray-25);
+  --bg-sunken:     var(--gray-100);
+  --bg-hover:      rgba(47, 87, 170, .07);
+  --bg-active:     rgba(47, 87, 170, .12);
+  --bg-selected:   rgba(47, 87, 170, .14);
+  --bg-scrim:      rgba(15, 20, 27, .45);
+  --bg-glass:      rgba(255, 255, 255, .78);
+
+  --border-subtle: var(--gray-200);
+  --border:        var(--gray-300);
+  --border-strong: var(--gray-400);
+
+  --text-strong:   var(--gray-900);
+  --text:          var(--gray-800);
+  --text-muted:    var(--gray-600);
+  --text-subtle:   var(--gray-500);
+  --text-on-brand: #ffffff;
+
+  --brand:        var(--onyx-navy-600);
+  --brand-hover:  var(--onyx-navy-700);
+  --brand-active: var(--onyx-navy-800);
+  --brand-fg:     var(--onyx-navy-700);
+  --brand-tint:   var(--onyx-navy-50);
+  --accent:       var(--onyx-red-500);
+  --accent-hover: var(--onyx-red-600);
+  --accent-tint:  var(--onyx-red-50);
+
+  --focus:      rgba(47, 87, 170, .55);
+  --focus-ring: 0 0 0 2px var(--bg-surface), 0 0 0 4px var(--focus);
+
+  --status-ready-fg: #0f7a52;
+  --status-ready-bg: rgba(15, 122, 82, .12);
+  --status-wip-fg:   #8a5d00;
+  --status-wip-bg:   rgba(196, 141, 10, .16);
+  --success-fg:      #0f7a52;
+  --danger-fg:       var(--onyx-red-600);
+
+  /* ألوان تمييز الأنظمة (شريط الأنظمة والبطاقات) */
+  --accent-slate:   #64748b;
+  --accent-indigo:  #4f5fd7;
+  --accent-blue:    #2f6fd0;
+  --accent-violet:  #7c4ddb;
+  --accent-amber:   #c48d0a;
+  --accent-teal:    #0e8f86;
+  --accent-orange:  #d1701a;
+  --accent-green:   #17915a;
+  --accent-rose:    #cf4270;
+  --accent-fuchsia: #a83bb8;
+  --accent-cyan:    #0e87ad;
+  --accent-sky:     #2b82c9;
+  --accent-emerald: #109268;
+
+  /* ─────────── الخطوط ─────────── */
+  --font-sans: "IBM Plex Sans Arabic", "Noto Sans Arabic", "Segoe UI", "Dubai",
+               ui-sans-serif, system-ui, Tahoma, Arial, sans-serif;
+  --font-mono: ui-monospace, "Cascadia Code", "Consolas", "Courier New", monospace;
+
+  --text-2xs:  0.6875rem;  /* 11 */
+  --text-xs:   0.75rem;    /* 12 */
+  --text-sm:   0.8125rem;  /* 13 */
+  --text-md:   0.875rem;   /* 14 — واجهة */
+  --text-base: 0.9375rem;  /* 15 — نص */
+  --text-lg:   1.0625rem;  /* 17 */
+  --text-xl:   1.3125rem;  /* 21 */
+  --text-2xl:  1.625rem;   /* 26 */
+  --text-3xl:  2.125rem;   /* 34 */
+
+  --leading-tight:  1.35;
+  --leading-snug:   1.5;
+  --leading-normal: 1.7;
+
+  --w-regular:  400;
+  --w-medium:   500;
+  --w-semibold: 600;
+  --w-bold:     700;
+
+  /* ─────────── المسافات (شبكة 4) ─────────── */
+  --space-1: 4px;   --space-2: 8px;   --space-3: 12px;  --space-4: 16px;
+  --space-5: 20px;  --space-6: 24px;  --space-7: 32px;  --space-8: 40px;
+  --space-9: 48px;  --space-10: 64px; --space-12: 80px;
+
+  /* ─────────── الحواف ─────────── */
+  --radius-xs:   4px;
+  --radius-sm:   6px;
+  --radius-md:   10px;
+  --radius-lg:   14px;
+  --radius-xl:   20px;
+  --radius-full: 999px;
+
+  /* ─────────── الارتفاع (ظلال) ─────────── */
+  --shadow-xs:      0 1px 2px rgba(16, 24, 40, .06);
+  --shadow-sm:      0 1px 3px rgba(16, 24, 40, .10), 0 1px 2px rgba(16, 24, 40, .06);
+  --shadow-md:      0 6px 16px rgba(16, 24, 40, .10), 0 2px 6px rgba(16, 24, 40, .06);
+  --shadow-lg:      0 16px 40px rgba(16, 24, 40, .14), 0 4px 12px rgba(16, 24, 40, .08);
+  --shadow-overlay: 0 28px 72px rgba(16, 24, 40, .26), 0 8px 24px rgba(16, 24, 40, .14);
+
+  /* ─────────── الحركة ─────────── */
+  --ease-standard: cubic-bezier(.2, 0, 0, 1);
+  --ease-out:      cubic-bezier(0, 0, .2, 1);
+  --ease-in:       cubic-bezier(.4, 0, 1, 1);
+  --ease-spring:   cubic-bezier(.2, .8, .2, 1);
+  --dur-1: 80ms;  --dur-2: 140ms; --dur-3: 220ms; --dur-4: 320ms; --dur-5: 480ms;
+
+  /* ─────────── مقاسات التخطيط ─────────── */
+  --topbar-h:       56px;
+  --statusbar-h:    28px;
+  --rail-w:         72px;
+  --rail-w-expanded: 264px;
+  --tree-w:         332px;
+  --tree-w-min:     260px;
+  --tree-w-max:     460px;
+  --content-max:    1240px;
+  --row-h:          34px;
+  --indent:         20px;
+
+  --z-rail: 20; --z-topbar: 30; --z-resize: 25;
+  --z-toast: 60; --z-palette: 80; --z-tooltip: 90;
+}
+
+/* كثافة مضغوطة */
+:root[data-density="compact"] {
+  --row-h: 28px;
+  --indent: 17px;
+}
+
+/* ─────────── السمة الداكنة ─────────── */
+:root[data-theme="dark"] {
+  --bg-app:        #0d1220;
+  --bg-surface:    #141b2b;
+  --bg-surface-2:  #172032;
+  --bg-sunken:     #0a0f1a;
+  --bg-hover:      rgba(143, 180, 255, .10);
+  --bg-active:     rgba(143, 180, 255, .16);
+  --bg-selected:   rgba(143, 180, 255, .20);
+  --bg-scrim:      rgba(0, 0, 0, .62);
+  --bg-glass:      rgba(20, 27, 43, .82);
+
+  --border-subtle: #232c3e;
+  --border:        #2f3a4f;
+  --border-strong: #415066;
+
+  --text-strong:   #f2f5fa;
+  --text:          #e2e7f0;
+  --text-muted:    #a2adc0;
+  --text-subtle:   #71809a;
+  --text-on-brand: #ffffff;
+
+  --brand:        var(--onyx-navy-400);
+  --brand-hover:  var(--onyx-navy-300);
+  --brand-active: var(--onyx-navy-200);
+  --brand-fg:     #9db8e6;
+  --brand-tint:   rgba(84, 124, 196, .16);
+  --accent:       var(--onyx-red-400);
+  --accent-hover: var(--onyx-red-300);
+  --accent-tint:  rgba(222, 72, 78, .16);
+
+  --focus:      rgba(143, 180, 255, .65);
+  --focus-ring: 0 0 0 2px var(--bg-surface), 0 0 0 4px var(--focus);
+
+  --status-ready-fg: #4ecf9b;
+  --status-ready-bg: rgba(78, 207, 155, .16);
+  --status-wip-fg:   #e6b64c;
+  --status-wip-bg:   rgba(230, 182, 76, .18);
+  --success-fg:      #4ecf9b;
+  --danger-fg:       var(--onyx-red-300);
+
+  --accent-slate:   #94a3b8;
+  --accent-indigo:  #8b96ee;
+  --accent-blue:    #6ba3e8;
+  --accent-violet:  #ab8bf0;
+  --accent-amber:   #e6b64c;
+  --accent-teal:    #3fc4b8;
+  --accent-orange:  #eda45f;
+  --accent-green:   #52c58c;
+  --accent-rose:    #ef7ba0;
+  --accent-fuchsia: #cf7edb;
+  --accent-cyan:    #4cbadb;
+  --accent-sky:     #6cb4ea;
+  --accent-emerald: #4cc79a;
+
+  --shadow-xs:      0 1px 2px rgba(0, 0, 0, .40);
+  --shadow-sm:      0 1px 3px rgba(0, 0, 0, .50), 0 1px 2px rgba(0, 0, 0, .40);
+  --shadow-md:      0 8px 20px rgba(0, 0, 0, .50), 0 3px 8px rgba(0, 0, 0, .40);
+  --shadow-lg:      0 20px 44px rgba(0, 0, 0, .55), 0 6px 16px rgba(0, 0, 0, .45);
+  --shadow-overlay: 0 32px 80px rgba(0, 0, 0, .60), 0 12px 28px rgba(0, 0, 0, .50);
+}
+
+/* احترام تقليل الحركة */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --dur-1: 0ms; --dur-2: 0ms; --dur-3: 0ms; --dur-4: 0ms; --dur-5: 0ms;
+  }
+  *, *::before, *::after {
+    animation-duration: .001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .001ms !important;
+    scroll-behavior: auto !important;
+  }
+}

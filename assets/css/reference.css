@@ -1,0 +1,205 @@
+/* ============================================================================
+   ONYX ERP — وثيقة المرجع
+   ----------------------------------------------------------------------------
+   تنسيق وثيقة تُقرأ وتُطبع: عمود واحد، جداول مسطّحة، بلا أي عنصر تنقّل شجري.
+   ========================================================================== */
+
+body { background: var(--bg-app); }
+
+.doc__top {
+  position: sticky;
+  inset-block-start: 0;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-4);
+  background: var(--bg-surface);
+  border-block-end: 1px solid var(--border-subtle);
+}
+.doc__top a.btn { text-decoration: none; }
+.doc__topspacer { flex: 1; }
+.doc__find { width: min(320px, 40vw); }
+
+.doc {
+  max-width: 940px;
+  margin: 0 auto;
+  padding: var(--space-6) var(--space-5) var(--space-9);
+}
+
+.doc__head h1 {
+  font-size: var(--text-2xl, 26px);
+  font-weight: var(--w-semibold);
+  color: var(--text-strong);
+  margin: 0 0 var(--space-2);
+}
+.doc__head p { font-size: var(--text-sm); color: var(--text-muted); margin: 0 0 var(--space-2); }
+.doc__lead {
+  padding: var(--space-3) var(--space-4);
+  background: var(--bg-sunken);
+  border-inline-start: 3px solid var(--border);
+  border-radius: var(--radius-sm);
+  line-height: var(--leading-normal);
+}
+.doc a { color: var(--brand-fg); }
+
+/* ── الفهرس ── */
+.doc__toc {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  align-items: center;
+  margin-block: var(--space-5);
+  padding: var(--space-3) var(--space-4);
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+}
+.doc__toc b { font-size: var(--text-xs); color: var(--text-subtle); margin-inline-end: var(--space-2); }
+.doc__toc a {
+  padding: 3px 10px;
+  border-radius: var(--radius-full);
+  background: var(--bg-sunken);
+  font-size: var(--text-xs);
+  text-decoration: none;
+  color: var(--text-muted);
+}
+.doc__toc a:hover { background: var(--brand-tint); color: var(--brand-fg); }
+
+/* ── أقسام ── */
+.doc__sec { margin-block-start: var(--space-8); }
+.doc__sec > h2 {
+  font-size: var(--text-xl);
+  font-weight: var(--w-semibold);
+  color: var(--text-strong);
+  padding-block-end: var(--space-2);
+  border-block-end: 2px solid var(--border);
+  margin: 0 0 var(--space-2);
+}
+.doc__sub {
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+  line-height: var(--leading-normal);
+  margin: 0 0 var(--space-4);
+  max-width: 78ch;
+}
+
+.doc__block { margin-block-end: var(--space-6); }
+.doc__block > h3, .doc__note > h3 {
+  font-size: var(--text-md);
+  font-weight: var(--w-semibold);
+  color: var(--text-strong);
+  margin: 0 0 var(--space-2);
+  display: flex; align-items: center; gap: var(--space-2); flex-wrap: wrap;
+}
+.doc__block code {
+  padding: 1px 7px;
+  background: var(--bg-sunken);
+  border-radius: var(--radius-sm);
+  font-size: var(--text-sm);
+  direction: ltr;
+}
+.doc__count {
+  font-size: var(--text-xs);
+  font-weight: 400;
+  color: var(--text-subtle);
+}
+
+/* ── جداول ── */
+.doc__tbl {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  font-size: var(--text-sm);
+}
+.doc__tbl th {
+  text-align: start;
+  padding: var(--space-2) var(--space-3);
+  background: var(--bg-sunken);
+  border-block-end: 1px solid var(--border);
+  font-size: var(--text-xs);
+  font-weight: var(--w-semibold);
+  color: var(--text-subtle);
+  white-space: nowrap;
+}
+.doc__tbl td {
+  padding: var(--space-2) var(--space-3);
+  border-block-start: 1px solid var(--border-subtle);
+  color: var(--text);
+  vertical-align: top;
+}
+.doc__tbl tbody tr:hover { background: var(--bg-hover); }
+.doc__code {
+  direction: ltr;
+  text-align: start;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+.doc__code a { text-decoration: none; }
+.doc__name { color: var(--text-strong); }
+.doc__name small { display: block; font-size: var(--text-xs); color: var(--text-subtle); margin-block-start: 2px; }
+.doc__grp { color: var(--text-subtle); font-size: var(--text-xs); white-space: nowrap; }
+.doc__entry { color: var(--text-muted); font-size: var(--text-xs); }
+.doc__leaf { color: var(--success-fg); }
+
+/* تدرّج بسيط يوضّح عمق الحساب بلا شجرة */
+.doc__tbl tr.lvl1 .doc__name { padding-inline-start: var(--space-4); }
+.doc__tbl tr.lvl2 .doc__name { padding-inline-start: var(--space-6); }
+.doc__tbl tr.lvl3 .doc__name { padding-inline-start: var(--space-8); }
+.doc__tbl tr.lvl4 .doc__name { padding-inline-start: var(--space-9); }
+
+/* ── ملاحظات ── */
+.doc__note {
+  padding: var(--space-4) var(--space-5);
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  margin-block-end: var(--space-4);
+}
+.doc__note--hard { border-inline-start: 3px solid var(--danger-fg); }
+.doc__note p {
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+  line-height: var(--leading-normal);
+  margin: 0 0 var(--space-2);
+  max-width: 78ch;
+}
+.doc__note p b { color: var(--text-strong); }
+.doc__note .doc__tbl { margin-block-start: var(--space-3); }
+.doc__accs { font-size: var(--text-xs); }
+.doc__accs a { margin-inline-end: var(--space-1); }
+
+.doc__hit {
+  background: var(--status-wip-bg) !important;
+  box-shadow: inset 0 0 0 2px var(--status-wip-fg);
+}
+
+.doc__foot {
+  max-width: 940px;
+  margin: 0 auto;
+  padding: var(--space-5);
+  border-block-start: 1px solid var(--border-subtle);
+  font-size: var(--text-xs);
+  color: var(--text-subtle);
+}
+
+/* ── الطباعة: وثيقة نظيفة ── */
+@media print {
+  .doc__top, .doc__toc { display: none; }
+  .doc { max-width: none; padding: 0; }
+  .doc__tbl { font-size: 10pt; page-break-inside: auto; }
+  .doc__tbl tr { page-break-inside: avoid; }
+  .doc__sec { page-break-before: auto; }
+  .doc__note { break-inside: avoid; }
+}
+
+@media (max-width: 700px) {
+  .doc { padding: var(--space-4) var(--space-3) var(--space-8); }
+  .doc__top { flex-wrap: wrap; }
+  .doc__find { width: 100%; order: 9; }
+  .doc__tbl { font-size: var(--text-xs); }
+}
