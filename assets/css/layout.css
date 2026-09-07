@@ -261,10 +261,12 @@
     width: min(340px, 86vw);
     z-index: 15;
     box-shadow: var(--shadow-lg);
-    transform: translateX(-100%);
+    border-inline-end: 1px solid var(--border-subtle);
+    transform: translateX(-100%);          /* LTR: مخبّأ خارج الحافة اليسرى */
     transition: transform var(--dur-3) var(--ease-standard);
   }
-  [dir="rtl"] .treepane { transform: translateX(-100%); }
+  /* RTL: اللوحة على اليمين — تُخبّأ خارج الحافة اليمنى (موجب)، لا اليسرى */
+  [dir="rtl"] .treepane { transform: translateX(100%); }
   .body[data-drawer="open"] .treepane { transform: translateX(0); }
   .resizer { display: none; }
   .search-trigger { width: auto; flex: 1; }
@@ -313,8 +315,10 @@
 }
 .treetoggle svg { transition: transform var(--dur-3) var(--ease-standard); }
 
-/* معزولة عن درج الجوال: الطيّ سلوك سطح مكتب وحده */
-@media (min-width: 901px) {
+/* معزولة عن درج الجوال: الطيّ سلوك سطح مكتب وحده.
+   ‎900.02‎ لا ‎901‎: كي يلتقي الحدّان بلا شقٍّ عند العرض الكسري (تحجيم ويندوز ١٢٥٪/١٥٠٪)
+   ويطابق ‎mqDesktop‎ في ‎app.js‎. */
+@media (min-width: 900.02px) {
   /* عرض صريح كي لا ينضغط محتوى اللوحة أثناء الانزلاق */
   .treepane { width: var(--tree-w); transition: transform var(--dur-3) var(--ease-standard); }
   .body { transition: grid-template-columns var(--dur-3) var(--ease-standard); }

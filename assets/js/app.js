@@ -10,6 +10,9 @@
 
   var app, railScroll, treeScroll, treeTitle, treeTools, searchInput, searchCount, treeSeg;
   var treeToggleBtn = null;
+  /* حدّ الجوال: تحته يصير التصفّح درجاً منزلقاً، فوقه لوحةً قابلة للطيّ.
+     ‎900.02‎ يطابق ‎@media (min-width: 900.02px)‎ في ‎layout.css‎ فلا يبقى شقٌّ عند العرض الكسري. */
+  var mqDesktop = window.matchMedia ? window.matchMedia("(min-width: 900.02px)") : null;
   var currentModule = null, currentNode = null, currentTab = null;
   var treeMode = "tree";          // tree | fav | recent
   var suppressHash = false;
@@ -234,7 +237,7 @@
     S.setLastRoute(location.hash);
 
     /* على الشاشات الصغيرة: أغلق الدرج بعد الفتح */
-    if (window.innerWidth <= 900 && node._isLeaf) closeDrawer();
+    if (!isDesktop() && node._isLeaf) closeDrawer();
   }
 
   function openModule(m) { open(m); }
@@ -268,11 +271,53 @@
   }
 
   /* ════════════════════ الدرج (شاشات صغيرة) ════════════════════ */
-  function openDrawer() { document.getElementById("appBody").setAttribute("data-drawer", "open"); }
-  function closeDrawer() { document.getElementById("appBody").removeAttribute("data-drawer"); }
+  function isDesktop() { return mqDesktop ? mqDesktop.matches : window.innerWidth > 900; }
+
+  function openDrawer() {
+    document.getElementById("appBody").setAttribute("data-drawer", "open");
+    applyPaneA11y();
+  }
+  function closeDrawer() {
+    document.getElementById("appBody").removeAttribute("data-drawer");
+    applyPaneA11y();
+  }
   function toggleDrawer() {
     var b = document.getElementById("appBody");
     if (b.getAttribute("data-drawer") === "open") closeDrawer(); else openDrawer();
+  }
+
+  /* هل اللوحة مخفيّة فعلياً الآن؟ سطح المكتب: حين تكون مطويّة. الجوال: حين يكون الدرج مغلقاً. */
+  function treePaneHidden() {
+    var b = document.getElementById("appBody");
+    return isDesktop()
+      ? b.getAttribute("data-tree") === "collapsed"
+      : b.getAttribute("data-drawer") !== "open";
+  }
+
+  /* اللوحة المنزلقة تبقى في شجرة الوصول ما لم نُعطّلها — عطّلها وهي مخفيّة فقط،
+     وبحسب منطق العرض الحالي لا حالة الطيّ وحدها (وإلا تجمّد الدرج على الجوال). */
+  function applyPaneA11y() {
+    var pane = document.querySelector(".treepane");
+    if (!pane) return;
+    var hidden = treePaneHidden();
+    if ("inert" in pane) pane.inert = hidden;
+    pane.setAttribute("aria-hidden", hidden ? "true" : "false");
+  }
+
+  /* يُنادى عند عبور حدّ الجوال (تغيير حجم النافذة/تدويرها):
+     - الدرج سلوكٌ عابر فيُغلق؛ حالة الطيّ محفوظة في ‎data-tree‎ فتبقى.
+     - توسيع الشريط سلوك سطح مكتب — يُعرض مطويّاً على الجوال دون المساس بالتفضيل.
+     - ‎no-anim‎ لحظةَ العبور كي لا تنزلق اللوحة/الشبكة استجابةً لسحب حافة النافذة.
+     - ثم تُعاد مواءمة إخفاء اللوحة (inert/aria) مع منطق العرض الجديد. */
+  function syncLayoutToViewport() {
+    var b = document.getElementById("appBody");
+    b.classList.add("no-anim");
+    b.removeAttribute("data-drawer");
+    if (app) app.setAttribute("data-rail", (isDesktop() && S.getRailExpanded()) ? "expanded" : "collapsed");
+    applyPaneA11y();
+    requestAnimationFrame(function () {
+      requestAnimationFrame(function () { b.classList.remove("no-anim"); });
+    });
   }
 
   /* ════════════════════ طيّ لوحة الشجرة ════════════════════
@@ -288,12 +333,7 @@
     if (collapsed) b.setAttribute("data-tree", "collapsed");
     else b.removeAttribute("data-tree");
 
-    /* اللوحة المنزلقة تبقى في ترتيب التبويب — عطّلها صراحةً */
-    var pane = document.querySelector(".treepane");
-    if (pane) {
-      if ("inert" in pane) pane.inert = collapsed;
-      pane.setAttribute("aria-hidden", collapsed ? "true" : "false");
-    }
+    applyPaneA11y();
     if (treeToggleBtn) {
       treeToggleBtn.setAttribute("aria-expanded", collapsed ? "false" : "true");
       treeToggleBtn.setAttribute("aria-label", collapsed ? "إظهار لوحة الشجرة" : "طيّ لوحة الشجرة");
@@ -308,12 +348,30 @@
     if (!rz) return;
     var dragging = false;
 
+    /* أقصى عرض للّوحة: الأصغر بين ٤٦٠ و~٤٢٪ من النافذة كي لا تخنق المحتوى وهي واسعة على نافذة ضيّقة */
+    function maxW() { return Math.max(300, Math.min(460, Math.round(window.innerWidth * 0.42))); }
+    /* طبّق العرض على المتغيّر فقط (بلا حفظ) — للمواءمة عند تغيير حجم النافذة */
+    function applyW(px) { app.style.setProperty("--tree-w", U.clamp(px, 260, maxW()) + "px"); }
+    /* تغيير مقصود من المستخدم: طبّق واحفظ */
     function setW(px) {
-      px = U.clamp(px, 260, 460);
+      px = U.clamp(px, 260, maxW());
       app.style.setProperty("--tree-w", px + "px");
       S.setTreeWidth(px);
     }
-    app.style.setProperty("--tree-w", S.getTreeWidth() + "px");
+    applyW(S.getTreeWidth());
+
+    /* عند تغيير حجم النافذة (بلا عبور حدّ الجوال): أعِد ملاءمة العرض المحفوظ مع النافذة الحالية */
+    window.addEventListener("resize", U.debounce(function () {
+      if (isDesktop() && !isTreeCollapsed()) applyW(S.getTreeWidth());
+    }, 150));
+
+    function endDrag(e) {
+      if (!dragging) return;
+      dragging = false;
+      try { rz.releasePointerCapture(e.pointerId); } catch (err) {}
+      rz.removeAttribute("data-dragging");
+      document.body.style.cursor = "";
+    }
 
     rz.addEventListener("pointerdown", function (e) {
       dragging = true;
@@ -327,12 +385,10 @@
       var railW = document.querySelector(".rail").getBoundingClientRect().width;
       setW(window.innerWidth - railW - e.clientX);
     });
-    rz.addEventListener("pointerup", function (e) {
-      dragging = false;
-      rz.releasePointerCapture(e.pointerId);
-      rz.removeAttribute("data-dragging");
-      document.body.style.cursor = "";
-    });
+    rz.addEventListener("pointerup", endDrag);
+    /* الحدّ إن اختفى المقبض (‎display:none‎ عند العبور للجوال أثناء السحب) يُنهي السحب */
+    rz.addEventListener("pointercancel", endDrag);
+    rz.addEventListener("lostpointercapture", endDrag);
     rz.addEventListener("dblclick", function () { setW(332); });
     rz.addEventListener("keydown", function (e) {
       if (isTreeCollapsed()) return;
@@ -358,7 +414,10 @@
 
       if (e.key === "/" && !inField) { e.preventDefault(); Palette.open(); return; }
       if ((e.ctrlKey || e.metaKey) && (e.key === "f" || e.key === "F") && !inField) {
-        e.preventDefault(); setTreePane(false);
+        e.preventDefault();
+        /* اكشف اللوحة كما يفعل الزرّان: درجاً على الجوال، وإلغاء طيّ على سطح المكتب —
+           وإلا بقيت اللوحة inert فيضيع focus() ونكون قد عطّلنا بحث المتصفح دون بديل */
+        if (isDesktop()) setTreePane(false); else openDrawer();
         searchInput.focus(); searchInput.select(); return;
       }
       if (e.key === "Escape" && document.activeElement === searchInput && searchInput.value) {
@@ -398,8 +457,8 @@
         "ابحث في شاشات الأنظمة التسعة");
     }
 
-    /* حالة الشريط */
-    app.setAttribute("data-rail", S.getRailExpanded() ? "expanded" : "collapsed");
+    /* حالة الشريط — التوسيع سلوك سطح مكتب وحده */
+    app.setAttribute("data-rail", (isDesktop() && S.getRailExpanded()) ? "expanded" : "collapsed");
 
     buildRail();
     initResizer();
@@ -407,7 +466,7 @@
 
     /* ── أزرار الشريط العلوي ── */
     document.getElementById("railToggle").addEventListener("click", function () {
-      if (window.innerWidth <= 900) { toggleDrawer(); return; }
+      if (!isDesktop()) { toggleDrawer(); return; }
       var next = app.getAttribute("data-rail") !== "expanded";
       app.setAttribute("data-rail", next ? "expanded" : "collapsed");
       S.setRailExpanded(next);
@@ -417,11 +476,19 @@
     treeToggleBtn = document.getElementById("treeToggle");
     if (treeToggleBtn) {
       treeToggleBtn.addEventListener("click", function () {
-        if (window.innerWidth <= 900) { toggleDrawer(); return; }
+        if (!isDesktop()) { toggleDrawer(); return; }
         setTreePane(!isTreeCollapsed());
       });
     }
     setTreePane(S.getTreeCollapsed(), true);
+
+    /* ── مزامنة التخطيط عند عبور حدّ الجوال (تغيير حجم النافذة/تدويرها) ── */
+    if (mqDesktop) {
+      var onViewportCross = function () { syncLayoutToViewport(); };
+      if (mqDesktop.addEventListener) mqDesktop.addEventListener("change", onViewportCross);
+      else if (mqDesktop.addListener) mqDesktop.addListener(onViewportCross);
+    }
+
     /* ارفع مانع الحركة بعد أول رسم كي لا تنزلق اللوحة عند كل تحميل */
     requestAnimationFrame(function () {
       requestAnimationFrame(function () {
