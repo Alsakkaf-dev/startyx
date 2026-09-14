@@ -172,7 +172,7 @@
     );
     sideEl.appendChild(ref);
     sideEl.appendChild(U.el(
-      '<p class="cp__sidenote">الدليل المحاسبي · جسور الربط · الفجوات البنيوية · الأنظمة المقترحة</p>'
+      '<p class="cp__sidenote">الدليل المحاسبي · جسور الربط · الفجوات البنيوية</p>'
     ));
   }
 

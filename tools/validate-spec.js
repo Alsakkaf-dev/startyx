@@ -3,7 +3,7 @@
    ----------------------------------------------------------------------------
    التشغيل:  node tools/validate-spec.js
    يفحص:
-     ١) كل مرجع شاشة (op.* / prop.* / cfg.*) موجود في البيانات الفعلية
+     ١) كل مرجع شاشة (op.* / cfg.*) موجود في البيانات الفعلية
      ٢) كل ref كيان (to:) يشير لكيان معرَّف
      ٣) كل وثيقة لها قاعدة ترحيل، وأطرافها متوازنة منطقياً
      ٤) كل مبلغ مستخدَم معرَّف في AMOUNTS
@@ -23,7 +23,7 @@ win.window = win;
 win.localStorage = { getItem: () => null, setItem: () => {}, removeItem: () => {} };
 const ctx = vm.createContext(win);
 
-["util.js", "store.js", "data.js", "links.js", "proposed.js", "index-data.js",
+["util.js", "store.js", "data.js", "links.js", "index-data.js",
  "spec-model.js", "spec-docs.js", "spec-rules.js"].forEach(f =>
   vm.runInContext(fs.readFileSync(path.join(APP, "assets/js", f), "utf8"), ctx, { filename: f }));
 
@@ -170,7 +170,7 @@ S.phases.forEach(p => {
 console.log("── ٦) العوائق");
 S.blockers.forEach(b => {
   chk();
-  const m = String(b.source).match(/((op|cfg|acc|prop)\.[\w.]+)/);
+  const m = String(b.source).match(/((op|cfg|acc)\.[\w.]+)/);
   if (m && !I.resolve(m[1])) err(`العائق ${b.id}: مصدر غير موجود «${m[1]}»`);
 });
 

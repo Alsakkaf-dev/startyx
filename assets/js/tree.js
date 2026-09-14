@@ -147,11 +147,6 @@
       cs.className = "pill pill--" + node.cfgStatus.replace(/_/g, "-");
       cs.textContent = CFG_LABEL[node.cfgStatus] || node.cfgStatus;
       row.appendChild(cs);
-    } else if (node._effStatus === "proposed") {
-      var pp = document.createElement("span");
-      pp.className = "pill pill--proposed";
-      pp.textContent = "مقترح";
-      row.appendChild(pp);
     } else if (node._effStatus === "wip") {
       var p = document.createElement("span");
       p.className = "pill pill--wip";

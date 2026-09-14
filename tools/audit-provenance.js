@@ -3,12 +3,11 @@
    ----------------------------------------------------------------------------
    التشغيل:  node tools/audit-provenance.js
 
-   القاعدة: كل ما يعرضه البرنامج يجب أن يعود لأحد مصدرين لا ثالث لهما:
-     ① مستخرَج من  tree-viewer.html   (op.* / acc.* / cfg.*)
-     ② مُشتقّ صراحةً من الدليل المحاسبي، وموسوم بأنه مُشتقّ (prop.*)
+   القاعدة: كل ما يعرضه البرنامج يجب أن يكون مستخرَجاً من  tree-viewer.html
+   (op.* / acc.* / cfg.*) — لا مصدر غيره.
 
    أي شيء آخر — رقم مُختلَق، شاشة من إصدار أونيكس مختلف، مفهوم ERP عام
-   لا أثر له في شجرتكم — يُرفع هنا كمخالفة.
+   لا أثر له في شجرتكم، شاشة مقترحة — يُرفع هنا كمخالفة.
 
    شغّله بعد أي تعديل. إن رجع بخطأ فقد تسرّب شيء لا يخصّ بتروسبيشل.
    ========================================================================== */
@@ -24,13 +23,12 @@ win.window = win;
 win.localStorage = { getItem: () => null, setItem: () => {}, removeItem: () => {} };
 const ctx = vm.createContext(win);
 
-["util.js", "store.js", "data.js", "mock.js", "links.js", "proposed.js", "index-data.js",
+["util.js", "store.js", "data.js", "mock.js", "links.js", "index-data.js",
  "spec-model.js", "spec-docs.js", "spec-rules.js", "settings-schema.js"].forEach(f =>
   vm.runInContext(fs.readFileSync(path.join(APP, "assets/js", f), "utf8"), ctx, { filename: f }));
 
 win.OnyxIndex.build();
-const I = win.OnyxIndex, S = win.ONYX_SPEC, L = win.ONYX_LINKS,
-      M = win.ONYX_MOCK, PR = win.ONYX_PROPOSED;
+const I = win.OnyxIndex, S = win.ONYX_SPEC, L = win.ONYX_LINKS, M = win.ONYX_MOCK;
 
 let violations = [], notes = [], checks = 0;
 const bad  = m => violations.push(m);
@@ -39,8 +37,6 @@ const chk  = () => checks++;
 
 /* من الشجرة الفعلية؟ */
 const fromTree = r => /^(op|acc|cfg)\./.test(String(r)) && !!I.resolve(r);
-/* مُشتقّ موسوم؟ */
-const derived  = r => /^prop\./.test(String(r));
 
 console.log("═══ مُدقِّق الأصل: شجرة بتروسبيشل فقط ═══\n");
 
@@ -48,16 +44,7 @@ console.log("═══ مُدقِّق الأصل: شجرة بتروسبيشل ف
 console.log("① الأشجار المعروضة");
 I.modules.forEach(m => {
   chk();
-  if (m.variant === "proposed") {
-    if (!m.gapFor || !m.gapFor.length)
-      bad(`النظام المقترح «${m.label}» بلا gapFor — لا يثبت اشتقاقه من الدليل`);
-    else {
-      const okAll = m.gapFor.every(a => fromTree(a));
-      if (!okAll) bad(`النظام المقترح «${m.label}»: gapFor يشير لحساب ليس في دليلكم`);
-      else console.log(`   ◇ مُشتقّ  ${m.label}  ← ${m.gapFor.join(" · ")}`);
-    }
-    if (!m.why) bad(`النظام المقترح «${m.label}» بلا why — لا يوضّح لماذا وُجد`);
-  } else if (m.variant === "operations" || m.variant === "accounts" || m.variant === "config") {
+  if (m.variant === "operations" || m.variant === "accounts" || m.variant === "config") {
     console.log(`   ✓ من الشجرة  ${m.label}`);
   } else {
     bad(`الشجرة «${m.label}» بلا variant معروف — أصلها غير محدَّد`);
@@ -108,23 +95,18 @@ Object.keys(S.entities).forEach(k => {
   chk();
   const refs = [e.screen].concat(e.screens || []).filter(Boolean);
   const hasReal = refs.some(r => fromTree(r) || /\.x$/.test(r));
-  const hasDerived = refs.some(r => derived(r));
   if (!refs.length) {
     if (!e.noScreen && e.kind !== "ledger")
       bad(`الكيان «${e.label}» بلا شاشة وبلا noScreen — أصله غير موثَّق`);
-  } else if (!hasReal && !hasDerived) {
+  } else if (!hasReal) {
     bad(`الكيان «${e.label}»: شاشاته ليست من الشجرة (${refs.join(", ")})`);
   }
-  if (e.proposed && !hasDerived)
-    bad(`الكيان «${e.label}» موسوم proposed لكن شاشته ليست prop.*`);
 });
 
 S.documents.forEach(d => {
   chk();
-  if (!fromTree(d.ref) && !derived(d.ref))
-    bad(`الوثيقة «${d.label}» (${d.ref}): ليست من الشجرة ولا مُشتقّة`);
-  if (derived(d.ref) && !d.proposed)
-    bad(`الوثيقة «${d.label}» مرجعها prop.* لكنها غير موسومة proposed`);
+  if (!fromTree(d.ref))
+    bad(`الوثيقة «${d.label}» (${d.ref}): ليست من الشجرة`);
   /* الحسابات الثابتة يجب أن تكون في دليلكم */
   ((d.posting || {}).legs || []).forEach(l => {
     chk();
@@ -142,13 +124,13 @@ S.documents.forEach(d => {
 (S.phases || []).forEach(p => {
   (p.screens || []).forEach(r => {
     chk();
-    if (!fromTree(r) && !derived(r) && !/\.x$/.test(r))
+    if (!fromTree(r) && !/\.x$/.test(r))
       bad(`المرحلة ${p.n}: شاشة ليست من الشجرة ${r}`);
   });
 });
 (S.blockers || []).forEach(b => {
   chk();
-  const m = String(b.source).match(/((op|cfg|acc|prop)\.[\w.]+)/);
+  const m = String(b.source).match(/((op|cfg|acc)\.[\w.]+)/);
   if (!m) note(`العائق ${b.id}: مصدره غير مرتبط بمرجع من الشجرة`);
   else if (!I.resolve(m[1])) bad(`العائق ${b.id}: مصدر غير موجود ${m[1]}`);
 });
@@ -244,5 +226,5 @@ console.log("\n" + "═".repeat(62));
 console.log(`فحوصات: ${checks}   |   مخالفات: ${violations.length}   |   ملاحظات: ${notes.length}`);
 if (violations.length) { console.log("\n✗ مخالفات قاعدة «شجرة بتروسبيشل فقط»:"); violations.forEach(v => console.log("   " + v)); }
 if (notes.length) { console.log("\n· ملاحظات:"); notes.forEach(n => console.log("   " + n)); }
-if (!violations.length) console.log("\n✔ كل ما يعرضه البرنامج يعود لشجرة بتروسبيشل أو مُشتقّ منها بوسم صريح");
+if (!violations.length) console.log("\n✔ كل ما يعرضه البرنامج يعود لشجرة بتروسبيشل");
 process.exit(violations.length ? 1 : 0);

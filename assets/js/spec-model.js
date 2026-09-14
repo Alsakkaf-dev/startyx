@@ -121,7 +121,8 @@
        ══════════════════════════════════════════════════════════════════ */
 
     documentType: {
-      label: "نوع الوثيقة", kind: "config", screen: "op.4.6.2", layer: 1, key: "code",
+      label: "نوع الوثيقة", kind: "config", layer: 1, key: "code",
+      noScreen: "لا شاشة واحدة لكل الأنواع — كل نظام يعرّف أنواع وثائقه في تهيئته (أنواع قيود اليومية، أنواع القبض والصرف، أنواع فواتير المبيعات…).",
       note: "المفتاح الذي يجعل الوثيقة تعرف حساباتها وترقيمها وسلوكها.",
       fields: [
         F("code", "code", { req: true, unique: true }),
@@ -139,7 +140,6 @@
         F("affectsTax", "bool")
       ],
       rules: [
-        "الحساب الافتراضي يُربط من op.4.6.2 «ربط أنواع الوثائق بالحسابات».",
         "لا تُحذف نوع وثيقة استُخدم — يُوقَف."
       ]
     },
@@ -190,7 +190,7 @@
         ]}),
         F("account", "ref", { to: "account", req: true })
       ],
-      screens: ["op.5.1.2.16", "op.3.4", "op.3.5", "op.4.6.2", "op.1.2.4", "op.1.2.11"],
+      screens: ["op.5.1.2.16", "op.3.4", "op.3.5", "op.1.2.4", "op.1.2.11"],
       rules: [
         "قاعدة ذهبية: **الوثيقة لا تخزّن رقم حساب — تخزّن مفتاح الربط**، ويُحلّ الحساب وقت الترحيل.",
         "تغيير الربط لا يغيّر القيود المرحَّلة سابقاً.",
@@ -289,17 +289,13 @@
 
     salesman: { label: "مندوب البيع", kind: "master", screen: "op.7.1.2.4", layer: 2, key: "code",
       fields: [F("code","code",{req:true,unique:true}), F("nameAr","text",{req:true}),
-               F("commissionRule","ref",{to:"commissionRule"}), F("account","ref",{to:"account"})],
-      rules: ["حساب المندوب وسيط — يُصفَّى بالعمولة أو التحصيل."] },
-
-    commissionRule: { label: "قاعدة العمولة", kind: "config", screen: "op.7.2.2", layer: 1, key: "code",
-      fields: [F("code","code",{req:true}), F("basis","enum",{values:["نسبة من المبيعات","نسبة من التحصيل","مبلغ ثابت"]}),
-               F("rate","num")], rules: [] },
+               F("account","ref",{to:"account"})],
+      rules: ["حساب المندوب وسيط — يُصفَّى بالتحصيل."] },
 
     priceList: { label: "قائمة الأسعار", kind: "master", screen: "op.5.1.2.14", layer: 2, key: "code",
       fields: [F("code","code",{req:true}), F("nameAr","text",{req:true}), F("currency","ref",{to:"currency"}),
                F("validFrom","date"), F("validTo","date")],
-      rules: ["تعديل السعر يمر بـ«طلب تعديل تسعيرة» ثم اعتماد — لا تعديل مباشر."] },
+      rules: [] },
 
     cashbox: { label: "الصندوق", kind: "master", screen: "op.4.1.2.2", layer: 2, key: "code",
       fields: [F("code","code",{req:true,unique:true}), F("nameAr","text",{req:true}),
@@ -317,37 +313,7 @@
       fields: [F("code","code",{req:true,unique:true}), F("nameAr","text",{req:true}),
                F("account","ref",{to:"account",note:"تحت 1204 ذمم الموظفين"}),
                F("job","text"), F("isActive","bool",{def:true})],
-      rules: ["حساب الموظف يُستخدم للسلف والعهد — انظر النظام المقترح prop.hr."] },
-
-    fixedAsset: {
-      label: "الأصل الثابت", kind: "master", screen: "prop.assets.inputs.1", layer: 2, key: "code",
-      proposed: true,
-      fields: [
-        F("code","code",{req:true,unique:true}),
-        F("nameAr","text",{req:true}),
-        F("group","ref",{to:"assetGroup",req:true}),
-        F("assetAccount","ref",{to:"account",req:true,note:"تحت 1101"}),
-        F("accumDepAccount","ref",{to:"account",req:true,note:"تحت 2203"}),
-        F("depExpenseAccount","ref",{to:"account",req:true,note:"تحت 3203"}),
-        F("acquisitionDate","date",{req:true}), F("cost","money",{req:true}),
-        F("salvageValue","money"), F("usefulLifeMonths","num",{req:true}),
-        F("depMethod","enum",{values:["القسط الثابت","القسط المتناقص","وحدات الإنتاج"]}),
-        F("costCenter","ref",{to:"costCenter"}), F("location","text"),
-        F("accumDepreciation","money",{calc:true}), F("netBookValue","money",{calc:true}),
-        F("status","enum",{values:["قيد الاستخدام","مستهلك بالكامل","مستبعد"]})
-      ],
-      rules: [
-        "netBookValue = cost − accumDepreciation، ولا يقل عن salvageValue أبداً.",
-        "الأصول الستون الموجودة حالياً كحسابات مفردة تُهاجَر إلى هذا الكيان مع إبقاء حساباتها.",
-        "لا يُحذف أصل — يُستبعد بوثيقة استبعاد."
-      ]
-    },
-
-    assetGroup: { label: "مجموعة الأصول", kind: "master", screen: "prop.assets.setup.2", layer: 1, key: "code",
-      proposed: true,
-      fields: [F("code","code",{req:true}), F("nameAr","text",{req:true}), F("defaultLifeMonths","num"),
-               F("defaultMethod","enum",{values:["القسط الثابت","القسط المتناقص"]})],
-      rules: ["تقابل مستوى 1101xx في الدليل: سيارات، آلات، كمبيوترات، أثاث…"] },
+      rules: ["حساب الموظف يُستخدم للسلف والعهد."] },
 
     /* ══════════════════════════════════════════════════════════════════
        ط ب ق ة   ا ل د ف ا ت ر  —  تُكتب بالترحيل فقط
@@ -441,7 +407,7 @@
   var LAYERS = [
     { n: 0, label: "الأساس",           what: "الحسابات، العملات، الفترات، الفروع، الأبعاد التحليلية" },
     { n: 1, label: "التهيئة",          what: "أنواع الوثائق، الترقيم، الضرائب، ربط الحسابات، المجموعات" },
-    { n: 2, label: "البيانات الأساسية", what: "الأصناف، المخازن، العملاء، الموردون، الصناديق، البنوك، الأصول" },
+    { n: 2, label: "البيانات الأساسية", what: "الأصناف، المخازن، العملاء، الموردون، الصناديق، البنوك" },
     { n: 3, label: "الأرصدة الافتتاحية", what: "أرصدة الحسابات والمخزون والذمم عند بدء التشغيل" },
     { n: 4, label: "الوثائق والدفاتر",  what: "الفواتير والسندات والقيود وحركة المخزون" },
     { n: 5, label: "التقارير والإقفال", what: "الأرصدة، ميزان المراجعة، القوائم، الإقفال الشهري والسنوي" }

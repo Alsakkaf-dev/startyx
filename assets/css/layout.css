@@ -278,7 +278,7 @@
   .main__inner { padding: var(--space-4) var(--space-3) var(--space-9); }
 }
 
-/* الشريط عمود مرن — الرئيسية ثم الأنظمة التسعة، بلا انضغاط */
+/* الشريط عمود مرن — الرئيسية ثم الأنظمة التشغيلية، بلا انضغاط */
 .rail__scroll { display: flex; flex-direction: column; }
 .rail__scroll > .rail__item,
 .rail__scroll > .rail__caption,

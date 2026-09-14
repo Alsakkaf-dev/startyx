@@ -279,7 +279,3 @@ li[aria-expanded="true"] > .node > .node__chevron { transform: rotate(-90deg); }
 .pill--inferred      { background: var(--status-wip-bg);   color: var(--status-wip-fg); }
 .pill--pending       { background: var(--bg-sunken);       color: var(--text-subtle); }
 
-/* شارة النظام المقترح */
-.pill--proposed { background: var(--status-wip-bg); color: var(--status-wip-fg); }
-.rail__item[data-proposed="1"] .icon { opacity: .8; }
-

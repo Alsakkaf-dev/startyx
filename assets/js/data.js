@@ -4,10 +4,10 @@
    ⚠  ملف مُولَّد آلياً — لا تعدّله يدوياً.
       المصدر : tree-viewer.html  (مُلتقط من النظام المثبَّت فعلياً)
       التوليد: node tools/build-data.js
-      المحتوى: 11 شجرة · 180 مجموعة · 901 عنصر نهائي
+      المحتوى: 10 شجرة · 159 مجموعة · 675 عنصر نهائي
 
    الأشجار:
-     • ٩ أنظمة تشغيلية (variant: "operations") — بأرقام مرجعية من النظام
+     • ٨ أنظمة تشغيلية (variant: "operations") — بأرقام مرجعية من النظام
      • الدليل المحاسبي  (variant: "accounts")  — بأرقام الحسابات
      • الإعدادات الفعّالة (variant: "config")   — بحالات التحقق
    ========================================================================== */
@@ -68,13 +68,6 @@
               "id": "op.1.1.3",
               "ref": "op.1.1.3",
               "label": "تهيئة العملات",
-              "status": "ready",
-              "kind": "screen"
-            },
-            {
-              "id": "op.1.1.4",
-              "ref": "op.1.1.4",
-              "label": "الأقاليم الدولية",
               "status": "ready",
               "kind": "screen"
             },
@@ -149,27 +142,6 @@
               "kind": "screen"
             },
             {
-              "id": "op.1.1.15",
-              "ref": "op.1.1.15",
-              "label": "تهيئة المشاريع",
-              "status": "ready",
-              "kind": "screen"
-            },
-            {
-              "id": "op.1.1.16",
-              "ref": "op.1.1.16",
-              "label": "ترميز بيانات إضافية للمشاريع",
-              "status": "ready",
-              "kind": "screen"
-            },
-            {
-              "id": "op.1.1.17",
-              "ref": "op.1.1.17",
-              "label": "الترميزات العامة",
-              "status": "ready",
-              "kind": "screen"
-            },
-            {
               "id": "op.1.1.18",
               "ref": "op.1.1.18",
               "label": "أنواع الهيكل الإداري",
@@ -180,20 +152,6 @@
               "id": "op.1.1.19",
               "ref": "op.1.1.19",
               "label": "الترميزات العامة للموظفين",
-              "status": "ready",
-              "kind": "screen"
-            },
-            {
-              "id": "op.1.1.20",
-              "ref": "op.1.1.20",
-              "label": "ترجمة النصوص",
-              "status": "ready",
-              "kind": "screen"
-            },
-            {
-              "id": "op.1.1.21",
-              "ref": "op.1.1.21",
-              "label": "مستويات الإعتماد",
               "status": "ready",
               "kind": "screen"
             },
@@ -381,13 +339,6 @@
               "kind": "screen"
             },
             {
-              "id": "op.2.2.2",
-              "ref": "op.2.2.2",
-              "label": "صلاحيات التبويبات",
-              "status": "ready",
-              "kind": "screen"
-            },
-            {
               "id": "op.2.2.3",
               "ref": "op.2.2.3",
               "label": "صلاحيات المدخلات",
@@ -405,13 +356,6 @@
               "id": "op.2.2.5",
               "ref": "op.2.2.5",
               "label": "تنبيهات النظام",
-              "status": "ready",
-              "kind": "screen"
-            },
-            {
-              "id": "op.2.2.6",
-              "ref": "op.2.2.6",
-              "label": "اعتماد اجهزة تطبيقات الموبايل",
               "status": "ready",
               "kind": "screen"
             },
@@ -490,13 +434,6 @@
               "label": "الإقفال السنوي",
               "status": "ready",
               "kind": "screen"
-            },
-            {
-              "id": "op.2.4.4",
-              "ref": "op.2.4.4",
-              "label": "إلغاء الإقفالات",
-              "status": "ready",
-              "kind": "screen"
             }
           ]
         },
@@ -540,13 +477,6 @@
           "icon": "file",
           "children": [
             {
-              "id": "op.2.6.1",
-              "ref": "op.2.6.1",
-              "label": "ترميز اللغات",
-              "status": "ready",
-              "kind": "screen"
-            },
-            {
               "id": "op.2.6.2",
               "ref": "op.2.6.2",
               "label": "أرشفة مرفقات الوثائق",
@@ -564,13 +494,6 @@
               "id": "op.2.6.4",
               "ref": "op.2.6.4",
               "label": "نقل البيانات بين الوحدات المحاسبية",
-              "status": "ready",
-              "kind": "screen"
-            },
-            {
-              "id": "op.2.6.5",
-              "ref": "op.2.6.5",
-              "label": "متغيرات قاعدة البيانات",
               "status": "ready",
               "kind": "screen"
             },
@@ -623,72 +546,6 @@
               "id": "op.2.7.2",
               "ref": "op.2.7.2",
               "label": "الحقول الإجبارية",
-              "status": "ready",
-              "kind": "screen"
-            },
-            {
-              "id": "op.2.7.3",
-              "ref": "op.2.7.3",
-              "label": "قوالب التقارير",
-              "status": "ready",
-              "kind": "screen"
-            },
-            {
-              "id": "op.2.7.4",
-              "ref": "op.2.7.4",
-              "label": "نماذج الطباعة",
-              "status": "ready",
-              "kind": "screen"
-            },
-            {
-              "id": "op.2.7.5",
-              "ref": "op.2.7.5",
-              "label": "مؤشرات النظام",
-              "status": "ready",
-              "kind": "screen"
-            },
-            {
-              "id": "op.2.7.6",
-              "ref": "op.2.7.6",
-              "label": "ترميز الشاشات",
-              "status": "ready",
-              "kind": "screen"
-            },
-            {
-              "id": "op.2.7.7",
-              "ref": "op.2.7.7",
-              "label": "الرسائل",
-              "status": "ready",
-              "kind": "screen"
-            },
-            {
-              "id": "op.2.7.8",
-              "ref": "op.2.7.8",
-              "label": "النصوص",
-              "status": "ready",
-              "kind": "screen"
-            }
-          ]
-        },
-        {
-          "id": "op.2.8",
-          "ref": "op.2.8",
-          "label": "إدارة التكامل والربط",
-          "status": "ready",
-          "kind": "submodule",
-          "icon": "folder",
-          "children": [
-            {
-              "id": "op.2.8.1",
-              "ref": "op.2.8.1",
-              "label": "ترميز خدمات الويب",
-              "status": "ready",
-              "kind": "screen"
-            },
-            {
-              "id": "op.2.8.2",
-              "ref": "op.2.8.2",
-              "label": "مزامنة البيانات",
               "status": "ready",
               "kind": "screen"
             }
@@ -750,13 +607,6 @@
           "kind": "screen"
         },
         {
-          "id": "op.3.7",
-          "ref": "op.3.7",
-          "label": "ترميز خدمات الويب",
-          "status": "ready",
-          "kind": "screen"
-        },
-        {
           "id": "op.3.8",
           "ref": "op.3.8",
           "label": "حركة الضرائب",
@@ -787,7 +637,7 @@
       "variant": "operations",
       "icon": "landmark",
       "accent": "blue",
-      "note": "الأستاذ العام والمراجعة والترحيلات والموازنات والضمانات.",
+      "note": "الأستاذ العام والموازنات.",
       "status": "ready",
       "children": [
         {
@@ -824,20 +674,6 @@
                   "id": "op.4.1.1.3",
                   "ref": "op.4.1.1.3",
                   "label": "مجموعات البنوك",
-                  "status": "ready",
-                  "kind": "screen"
-                },
-                {
-                  "id": "op.4.1.1.4",
-                  "ref": "op.4.1.1.4",
-                  "label": "أنواع الإشعارات",
-                  "status": "ready",
-                  "kind": "screen"
-                },
-                {
-                  "id": "op.4.1.1.5",
-                  "ref": "op.4.1.1.5",
-                  "label": "أنواع الطلبات",
                   "status": "ready",
                   "kind": "screen"
                 },
@@ -901,13 +737,6 @@
                   "kind": "screen"
                 },
                 {
-                  "id": "op.4.1.2.5",
-                  "ref": "op.4.1.2.5",
-                  "label": "طلب تعديل تهيئة الحدود",
-                  "status": "ready",
-                  "kind": "screen"
-                },
-                {
                   "id": "op.4.1.2.6",
                   "ref": "op.4.1.2.6",
                   "label": "تهيئة الحدود",
@@ -953,27 +782,6 @@
               "icon": "layers",
               "children": [
                 {
-                  "id": "op.4.1.3.1",
-                  "ref": "op.4.1.3.1",
-                  "label": "إشعارات مدينة",
-                  "status": "ready",
-                  "kind": "screen"
-                },
-                {
-                  "id": "op.4.1.3.2",
-                  "ref": "op.4.1.3.2",
-                  "label": "إشعارات دائنة",
-                  "status": "ready",
-                  "kind": "screen"
-                },
-                {
-                  "id": "op.4.1.3.3",
-                  "ref": "op.4.1.3.3",
-                  "label": "طلبات سندات القبض",
-                  "status": "ready",
-                  "kind": "screen"
-                },
-                {
                   "id": "op.4.1.3.4",
                   "ref": "op.4.1.3.4",
                   "label": "سند القبض",
@@ -981,23 +789,9 @@
                   "kind": "screen"
                 },
                 {
-                  "id": "op.4.1.3.5",
-                  "ref": "op.4.1.3.5",
-                  "label": "طلبات سندات الصرف",
-                  "status": "ready",
-                  "kind": "screen"
-                },
-                {
                   "id": "op.4.1.3.6",
                   "ref": "op.4.1.3.6",
                   "label": "سند الصرف",
-                  "status": "ready",
-                  "kind": "screen"
-                },
-                {
-                  "id": "op.4.1.3.7",
-                  "ref": "op.4.1.3.7",
-                  "label": "تحقيق الإيداع النقدي لدى البنوك",
                   "status": "ready",
                   "kind": "screen"
                 },
@@ -1037,13 +831,6 @@
                   "kind": "screen"
                 },
                 {
-                  "id": "op.4.1.3.13",
-                  "ref": "op.4.1.3.13",
-                  "label": "طلبات قيود اليومية",
-                  "status": "ready",
-                  "kind": "screen"
-                },
-                {
                   "id": "op.4.1.3.14",
                   "ref": "op.4.1.3.14",
                   "label": "قيود اليومية",
@@ -1051,9 +838,9 @@
                   "kind": "screen"
                 },
                 {
-                  "id": "op.4.1.3.15",
-                  "ref": "op.4.1.3.15",
-                  "label": "طلب بيع عملة",
+                  "id": "op.4.1.3.21",
+                  "ref": "op.4.1.3.21",
+                  "label": "قيود بنكية",
                   "status": "ready",
                   "kind": "screen"
                 },
@@ -1075,13 +862,6 @@
                   "id": "op.4.1.3.18",
                   "ref": "op.4.1.3.18",
                   "label": "توزيع المصروفات المقدمة",
-                  "status": "ready",
-                  "kind": "screen"
-                },
-                {
-                  "id": "op.4.1.3.19",
-                  "ref": "op.4.1.3.19",
-                  "label": "توزيع الإيرادات المقدمة",
                   "status": "ready",
                   "kind": "screen"
                 },
@@ -1166,13 +946,6 @@
                   "kind": "screen"
                 },
                 {
-                  "id": "op.4.1.4.10",
-                  "ref": "op.4.1.4.10",
-                  "label": "تقارير طلبات سند القبض",
-                  "status": "ready",
-                  "kind": "screen"
-                },
-                {
                   "id": "op.4.1.4.11",
                   "ref": "op.4.1.4.11",
                   "label": "تقارير سند القبض",
@@ -1180,23 +953,9 @@
                   "kind": "screen"
                 },
                 {
-                  "id": "op.4.1.4.12",
-                  "ref": "op.4.1.4.12",
-                  "label": "تقارير طلبات سند الصرف",
-                  "status": "ready",
-                  "kind": "screen"
-                },
-                {
                   "id": "op.4.1.4.13",
                   "ref": "op.4.1.4.13",
                   "label": "تقارير سند الصرف",
-                  "status": "ready",
-                  "kind": "screen"
-                },
-                {
-                  "id": "op.4.1.4.14",
-                  "ref": "op.4.1.4.14",
-                  "label": "تقارير طلبات قيود اليومية",
                   "status": "ready",
                   "kind": "screen"
                 },
@@ -1243,13 +1002,6 @@
                   "kind": "screen"
                 },
                 {
-                  "id": "op.4.1.4.21",
-                  "ref": "op.4.1.4.21",
-                  "label": "تقارير توزيع الإيرادات المقدمة",
-                  "status": "ready",
-                  "kind": "screen"
-                },
-                {
                   "id": "op.4.1.4.22",
                   "ref": "op.4.1.4.22",
                   "label": "تقارير تسوية البنوك",
@@ -1264,13 +1016,6 @@
                   "kind": "screen"
                 },
                 {
-                  "id": "op.4.1.4.24",
-                  "ref": "op.4.1.4.24",
-                  "label": "تقارير الحسابات المدينة والدائنة الأخرى",
-                  "status": "ready",
-                  "kind": "screen"
-                },
-                {
                   "id": "op.4.1.4.25",
                   "ref": "op.4.1.4.25",
                   "label": "تقارير مراكز التكلفة",
@@ -1281,20 +1026,6 @@
                   "id": "op.4.1.4.26",
                   "ref": "op.4.1.4.26",
                   "label": "تقارير مراكز التكلفة عمليات",
-                  "status": "ready",
-                  "kind": "screen"
-                },
-                {
-                  "id": "op.4.1.4.27",
-                  "ref": "op.4.1.4.27",
-                  "label": "تقارير دليل المشاريع",
-                  "status": "ready",
-                  "kind": "screen"
-                },
-                {
-                  "id": "op.4.1.4.28",
-                  "ref": "op.4.1.4.28",
-                  "label": "تقارير بيانات الأنشطة",
                   "status": "ready",
                   "kind": "screen"
                 },
@@ -1327,13 +1058,6 @@
                   "kind": "screen"
                 },
                 {
-                  "id": "op.4.1.4.33",
-                  "ref": "op.4.1.4.33",
-                  "label": "تقارير الإشعارات",
-                  "status": "ready",
-                  "kind": "screen"
-                },
-                {
                   "id": "op.4.1.4.34",
                   "ref": "op.4.1.4.34",
                   "label": "تقارير السندات المفقودة",
@@ -1345,285 +1069,12 @@
           ]
         },
         {
-          "id": "op.4.2",
-          "ref": "op.4.2",
-          "label": "نظام إدارة المراجعة والترحيلات",
-          "status": "ready",
-          "kind": "submodule",
-          "icon": "folder",
-          "children": [
-            {
-              "id": "op.4.2.1",
-              "ref": "op.4.2.1",
-              "label": "إعتماد الوثائق",
-              "status": "ready",
-              "kind": "screen"
-            },
-            {
-              "id": "op.4.2.2",
-              "ref": "op.4.2.2",
-              "label": "الترحيل",
-              "status": "ready",
-              "kind": "screen"
-            },
-            {
-              "id": "op.4.2.3",
-              "ref": "op.4.2.3",
-              "label": "إلغاء الترحيل",
-              "status": "ready",
-              "kind": "screen"
-            },
-            {
-              "id": "op.4.2.4",
-              "ref": "op.4.2.4",
-              "label": "مطابقة اليومية العامة للعمليات",
-              "status": "ready",
-              "kind": "screen"
-            },
-            {
-              "id": "op.4.2.5",
-              "ref": "op.4.2.5",
-              "label": "مطابقة كشف حساب",
-              "status": "ready",
-              "kind": "screen"
-            },
-            {
-              "id": "op.4.2.6",
-              "ref": "op.4.2.6",
-              "label": "مطابقة الأرصدة",
-              "status": "ready",
-              "kind": "screen"
-            },
-            {
-              "id": "op.4.2.7",
-              "ref": "op.4.2.7",
-              "label": "تقارير المستندات المرحلة وغير المرحلة",
-              "status": "ready",
-              "kind": "screen"
-            }
-          ]
-        },
-        {
           "id": "op.4.3",
           "ref": "op.4.3",
           "label": "نظام إدارة الموازنة والمخططات",
           "status": "ready",
           "note": "لم يُصوَّر توسيعه بعد",
           "kind": "screen"
-        },
-        {
-          "id": "op.4.4",
-          "ref": "op.4.4",
-          "label": "إدارة الحسابات",
-          "status": "ready",
-          "kind": "submodule",
-          "icon": "folder",
-          "children": [
-            {
-              "id": "op.4.4.1",
-              "ref": "op.4.4.1",
-              "label": "إدارة المخزون",
-              "status": "ready",
-              "kind": "group",
-              "icon": "folder",
-              "children": [
-                {
-                  "id": "op.4.4.1.1",
-                  "ref": "op.4.4.1.1",
-                  "label": "مخططات الصرف المخزني",
-                  "status": "ready",
-                  "kind": "screen"
-                },
-                {
-                  "id": "op.4.4.1.2",
-                  "ref": "op.4.4.1.2",
-                  "label": "تقارير مخططات الصرف المخزني",
-                  "status": "ready",
-                  "kind": "screen"
-                }
-              ]
-            },
-            {
-              "id": "op.4.4.2",
-              "ref": "op.4.4.2",
-              "label": "إدارة الموردين والمشتريات",
-              "status": "ready",
-              "kind": "group",
-              "icon": "folder",
-              "children": [
-                {
-                  "id": "op.4.4.2.1",
-                  "ref": "op.4.4.2.1",
-                  "label": "مخططات المشتريات",
-                  "status": "ready",
-                  "kind": "screen"
-                },
-                {
-                  "id": "op.4.4.2.2",
-                  "ref": "op.4.4.2.2",
-                  "label": "تقارير مخططات المشتريات",
-                  "status": "ready",
-                  "kind": "screen"
-                }
-              ]
-            },
-            {
-              "id": "op.4.4.3",
-              "ref": "op.4.4.3",
-              "label": "إدارة العملاء والمبيعات",
-              "status": "ready",
-              "kind": "group",
-              "icon": "folder",
-              "children": [
-                {
-                  "id": "op.4.4.3.1",
-                  "ref": "op.4.4.3.1",
-                  "label": "مخططات المبيعات",
-                  "status": "ready",
-                  "kind": "screen"
-                },
-                {
-                  "id": "op.4.4.3.2",
-                  "ref": "op.4.4.3.2",
-                  "label": "مخطط التحصيل",
-                  "status": "ready",
-                  "kind": "screen"
-                },
-                {
-                  "id": "op.4.4.3.3",
-                  "ref": "op.4.4.3.3",
-                  "label": "تقارير المخطط الشهري للمبيعات",
-                  "status": "ready",
-                  "kind": "screen"
-                },
-                {
-                  "id": "op.4.4.3.4",
-                  "ref": "op.4.4.3.4",
-                  "label": "تقارير مخطط التحصيل",
-                  "status": "ready",
-                  "kind": "screen"
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "id": "op.4.5",
-          "ref": "op.4.5",
-          "label": "نظام إدارة الضمانات",
-          "status": "ready",
-          "kind": "submodule",
-          "icon": "folder",
-          "children": [
-            {
-              "id": "op.4.5.1",
-              "ref": "op.4.5.1",
-              "label": "أنواع الضمانات",
-              "status": "ready",
-              "kind": "screen"
-            },
-            {
-              "id": "op.4.5.2",
-              "ref": "op.4.5.2",
-              "label": "الضمانات البنكية",
-              "status": "ready",
-              "kind": "screen"
-            },
-            {
-              "id": "op.4.5.3",
-              "ref": "op.4.5.3",
-              "label": "تمديد الضمانات البنكية",
-              "status": "ready",
-              "kind": "screen"
-            },
-            {
-              "id": "op.4.5.4",
-              "ref": "op.4.5.4",
-              "label": "الغاء/مصادرة الضمانات البنكية",
-              "status": "ready",
-              "kind": "screen"
-            },
-            {
-              "id": "op.4.5.5",
-              "ref": "op.4.5.5",
-              "label": "ضمانات أخرى",
-              "status": "ready",
-              "kind": "screen"
-            },
-            {
-              "id": "op.4.5.6",
-              "ref": "op.4.5.6",
-              "label": "تمديد الضمان",
-              "status": "ready",
-              "kind": "screen"
-            },
-            {
-              "id": "op.4.5.7",
-              "ref": "op.4.5.7",
-              "label": "الغاء/مصادرة الضمان",
-              "status": "ready",
-              "kind": "screen"
-            },
-            {
-              "id": "op.4.5.8",
-              "ref": "op.4.5.8",
-              "label": "تقارير الضمانات البنكية",
-              "status": "ready",
-              "kind": "screen"
-            },
-            {
-              "id": "op.4.5.9",
-              "ref": "op.4.5.9",
-              "label": "تقارير خطابات الضمان",
-              "status": "ready",
-              "kind": "screen"
-            },
-            {
-              "id": "op.4.5.10",
-              "ref": "op.4.5.10",
-              "label": "تقارير تمديد الضمان",
-              "status": "ready",
-              "kind": "screen"
-            }
-          ]
-        },
-        {
-          "id": "op.4.6",
-          "ref": "op.4.6",
-          "label": "الربط المالي مع الأنظمة الخارجية",
-          "status": "ready",
-          "kind": "submodule",
-          "icon": "folder",
-          "children": [
-            {
-              "id": "op.4.6.1",
-              "ref": "op.4.6.1",
-              "label": "المتغيرات",
-              "status": "ready",
-              "kind": "screen"
-            },
-            {
-              "id": "op.4.6.2",
-              "ref": "op.4.6.2",
-              "label": "ربط أنواع الوثائق بالحسابات",
-              "status": "ready",
-              "kind": "screen"
-            },
-            {
-              "id": "op.4.6.3",
-              "ref": "op.4.6.3",
-              "label": "إستيراد القيود المالية - قيود اليومية",
-              "status": "ready",
-              "kind": "screen"
-            },
-            {
-              "id": "op.4.6.4",
-              "ref": "op.4.6.4",
-              "label": "تقارير إستيراد القيود المالية - قيود اليومية",
-              "status": "ready",
-              "kind": "screen"
-            }
-          ]
         }
       ]
     },
@@ -1635,7 +1086,7 @@
       "variant": "operations",
       "icon": "package",
       "accent": "teal",
-      "note": "المخازن والأصناف والتوريد والصرف والتحويل والجرد.",
+      "note": "المخازن والأصناف والتوريد والصرف والتحويل والتسوية.",
       "status": "ready",
       "children": [
         {
@@ -1683,25 +1134,11 @@
                   "kind": "screen"
                 },
                 {
-                  "id": "op.5.1.1.5",
-                  "ref": "op.5.1.1.5",
-                  "label": "رتب الأصناف",
-                  "status": "ready",
-                  "kind": "screen"
-                },
-                {
                   "id": "op.5.1.1.6",
                   "ref": "op.5.1.1.6",
                   "label": "مستويات التسعيرة",
                   "status": "ready",
                   "note": "جزء من الاسم غير واضح بالصورة",
-                  "kind": "screen"
-                },
-                {
-                  "id": "op.5.1.1.7",
-                  "ref": "op.5.1.1.7",
-                  "label": "أنواع الطلبات",
-                  "status": "ready",
                   "kind": "screen"
                 },
                 {
@@ -1764,48 +1201,6 @@
                   "kind": "screen"
                 },
                 {
-                  "id": "op.5.1.2.2",
-                  "ref": "op.5.1.2.2",
-                  "label": "المجموعة الفرعية",
-                  "status": "ready",
-                  "kind": "screen"
-                },
-                {
-                  "id": "op.5.1.2.3",
-                  "ref": "op.5.1.2.3",
-                  "label": "المجموعات تحت الفرعية",
-                  "status": "ready",
-                  "kind": "screen"
-                },
-                {
-                  "id": "op.5.1.2.4",
-                  "ref": "op.5.1.2.4",
-                  "label": "المجموعات المساعدة",
-                  "status": "ready",
-                  "kind": "screen"
-                },
-                {
-                  "id": "op.5.1.2.5",
-                  "ref": "op.5.1.2.5",
-                  "label": "المجموعات التفصيلية",
-                  "status": "ready",
-                  "kind": "screen"
-                },
-                {
-                  "id": "op.5.1.2.6",
-                  "ref": "op.5.1.2.6",
-                  "label": "المجموعة المتماثلة",
-                  "status": "ready",
-                  "kind": "screen"
-                },
-                {
-                  "id": "op.5.1.2.7",
-                  "ref": "op.5.1.2.7",
-                  "label": "تصنيفات الأصناف",
-                  "status": "ready",
-                  "kind": "screen"
-                },
-                {
                   "id": "op.5.1.2.8",
                   "ref": "op.5.1.2.8",
                   "label": "مجموعات المخازن",
@@ -1823,27 +1218,6 @@
                   "id": "op.5.1.2.10",
                   "ref": "op.5.1.2.10",
                   "label": "بيانات الأصناف",
-                  "status": "ready",
-                  "kind": "screen"
-                },
-                {
-                  "id": "op.5.1.2.11",
-                  "ref": "op.5.1.2.11",
-                  "label": "ربط الأصناف بالملحقات",
-                  "status": "ready",
-                  "kind": "screen"
-                },
-                {
-                  "id": "op.5.1.2.12",
-                  "ref": "op.5.1.2.12",
-                  "label": "تقييم الأصناف",
-                  "status": "ready",
-                  "kind": "screen"
-                },
-                {
-                  "id": "op.5.1.2.13",
-                  "ref": "op.5.1.2.13",
-                  "label": "طلب تعديل تسعيرة",
                   "status": "ready",
                   "kind": "screen"
                 },
@@ -1869,38 +1243,9 @@
                   "kind": "screen"
                 },
                 {
-                  "id": "op.5.1.2.17",
-                  "ref": "op.5.1.2.17",
-                  "label": "تخزين الأصناف",
-                  "status": "ready",
-                  "kind": "screen"
-                },
-                {
-                  "id": "op.5.1.2.18",
-                  "ref": "op.5.1.2.18",
-                  "label": "الأصناف المفضلة",
-                  "status": "ready",
-                  "kind": "screen"
-                },
-                {
                   "id": "op.5.1.2.19",
                   "ref": "op.5.1.2.19",
                   "label": "التعديل الجماعي لبيانات الأصناف",
-                  "status": "ready",
-                  "kind": "screen"
-                },
-                {
-                  "id": "op.5.1.2.20",
-                  "ref": "op.5.1.2.20",
-                  "label": "المبازين",
-                  "status": "ready",
-                  "note": "غير واضح — يُحتمل الموازين",
-                  "kind": "screen"
-                },
-                {
-                  "id": "op.5.1.2.21",
-                  "ref": "op.5.1.2.21",
-                  "label": "المجموعات التجميعية",
                   "status": "ready",
                   "kind": "screen"
                 }
@@ -1915,16 +1260,16 @@
               "icon": "layers",
               "children": [
                 {
-                  "id": "op.5.1.3.1",
-                  "ref": "op.5.1.3.1",
-                  "label": "حجز كميات الأصناف",
+                  "id": "op.5.1.3.2",
+                  "ref": "op.5.1.3.2",
+                  "label": "إذن التوريد المخزني",
                   "status": "ready",
                   "kind": "screen"
                 },
                 {
-                  "id": "op.5.1.3.2",
-                  "ref": "op.5.1.3.2",
-                  "label": "إذن التوريد المخزني",
+                  "id": "op.5.1.3.16",
+                  "ref": "op.5.1.3.16",
+                  "label": "أمر التوريد المخزني",
                   "status": "ready",
                   "kind": "screen"
                 },
@@ -1971,30 +1316,9 @@
                   "kind": "screen"
                 },
                 {
-                  "id": "op.5.1.3.9",
-                  "ref": "op.5.1.3.9",
-                  "label": "أمر إصلاح خارجي",
-                  "status": "ready",
-                  "kind": "screen"
-                },
-                {
                   "id": "op.5.1.3.10",
                   "ref": "op.5.1.3.10",
                   "label": "طلب صرف توالف",
-                  "status": "ready",
-                  "kind": "screen"
-                },
-                {
-                  "id": "op.5.1.3.11",
-                  "ref": "op.5.1.3.11",
-                  "label": "إذن توريد أمانات",
-                  "status": "ready",
-                  "kind": "screen"
-                },
-                {
-                  "id": "op.5.1.3.12",
-                  "ref": "op.5.1.3.12",
-                  "label": "إذن صرف أمانات",
                   "status": "ready",
                   "kind": "screen"
                 },
@@ -2044,30 +1368,9 @@
                   "kind": "screen"
                 },
                 {
-                  "id": "op.5.1.4.3",
-                  "ref": "op.5.1.4.3",
-                  "label": "تقارير بيانات المجموعات",
-                  "status": "ready",
-                  "kind": "screen"
-                },
-                {
                   "id": "op.5.1.4.4",
                   "ref": "op.5.1.4.4",
                   "label": "تقارير بيانات الأصناف",
-                  "status": "ready",
-                  "kind": "screen"
-                },
-                {
-                  "id": "op.5.1.4.5",
-                  "ref": "op.5.1.4.5",
-                  "label": "تقارير حدود الأصناف",
-                  "status": "ready",
-                  "kind": "screen"
-                },
-                {
-                  "id": "op.5.1.4.6",
-                  "ref": "op.5.1.4.6",
-                  "label": "طباعة باركود الأصناف",
                   "status": "ready",
                   "kind": "screen"
                 },
@@ -2089,20 +1392,6 @@
                   "id": "op.5.1.4.9",
                   "ref": "op.5.1.4.9",
                   "label": "تقارير المخزون الإفتتاحي",
-                  "status": "ready",
-                  "kind": "screen"
-                },
-                {
-                  "id": "op.5.1.4.10",
-                  "ref": "op.5.1.4.10",
-                  "label": "تقارير حجز كميات الأصناف",
-                  "status": "ready",
-                  "kind": "screen"
-                },
-                {
-                  "id": "op.5.1.4.11",
-                  "ref": "op.5.1.4.11",
-                  "label": "تقارير إذن التوريد",
                   "status": "ready",
                   "kind": "screen"
                 },
@@ -2163,41 +1452,6 @@
                   "kind": "screen"
                 },
                 {
-                  "id": "op.5.1.4.20",
-                  "ref": "op.5.1.4.20",
-                  "label": "تقارير إذن توريد وصرف أمانات",
-                  "status": "ready",
-                  "kind": "screen"
-                },
-                {
-                  "id": "op.5.1.4.21",
-                  "ref": "op.5.1.4.21",
-                  "label": "تقارير أمر إصلاح خارجي",
-                  "status": "ready",
-                  "kind": "screen"
-                },
-                {
-                  "id": "op.5.1.4.22",
-                  "ref": "op.5.1.4.22",
-                  "label": "تقارير طلب صرف توالف",
-                  "status": "ready",
-                  "kind": "screen"
-                },
-                {
-                  "id": "op.5.1.4.23",
-                  "ref": "op.5.1.4.23",
-                  "label": "تقارير العهد المخزنية",
-                  "status": "ready",
-                  "kind": "screen"
-                },
-                {
-                  "id": "op.5.1.4.24",
-                  "ref": "op.5.1.4.24",
-                  "label": "تقارير تصفية العهد المخزنية",
-                  "status": "ready",
-                  "kind": "screen"
-                },
-                {
                   "id": "op.5.1.4.25",
                   "ref": "op.5.1.4.25",
                   "label": "تقارير حركة الأصناف المخزنية في الرفوف",
@@ -2205,131 +1459,6 @@
                   "kind": "screen"
                 }
               ]
-            }
-          ]
-        },
-        {
-          "id": "op.5.2",
-          "ref": "op.5.2",
-          "label": "نظام الأصناف المركبة",
-          "status": "ready",
-          "kind": "submodule",
-          "icon": "folder",
-          "children": [
-            {
-              "id": "op.5.2.1",
-              "ref": "op.5.2.1",
-              "label": "المواد الأولية للأصناف",
-              "status": "ready",
-              "kind": "screen"
-            },
-            {
-              "id": "op.5.2.2",
-              "ref": "op.5.2.2",
-              "label": "إستبدال مكونات الأصناف المركبة",
-              "status": "ready",
-              "kind": "screen"
-            },
-            {
-              "id": "op.5.2.3",
-              "ref": "op.5.2.3",
-              "label": "أنواع التجميع/التفكيك",
-              "status": "ready",
-              "kind": "screen"
-            },
-            {
-              "id": "op.5.2.4",
-              "ref": "op.5.2.4",
-              "label": "طلبات أوامر التجميع",
-              "status": "ready",
-              "kind": "screen"
-            },
-            {
-              "id": "op.5.2.5",
-              "ref": "op.5.2.5",
-              "label": "أوامر التجميع",
-              "status": "ready",
-              "kind": "screen"
-            },
-            {
-              "id": "op.5.2.6",
-              "ref": "op.5.2.6",
-              "label": "أوامر التفكيك",
-              "status": "ready",
-              "kind": "screen"
-            },
-            {
-              "id": "op.5.2.7",
-              "ref": "op.5.2.7",
-              "label": "الإستعلام عن المنتجات وموادها الأولية",
-              "status": "ready",
-              "kind": "screen"
-            },
-            {
-              "id": "op.5.2.8",
-              "ref": "op.5.2.8",
-              "label": "تقارير طلبات أوامر التجميع",
-              "status": "ready",
-              "kind": "screen"
-            },
-            {
-              "id": "op.5.2.9",
-              "ref": "op.5.2.9",
-              "label": "تقارير أوامر التجميع",
-              "status": "ready",
-              "kind": "screen"
-            },
-            {
-              "id": "op.5.2.10",
-              "ref": "op.5.2.10",
-              "label": "تقارير أوامر التفكيك",
-              "status": "ready",
-              "kind": "screen"
-            }
-          ]
-        },
-        {
-          "id": "op.5.3",
-          "ref": "op.5.3",
-          "label": "نظام الجرد",
-          "status": "ready",
-          "kind": "submodule",
-          "icon": "list",
-          "children": [
-            {
-              "id": "op.5.3.1",
-              "ref": "op.5.3.1",
-              "label": "أنواع الجرد",
-              "status": "ready",
-              "kind": "screen"
-            },
-            {
-              "id": "op.5.3.2",
-              "ref": "op.5.3.2",
-              "label": "جرد الآلات",
-              "status": "ready",
-              "kind": "screen"
-            },
-            {
-              "id": "op.5.3.3",
-              "ref": "op.5.3.3",
-              "label": "الجرد اليدوي",
-              "status": "ready",
-              "kind": "screen"
-            },
-            {
-              "id": "op.5.3.4",
-              "ref": "op.5.3.4",
-              "label": "تقارير جرد مخزون العميل",
-              "status": "ready",
-              "kind": "screen"
-            },
-            {
-              "id": "op.5.3.5",
-              "ref": "op.5.3.5",
-              "label": "تقارير الجرد",
-              "status": "ready",
-              "kind": "screen"
             }
           ]
         }
@@ -2879,7 +2008,7 @@
       "variant": "operations",
       "icon": "cart",
       "accent": "green",
-      "note": "العملاء والمبيعات والتوزيع والعمولات والعروض.",
+      "note": "العملاء والمبيعات.",
       "status": "ready",
       "children": [
         {
@@ -2941,51 +2070,9 @@
                   "kind": "screen"
                 },
                 {
-                  "id": "op.7.1.1.7",
-                  "ref": "op.7.1.1.7",
-                  "label": "أنواع المحصلين",
-                  "status": "ready",
-                  "kind": "screen"
-                },
-                {
                   "id": "op.7.1.1.8",
                   "ref": "op.7.1.1.8",
                   "label": "أنواع المسوقين",
-                  "status": "ready",
-                  "kind": "screen"
-                },
-                {
-                  "id": "op.7.1.1.9",
-                  "ref": "op.7.1.1.9",
-                  "label": "ترميز درجات المسوقين",
-                  "status": "ready",
-                  "kind": "screen"
-                },
-                {
-                  "id": "op.7.1.1.10",
-                  "ref": "op.7.1.1.10",
-                  "label": "مجموعة بطائق الائتمان",
-                  "status": "ready",
-                  "kind": "screen"
-                },
-                {
-                  "id": "op.7.1.1.11",
-                  "ref": "op.7.1.1.11",
-                  "label": "أنواع بطائق الائتمان",
-                  "status": "ready",
-                  "kind": "screen"
-                },
-                {
-                  "id": "op.7.1.1.12",
-                  "ref": "op.7.1.1.12",
-                  "label": "بيانات بطاقات الائتمان",
-                  "status": "ready",
-                  "kind": "screen"
-                },
-                {
-                  "id": "op.7.1.1.13",
-                  "ref": "op.7.1.1.13",
-                  "label": "أنواع طلبات الإشعارات",
                   "status": "ready",
                   "kind": "screen"
                 },
@@ -2994,42 +2081,6 @@
                   "ref": "op.7.1.1.14",
                   "label": "أنواع الإشعارات",
                   "status": "ready",
-                  "kind": "screen"
-                },
-                {
-                  "id": "op.7.1.1.15",
-                  "ref": "op.7.1.1.15",
-                  "label": "أنواع الكوبونات",
-                  "status": "ready",
-                  "kind": "screen"
-                },
-                {
-                  "id": "op.7.1.1.16",
-                  "ref": "op.7.1.1.16",
-                  "label": "الترميزات العامة لنظام العملاء",
-                  "status": "ready",
-                  "kind": "screen"
-                },
-                {
-                  "id": "op.7.1.1.17",
-                  "ref": "op.7.1.1.17",
-                  "label": "أنواع عقود المبيعات",
-                  "status": "ready",
-                  "kind": "screen"
-                },
-                {
-                  "id": "op.7.1.1.18",
-                  "ref": "op.7.1.1.18",
-                  "label": "ترميز شروط عقود المبيعات",
-                  "status": "ready",
-                  "kind": "screen"
-                },
-                {
-                  "id": "op.7.1.1.19",
-                  "ref": "op.7.1.1.19",
-                  "label": "ترميزات وصفتي",
-                  "status": "ready",
-                  "note": "غير واضح بالكامل بالصورة",
                   "kind": "screen"
                 }
               ]
@@ -3043,23 +2094,9 @@
               "icon": "file",
               "children": [
                 {
-                  "id": "op.7.1.2.1",
-                  "ref": "op.7.1.2.1",
-                  "label": "بيانات المسوقين",
-                  "status": "ready",
-                  "kind": "screen"
-                },
-                {
                   "id": "op.7.1.2.2",
                   "ref": "op.7.1.2.2",
                   "label": "مجموعة العملاء",
-                  "status": "ready",
-                  "kind": "screen"
-                },
-                {
-                  "id": "op.7.1.2.3",
-                  "ref": "op.7.1.2.3",
-                  "label": "بيانات المحصلين",
                   "status": "ready",
                   "kind": "screen"
                 },
@@ -3113,29 +2150,6 @@
                   "kind": "screen"
                 },
                 {
-                  "id": "op.7.1.2.11",
-                  "ref": "op.7.1.2.11",
-                  "label": "بيانات الكوبونات",
-                  "status": "ready",
-                  "kind": "screen"
-                },
-                {
-                  "id": "op.7.1.2.12",
-                  "ref": "op.7.1.2.12",
-                  "label": "مجموعة العملاء التقديون",
-                  "status": "ready",
-                  "note": "غير واضح",
-                  "kind": "screen"
-                },
-                {
-                  "id": "op.7.1.2.13",
-                  "ref": "op.7.1.2.13",
-                  "label": "بيانات العملاء التقديون",
-                  "status": "ready",
-                  "note": "غير واضح",
-                  "kind": "screen"
-                },
-                {
                   "id": "op.7.1.2.14",
                   "ref": "op.7.1.2.14",
                   "label": "التعديل الجماعي لبيانات العملاء",
@@ -3153,23 +2167,9 @@
               "icon": "layers",
               "children": [
                 {
-                  "id": "op.7.1.3.1",
-                  "ref": "op.7.1.3.1",
-                  "label": "طلبات إشعارات العملاء",
-                  "status": "ready",
-                  "kind": "screen"
-                },
-                {
                   "id": "op.7.1.3.2",
                   "ref": "op.7.1.3.2",
                   "label": "إشعارات العملاء",
-                  "status": "ready",
-                  "kind": "screen"
-                },
-                {
-                  "id": "op.7.1.3.3",
-                  "ref": "op.7.1.3.3",
-                  "label": "إشعارات العملاء المتعدد",
                   "status": "ready",
                   "kind": "screen"
                 },
@@ -3195,58 +2195,9 @@
                   "kind": "screen"
                 },
                 {
-                  "id": "op.7.1.3.7",
-                  "ref": "op.7.1.3.7",
-                  "label": "تسوية أقساط العملاء",
-                  "status": "ready",
-                  "kind": "screen"
-                },
-                {
                   "id": "op.7.1.3.8",
                   "ref": "op.7.1.3.8",
                   "label": "متابعة فواتير المبيعات",
-                  "status": "ready",
-                  "kind": "screen"
-                },
-                {
-                  "id": "op.7.1.3.9",
-                  "ref": "op.7.1.3.9",
-                  "label": "متابعة مطالبات شركات التأمين",
-                  "status": "ready",
-                  "kind": "screen"
-                },
-                {
-                  "id": "op.7.1.3.10",
-                  "ref": "op.7.1.3.10",
-                  "label": "عقود المبيعات",
-                  "status": "ready",
-                  "kind": "screen"
-                },
-                {
-                  "id": "op.7.1.3.11",
-                  "ref": "op.7.1.3.11",
-                  "label": "توزيع الكوبونات على المندوبين",
-                  "status": "ready",
-                  "kind": "screen"
-                },
-                {
-                  "id": "op.7.1.3.12",
-                  "ref": "op.7.1.3.12",
-                  "label": "إرجاع الكوبونات من المندوبين",
-                  "status": "ready",
-                  "kind": "screen"
-                },
-                {
-                  "id": "op.7.1.3.13",
-                  "ref": "op.7.1.3.13",
-                  "label": "مبيعات الكوبونات",
-                  "status": "ready",
-                  "kind": "screen"
-                },
-                {
-                  "id": "op.7.1.3.14",
-                  "ref": "op.7.1.3.14",
-                  "label": "إعتماد طلبات تجاوزات الخصومات",
                   "status": "ready",
                   "kind": "screen"
                 },
@@ -3271,13 +2222,6 @@
                   "id": "op.7.1.4.1",
                   "ref": "op.7.1.4.1",
                   "label": "تقارير بيانات المناطق",
-                  "status": "ready",
-                  "kind": "screen"
-                },
-                {
-                  "id": "op.7.1.4.2",
-                  "ref": "op.7.1.4.2",
-                  "label": "تقارير بيانات المحصلين",
                   "status": "ready",
                   "kind": "screen"
                 },
@@ -3324,20 +2268,6 @@
                   "kind": "screen"
                 },
                 {
-                  "id": "op.7.1.4.9",
-                  "ref": "op.7.1.4.9",
-                  "label": "تقارير طلبات إشعارات العملاء",
-                  "status": "ready",
-                  "kind": "screen"
-                },
-                {
-                  "id": "op.7.1.4.10",
-                  "ref": "op.7.1.4.10",
-                  "label": "تقارير إشعارات العملاء",
-                  "status": "ready",
-                  "kind": "screen"
-                },
-                {
                   "id": "op.7.1.4.11",
                   "ref": "op.7.1.4.11",
                   "label": "تقارير سند القبض",
@@ -3352,41 +2282,6 @@
                   "kind": "screen"
                 },
                 {
-                  "id": "op.7.1.4.13",
-                  "ref": "op.7.1.4.13",
-                  "label": "تقارير عقود المبيعات",
-                  "status": "ready",
-                  "kind": "screen"
-                },
-                {
-                  "id": "op.7.1.4.14",
-                  "ref": "op.7.1.4.14",
-                  "label": "تقارير مبيعات الكوبونات",
-                  "status": "ready",
-                  "kind": "screen"
-                },
-                {
-                  "id": "op.7.1.4.15",
-                  "ref": "op.7.1.4.15",
-                  "label": "رسوم بيانية",
-                  "status": "ready",
-                  "kind": "screen"
-                },
-                {
-                  "id": "op.7.1.4.16",
-                  "ref": "op.7.1.4.16",
-                  "label": "تقارير العملاء التقديون",
-                  "status": "ready",
-                  "kind": "screen"
-                },
-                {
-                  "id": "op.7.1.4.17",
-                  "ref": "op.7.1.4.17",
-                  "label": "تقارير بيانات النقاط",
-                  "status": "ready",
-                  "kind": "screen"
-                },
-                {
                   "id": "op.7.1.4.18",
                   "ref": "op.7.1.4.18",
                   "label": "طباعة باركود العملاء",
@@ -3394,211 +2289,6 @@
                   "kind": "screen"
                 }
               ]
-            }
-          ]
-        },
-        {
-          "id": "op.7.2",
-          "ref": "op.7.2",
-          "label": "نظام العمولات",
-          "status": "ready",
-          "kind": "submodule",
-          "icon": "folder",
-          "children": [
-            {
-              "id": "op.7.2.1",
-              "ref": "op.7.2.1",
-              "label": "ترميز عمولات العملاء",
-              "status": "ready",
-              "kind": "screen"
-            },
-            {
-              "id": "op.7.2.2",
-              "ref": "op.7.2.2",
-              "label": "ترميز عمولات المندوبين",
-              "status": "ready",
-              "kind": "screen"
-            },
-            {
-              "id": "op.7.2.3",
-              "ref": "op.7.2.3",
-              "label": "أنواع إحتساب تحصيلات المندوبين",
-              "status": "ready",
-              "kind": "screen"
-            },
-            {
-              "id": "op.7.2.4",
-              "ref": "op.7.2.4",
-              "label": "ترميز عمولات المحصلين",
-              "status": "ready",
-              "kind": "screen"
-            },
-            {
-              "id": "op.7.2.5",
-              "ref": "op.7.2.5",
-              "label": "ترميز عمولات الموظفين",
-              "status": "ready",
-              "kind": "screen"
-            },
-            {
-              "id": "op.7.2.6",
-              "ref": "op.7.2.6",
-              "label": "ترميز عمولات المسوقين",
-              "status": "ready",
-              "kind": "screen"
-            },
-            {
-              "id": "op.7.2.7",
-              "ref": "op.7.2.7",
-              "label": "إحتساب عمولات العملاء",
-              "status": "ready",
-              "kind": "screen"
-            },
-            {
-              "id": "op.7.2.8",
-              "ref": "op.7.2.8",
-              "label": "إحتساب عمولات المندوبين",
-              "status": "ready",
-              "kind": "screen"
-            },
-            {
-              "id": "op.7.2.9",
-              "ref": "op.7.2.9",
-              "label": "إحتساب عمولات المحصلين",
-              "status": "ready",
-              "kind": "screen"
-            },
-            {
-              "id": "op.7.2.10",
-              "ref": "op.7.2.10",
-              "label": "إحتساب عمولات الموظفين",
-              "status": "ready",
-              "kind": "screen"
-            },
-            {
-              "id": "op.7.2.11",
-              "ref": "op.7.2.11",
-              "label": "إحتساب عمولات المسوقين",
-              "status": "ready",
-              "kind": "screen"
-            },
-            {
-              "id": "op.7.2.12",
-              "ref": "op.7.2.12",
-              "label": "تقارير عمولات العملاء",
-              "status": "ready",
-              "kind": "screen"
-            },
-            {
-              "id": "op.7.2.13",
-              "ref": "op.7.2.13",
-              "label": "تقارير عمولات المندوبين",
-              "status": "ready",
-              "kind": "screen"
-            },
-            {
-              "id": "op.7.2.14",
-              "ref": "op.7.2.14",
-              "label": "تقارير عمولات المحصلين",
-              "status": "ready",
-              "kind": "screen"
-            },
-            {
-              "id": "op.7.2.15",
-              "ref": "op.7.2.15",
-              "label": "تقارير عمولات الموظفين",
-              "status": "ready",
-              "kind": "screen"
-            }
-          ]
-        },
-        {
-          "id": "op.7.3",
-          "ref": "op.7.3",
-          "label": "المتاجر الالكترونية",
-          "status": "ready",
-          "kind": "submodule",
-          "icon": "folder",
-          "children": [
-            {
-              "id": "op.7.3.1",
-              "ref": "op.7.3.1",
-              "label": "متغيرات المتاجر الالكترونية",
-              "status": "ready",
-              "kind": "screen"
-            },
-            {
-              "id": "op.7.3.2",
-              "ref": "op.7.3.2",
-              "label": "أصناف المتجر",
-              "status": "ready",
-              "kind": "screen"
-            },
-            {
-              "id": "op.7.3.3",
-              "ref": "op.7.3.3",
-              "label": "الإعلانات",
-              "status": "ready",
-              "kind": "screen"
-            },
-            {
-              "id": "op.7.3.4",
-              "ref": "op.7.3.4",
-              "label": "تقارير أصناف المتجر",
-              "status": "ready",
-              "kind": "screen"
-            },
-            {
-              "id": "op.7.3.5",
-              "ref": "op.7.3.5",
-              "label": "أصناف مطلوبة",
-              "status": "ready",
-              "kind": "screen"
-            },
-            {
-              "id": "op.7.3.6",
-              "ref": "op.7.3.6",
-              "label": "أصناف مستعملة للبيع",
-              "status": "ready",
-              "kind": "screen"
-            }
-          ]
-        },
-        {
-          "id": "op.7.4",
-          "ref": "op.7.4",
-          "label": "العروض الترويجية",
-          "status": "ready",
-          "kind": "submodule",
-          "icon": "folder",
-          "children": [
-            {
-              "id": "op.7.4.1",
-              "ref": "op.7.4.1",
-              "label": "أنواع العروض الترويجية",
-              "status": "ready",
-              "kind": "screen"
-            },
-            {
-              "id": "op.7.4.2",
-              "ref": "op.7.4.2",
-              "label": "مجموعات العروض الترويجية",
-              "status": "ready",
-              "kind": "screen"
-            },
-            {
-              "id": "op.7.4.3",
-              "ref": "op.7.4.3",
-              "label": "العروض الترويجية",
-              "status": "ready",
-              "kind": "screen"
-            },
-            {
-              "id": "op.7.4.4",
-              "ref": "op.7.4.4",
-              "label": "تقارير العروض الترويجية",
-              "status": "ready",
-              "kind": "screen"
             }
           ]
         },
@@ -3709,23 +2399,9 @@
               "icon": "layers",
               "children": [
                 {
-                  "id": "op.7.5.3.1",
-                  "ref": "op.7.5.3.1",
-                  "label": "طلب عروض الأسعار",
-                  "status": "ready",
-                  "kind": "screen"
-                },
-                {
                   "id": "op.7.5.3.2",
                   "ref": "op.7.5.3.2",
                   "label": "عروض الأسعار",
-                  "status": "ready",
-                  "kind": "screen"
-                },
-                {
-                  "id": "op.7.5.3.3",
-                  "ref": "op.7.5.3.3",
-                  "label": "طلبات العملاء",
                   "status": "ready",
                   "kind": "screen"
                 },
@@ -3775,13 +2451,6 @@
               "icon": "chart",
               "children": [
                 {
-                  "id": "op.7.5.4.1",
-                  "ref": "op.7.5.4.1",
-                  "label": "تقارير الأصناف المطلوبة",
-                  "status": "ready",
-                  "kind": "screen"
-                },
-                {
                   "id": "op.7.5.4.2",
                   "ref": "op.7.5.4.2",
                   "label": "تقارير أصناف العملاء",
@@ -3789,30 +2458,16 @@
                   "kind": "screen"
                 },
                 {
-                  "id": "op.7.5.4.3",
-                  "ref": "op.7.5.4.3",
-                  "label": "تقارير طلبات عروض الأسعار",
-                  "status": "ready",
-                  "kind": "screen"
-                },
-                {
-                  "id": "op.7.5.4.4",
-                  "ref": "op.7.5.4.4",
-                  "label": "تقارير عروض الأسعار",
-                  "status": "ready",
-                  "kind": "screen"
-                },
-                {
-                  "id": "op.7.5.4.5",
-                  "ref": "op.7.5.4.5",
-                  "label": "تقارير طلبات العملاء",
-                  "status": "ready",
-                  "kind": "screen"
-                },
-                {
                   "id": "op.7.5.4.6",
                   "ref": "op.7.5.4.6",
                   "label": "تقارير المبالغ الإضافية والخصومات",
+                  "status": "ready",
+                  "kind": "screen"
+                },
+                {
+                  "id": "op.7.5.4.10",
+                  "ref": "op.7.5.4.10",
+                  "label": "تقارير فاتورة المبيعات",
                   "status": "ready",
                   "kind": "screen"
                 },
@@ -3840,323 +2495,6 @@
               ]
             }
           ]
-        },
-        {
-          "id": "op.7.6",
-          "ref": "op.7.6",
-          "label": "نظام التوزيع",
-          "status": "ready",
-          "kind": "submodule",
-          "icon": "folder",
-          "children": [
-            {
-              "id": "op.7.6.1",
-              "ref": "op.7.6.1",
-              "label": "التهيئة",
-              "status": "ready",
-              "kind": "group",
-              "icon": "settings",
-              "children": [
-                {
-                  "id": "op.7.6.1.1",
-                  "ref": "op.7.6.1.1",
-                  "label": "متغيرات التوزيع",
-                  "status": "ready",
-                  "kind": "screen"
-                },
-                {
-                  "id": "op.7.6.1.2",
-                  "ref": "op.7.6.1.2",
-                  "label": "بنود خطة سير المندوب",
-                  "status": "ready",
-                  "kind": "screen"
-                },
-                {
-                  "id": "op.7.6.1.3",
-                  "ref": "op.7.6.1.3",
-                  "label": "مجموعة الأصناف المنافسة",
-                  "status": "ready",
-                  "kind": "screen"
-                },
-                {
-                  "id": "op.7.6.1.4",
-                  "ref": "op.7.6.1.4",
-                  "label": "طرق دخول الأصناف المنافسة",
-                  "status": "ready",
-                  "kind": "screen"
-                },
-                {
-                  "id": "op.7.6.1.5",
-                  "ref": "op.7.6.1.5",
-                  "label": "أنواع المزايا المعطاة للأصناف المنافسة",
-                  "status": "ready",
-                  "kind": "screen"
-                },
-                {
-                  "id": "op.7.6.1.6",
-                  "ref": "op.7.6.1.6",
-                  "label": "أنواع مصروفات المندوبين",
-                  "status": "ready",
-                  "kind": "screen"
-                },
-                {
-                  "id": "op.7.6.1.7",
-                  "ref": "op.7.6.1.7",
-                  "label": "أنواع أسعار الأصناف المنافسة",
-                  "status": "ready",
-                  "kind": "screen"
-                },
-                {
-                  "id": "op.7.6.1.8",
-                  "ref": "op.7.6.1.8",
-                  "label": "أسباب فشل زيارة العميل",
-                  "status": "ready",
-                  "kind": "screen"
-                },
-                {
-                  "id": "op.7.6.1.9",
-                  "ref": "op.7.6.1.9",
-                  "label": "تهيئة حقول المدخلات",
-                  "status": "ready",
-                  "kind": "screen"
-                },
-                {
-                  "id": "op.7.6.1.10",
-                  "ref": "op.7.6.1.10",
-                  "label": "أنواع المسوقين",
-                  "status": "ready",
-                  "kind": "screen"
-                },
-                {
-                  "id": "op.7.6.1.11",
-                  "ref": "op.7.6.1.11",
-                  "label": "ترميز درجات المسوقين",
-                  "status": "ready",
-                  "kind": "screen"
-                }
-              ]
-            },
-            {
-              "id": "op.7.6.2",
-              "ref": "op.7.6.2",
-              "label": "المدخلات",
-              "status": "ready",
-              "kind": "group",
-              "icon": "file",
-              "children": [
-                {
-                  "id": "op.7.6.2.1",
-                  "ref": "op.7.6.2.1",
-                  "label": "بيانات الشركات المنتجة للأصناف المنافسة",
-                  "status": "ready",
-                  "kind": "screen"
-                },
-                {
-                  "id": "op.7.6.2.2",
-                  "ref": "op.7.6.2.2",
-                  "label": "بيانات وكلاء الأصناف المنافسة",
-                  "status": "ready",
-                  "kind": "screen"
-                },
-                {
-                  "id": "op.7.6.2.3",
-                  "ref": "op.7.6.2.3",
-                  "label": "بيانات مجموعة التوزيع",
-                  "status": "ready",
-                  "kind": "screen"
-                },
-                {
-                  "id": "op.7.6.2.4",
-                  "ref": "op.7.6.2.4",
-                  "label": "بيانات الأصناف المنافسة",
-                  "status": "ready",
-                  "kind": "screen"
-                },
-                {
-                  "id": "op.7.6.2.5",
-                  "ref": "op.7.6.2.5",
-                  "label": "بيانات المسوقين",
-                  "status": "ready",
-                  "kind": "screen"
-                },
-                {
-                  "id": "op.7.6.2.6",
-                  "ref": "op.7.6.2.6",
-                  "label": "بيانات العملاء المستهدفين",
-                  "status": "ready",
-                  "kind": "screen"
-                },
-                {
-                  "id": "op.7.6.2.7",
-                  "ref": "op.7.6.2.7",
-                  "label": "فحص الإعدادات",
-                  "status": "ready",
-                  "kind": "screen"
-                },
-                {
-                  "id": "op.7.6.2.8",
-                  "ref": "op.7.6.2.8",
-                  "label": "بيانات مندوبي المبيعات",
-                  "status": "ready",
-                  "kind": "screen"
-                },
-                {
-                  "id": "op.7.6.2.9",
-                  "ref": "op.7.6.2.9",
-                  "label": "مخطط التحصيل",
-                  "status": "ready",
-                  "kind": "screen"
-                },
-                {
-                  "id": "op.7.6.2.10",
-                  "ref": "op.7.6.2.10",
-                  "label": "مخططات المبيعات",
-                  "status": "ready",
-                  "kind": "screen"
-                }
-              ]
-            },
-            {
-              "id": "op.7.6.3",
-              "ref": "op.7.6.3",
-              "label": "العمليات",
-              "status": "ready",
-              "kind": "group",
-              "icon": "layers",
-              "children": [
-                {
-                  "id": "op.7.6.3.1",
-                  "ref": "op.7.6.3.1",
-                  "label": "خطة السير اليومية للمندوب",
-                  "status": "ready",
-                  "kind": "screen"
-                },
-                {
-                  "id": "op.7.6.3.2",
-                  "ref": "op.7.6.3.2",
-                  "label": "خطة سير المندوب لفترة",
-                  "status": "ready",
-                  "kind": "screen"
-                },
-                {
-                  "id": "op.7.6.3.3",
-                  "ref": "op.7.6.3.3",
-                  "label": "المتابعة اليومية لخطة سير المندوب",
-                  "status": "ready",
-                  "kind": "screen"
-                },
-                {
-                  "id": "op.7.6.3.4",
-                  "ref": "op.7.6.3.4",
-                  "label": "مصروفات المندوبين",
-                  "status": "ready",
-                  "kind": "screen"
-                },
-                {
-                  "id": "op.7.6.3.5",
-                  "ref": "op.7.6.3.5",
-                  "label": "معلومات إحصائية عن الأصناف المنافسة",
-                  "status": "ready",
-                  "kind": "screen"
-                },
-                {
-                  "id": "op.7.6.3.6",
-                  "ref": "op.7.6.3.6",
-                  "label": "جرد مخزون العميل",
-                  "status": "ready",
-                  "kind": "screen"
-                },
-                {
-                  "id": "op.7.6.3.7",
-                  "ref": "op.7.6.3.7",
-                  "label": "الخرائط",
-                  "status": "ready",
-                  "kind": "screen"
-                },
-                {
-                  "id": "op.7.6.3.8",
-                  "ref": "op.7.6.3.8",
-                  "label": "مناقلة العملاء",
-                  "status": "ready",
-                  "kind": "screen"
-                },
-                {
-                  "id": "op.7.6.3.9",
-                  "ref": "op.7.6.3.9",
-                  "label": "عرض الأصناف للترويج",
-                  "status": "ready",
-                  "kind": "screen"
-                },
-                {
-                  "id": "op.7.6.3.10",
-                  "ref": "op.7.6.3.10",
-                  "label": "طلب تعديل بيانات العميل",
-                  "status": "ready",
-                  "kind": "screen"
-                },
-                {
-                  "id": "op.7.6.3.11",
-                  "ref": "op.7.6.3.11",
-                  "label": "الترحيل لنظام الأونكس برو",
-                  "status": "ready",
-                  "kind": "screen"
-                }
-              ]
-            },
-            {
-              "id": "op.7.6.4",
-              "ref": "op.7.6.4",
-              "label": "التقارير",
-              "status": "ready",
-              "note": "لم يُصوَّر توسيعها بعد",
-              "kind": "screen"
-            }
-          ]
-        },
-        {
-          "id": "op.7.7",
-          "ref": "op.7.7",
-          "label": "نظام الإستبيانات",
-          "status": "ready",
-          "kind": "submodule",
-          "icon": "file",
-          "children": [
-            {
-              "id": "op.7.7.1",
-              "ref": "op.7.7.1",
-              "label": "الترميزات العامة",
-              "status": "ready",
-              "kind": "screen"
-            },
-            {
-              "id": "op.7.7.2",
-              "ref": "op.7.7.2",
-              "label": "ترميز اجابات الاستبيان",
-              "status": "ready",
-              "kind": "screen"
-            },
-            {
-              "id": "op.7.7.3",
-              "ref": "op.7.7.3",
-              "label": "تفاصيل عناصر الإستبيان",
-              "status": "ready",
-              "kind": "screen"
-            },
-            {
-              "id": "op.7.7.4",
-              "ref": "op.7.7.4",
-              "label": "إستبيان الأصناف",
-              "status": "ready",
-              "kind": "screen"
-            },
-            {
-              "id": "op.7.7.5",
-              "ref": "op.7.7.5",
-              "label": "تقارير إستبيان الأصناف",
-              "status": "ready",
-              "kind": "screen"
-            }
-          ]
         }
       ]
     },
@@ -4180,23 +2518,9 @@
           "icon": "chart",
           "children": [
             {
-              "id": "op.8.1.1",
-              "ref": "op.8.1.1",
-              "label": "تقارير الرقابة",
-              "status": "ready",
-              "kind": "screen"
-            },
-            {
               "id": "op.8.1.2",
               "ref": "op.8.1.2",
               "label": "تقارير أرشفة مرفقات الوثائق",
-              "status": "ready",
-              "kind": "screen"
-            },
-            {
-              "id": "op.8.1.3",
-              "ref": "op.8.1.3",
-              "label": "حركة الإعتمادات",
               "status": "ready",
               "kind": "screen"
             },
@@ -4339,6 +2663,13 @@
               "kind": "screen"
             },
             {
+              "id": "op.8.5.6",
+              "ref": "op.8.5.6",
+              "label": "تقارير صافي المبيعات",
+              "status": "ready",
+              "kind": "screen"
+            },
+            {
               "id": "op.8.5.3",
               "ref": "op.8.5.3",
               "label": "تقارير صافي هامش الربح",
@@ -4356,123 +2687,6 @@
               "id": "op.8.5.5",
               "ref": "op.8.5.5",
               "label": "الأصناف المطلوبة للعملاء",
-              "status": "ready",
-              "kind": "screen"
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "id": "op.9",
-      "ref": "op.9",
-      "label": "الأنظمة المساعدة",
-      "kind": "module",
-      "variant": "operations",
-      "icon": "wrench",
-      "accent": "slate",
-      "note": "التنبيهات والشاشات المساعدة.",
-      "status": "ready",
-      "children": [
-        {
-          "id": "op.9.1",
-          "ref": "op.9.1",
-          "label": "نظام التنبيهات",
-          "status": "ready",
-          "kind": "submodule",
-          "icon": "folder",
-          "children": [
-            {
-              "id": "op.9.1.1",
-              "ref": "op.9.1.1",
-              "label": "متغيرات التنبيهات",
-              "status": "ready",
-              "kind": "screen"
-            },
-            {
-              "id": "op.9.1.2",
-              "ref": "op.9.1.2",
-              "label": "الرسائل المباشرة",
-              "status": "ready",
-              "kind": "screen"
-            },
-            {
-              "id": "op.9.1.3",
-              "ref": "op.9.1.3",
-              "label": "تنبيهات الحسابات",
-              "status": "ready",
-              "kind": "screen"
-            },
-            {
-              "id": "op.9.1.4",
-              "ref": "op.9.1.4",
-              "label": "تنبيهات الحسابات التحليلية",
-              "status": "ready",
-              "kind": "screen"
-            },
-            {
-              "id": "op.9.1.5",
-              "ref": "op.9.1.5",
-              "label": "تنبيهات المستفيدين",
-              "status": "ready",
-              "kind": "screen"
-            },
-            {
-              "id": "op.9.1.6",
-              "ref": "op.9.1.6",
-              "label": "تنبيهات الشيكات",
-              "status": "ready",
-              "kind": "screen"
-            },
-            {
-              "id": "op.9.1.7",
-              "ref": "op.9.1.7",
-              "label": "عرض الرسائل",
-              "status": "ready",
-              "kind": "screen"
-            }
-          ]
-        },
-        {
-          "id": "op.9.2",
-          "ref": "op.9.2",
-          "label": "الشاشات المساعدة",
-          "status": "ready",
-          "kind": "submodule",
-          "icon": "folder",
-          "children": [
-            {
-              "id": "op.9.2.1",
-              "ref": "op.9.2.1",
-              "label": "الحسابات المفضلة",
-              "status": "ready",
-              "kind": "screen"
-            },
-            {
-              "id": "op.9.2.2",
-              "ref": "op.9.2.2",
-              "label": "رسائل المستخدمين",
-              "status": "ready",
-              "kind": "screen"
-            },
-            {
-              "id": "op.9.2.3",
-              "ref": "op.9.2.3",
-              "label": "دليل العناوين",
-              "status": "ready",
-              "kind": "screen"
-            },
-            {
-              "id": "op.9.2.4",
-              "ref": "op.9.2.4",
-              "label": "جدولة الاعمال",
-              "status": "ready",
-              "kind": "screen"
-            },
-            {
-              "id": "op.9.2.5",
-              "ref": "op.9.2.5",
-              "label": "دليل النظام",
               "status": "ready",
               "kind": "screen"
             }
@@ -8450,16 +6664,6 @@
                   "cfgStatus": "pending",
                   "source": "تهيئة الموردين",
                   "kind": "screen"
-                },
-                {
-                  "id": "cfg.6.1.11",
-                  "ref": "cfg.6.1.11",
-                  "label": "متغيرات التوزيع",
-                  "status": "wip",
-                  "cfgStatus": "pending",
-                  "detail": "يحدد إن كان نظام التوزيع/المندوبين مفعّلاً فعلاً",
-                  "source": "تهيئة التوزيع",
-                  "kind": "screen"
                 }
               ]
             },
@@ -8664,16 +6868,6 @@
                   "status": "wip",
                   "cfgStatus": "pending",
                   "source": "صلاحيات المستخدمين",
-                  "kind": "screen"
-                },
-                {
-                  "id": "cfg.6.4.3",
-                  "ref": "cfg.6.4.3",
-                  "label": "مستويات الإعتماد",
-                  "status": "wip",
-                  "cfgStatus": "pending",
-                  "detail": "رغم أن مراجعة الوثائق معطّلة — نتأكد",
-                  "source": "تهيئة النظام",
                   "kind": "screen"
                 },
                 {

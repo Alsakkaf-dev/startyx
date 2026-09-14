@@ -106,7 +106,6 @@
     h.appendChild(U.el('<div class="section-head">' + I.svg("layers", { size: 18, cls: "icon" }) +
       "<h2>عقد الشاشة</h2><span class=\"spacer\"></span>" +
       (d.keyDoc ? '<span class="pill pill--brand">وثيقة محورية</span>' : "") +
-      (d.proposed ? '<span class="pill pill--proposed">مقترحة</span>' : "") +
       '<span class="pill pill--ready">' + esc(d.family) + "</span></div>"));
 
     h.appendChild(detailRows([
@@ -114,8 +113,7 @@
       ["طبقة البناء", d.layer != null ? U.formatNum(d.layer, true) + " — " +
         ((S.layers || []).filter(function (l) { return l.n === d.layer; })[0] || {}).label : null],
       ["حقول الرأس", (d.header || []).join("  ·  ")],
-      ["حقول السطور", (d.lines || []).join("  ·  ")],
-      ["يحلّ محل", d.replaces]
+      ["حقول السطور", (d.lines || []).join("  ·  ")]
     ]) || U.el("<div></div>"));
 
     /* القيد */

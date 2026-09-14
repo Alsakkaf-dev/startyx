@@ -10,7 +10,7 @@
   var results = [], active = 0, lastFocus = null;
 
   /* نطاق البحث — كل صفحة تبحث في محتواها وحده كي لا تختلط الشجرات.
-     index.html: الأنظمة التسعة · settings.html: الدليل والإعدادات والمقترحات */
+     index.html: الأنظمة التشغيلية · settings.html: الدليل والإعدادات */
   var scopeFn = null, scopeHint = null;
   function inScope(n) { return !scopeFn || scopeFn(n); }
   function pool() { return scopeFn ? IDX.screens.filter(inScope) : IDX.screens; }

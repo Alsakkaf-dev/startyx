@@ -409,7 +409,7 @@
   .leafrow__detail { max-width: 100%; flex-basis: 100%; white-space: normal; }
 }
 
-/* ═════════ بطاقة «لماذا هذا النظام مقترح» ═════════ */
+/* ═════════ صندوق التنبيه: الفجوة البنيوية · القرار المعلّق ═════════ */
 .whybox {
   background: var(--status-wip-bg);
   border: 1px solid var(--status-wip-fg);
@@ -620,8 +620,8 @@
 
 /* ═══════════════════════════════════════════════════════════════════════════
    مركز المرجع والإعدادات
-   ما ليس نظاماً تشغيلياً (الدليل المحاسبي · الإعدادات · المقترحات) يُعرض هنا
-   ببطاقات أوسع وأهدأ من بطاقات الأنظمة — كي لا يُقرأ كأنه نظام عاشر.
+   ما ليس نظاماً تشغيلياً (الدليل المحاسبي · الإعدادات) يُعرض هنا
+   ببطاقات أوسع وأهدأ من بطاقات الأنظمة — كي لا يُقرأ كأنه نظام تشغيلي.
    ═════════════════════════════════════════════════════════════════════════ */
 .hubgrid {
   display: grid;
@@ -646,8 +646,6 @@
   border-color: var(--sys-accent, var(--brand));
   box-shadow: var(--shadow-md);
 }
-.hubcard[data-tone="proposed"] { background: var(--bg-sunken); border-style: dashed; }
-.hubcard[data-tone="proposed"]:hover { border-style: solid; }
 .hubcard__top { display: flex; align-items: center; gap: var(--space-3); }
 .hubcard__icon {
   width: 36px; height: 36px;
@@ -657,7 +655,6 @@
   background: var(--bg-sunken);
   color: var(--sys-accent, var(--brand-fg));
 }
-.hubcard[data-tone="proposed"] .hubcard__icon { background: var(--bg-surface); }
 .hubcard__name {
   flex: 1; min-width: 0;
   font-size: var(--text-md);

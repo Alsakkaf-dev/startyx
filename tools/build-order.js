@@ -26,7 +26,7 @@ const win = { console };
 win.window = win;
 win.localStorage = { getItem: () => null, setItem: () => {}, removeItem: () => {} };
 const ctx = vm.createContext(win);
-["util.js", "store.js", "data.js", "links.js", "proposed.js", "index-data.js",
+["util.js", "store.js", "data.js", "links.js", "index-data.js",
  "spec-model.js", "spec-docs.js", "spec-rules.js"].forEach(f =>
   vm.runInContext(fs.readFileSync(path.join(APP, "assets/js", f), "utf8"), ctx, { filename: f }));
 win.OnyxIndex.build();
@@ -130,7 +130,7 @@ S.documents.forEach(d => {
   add({
     id: d.ref, kind: "document", label: n.label, ref: d.ref,
     layer: d.layer != null ? d.layer : 4,
-    family: d.family, keyDoc: !!d.keyDoc, proposed: !!d.proposed,
+    family: d.family, keyDoc: !!d.keyDoc,
     why: d.role, rules: d.validations || [],
     legs: ((d.posting || {}).legs || []).length,
     pending: (d.posting || {}).pendingDecision || null,
@@ -250,8 +250,6 @@ const done = new Set();
 function pick(list) {
   return list.sort((a, b) =>
     (a.layer - b.layer) ||
-    /* المقترح دائماً بعد الحقيقي داخل الطبقة نفسها */
-    ((a.proposed ? 1 : 0) - (b.proposed ? 1 : 0)) ||
     /* الأبسط أولاً — تختبر خدمة الترحيل بأقل مخاطرة */
     (a.cx - b.cx) ||
     /* ترتيب صريح إن وُجد (الخدمات والتقارير) */
@@ -318,7 +316,7 @@ if (process.argv.indexOf("--json") !== -1) {
     }
     console.log(`\n${String(i + 1).padStart(3)}. ${n.label}` +
       (n.ref ? `   [${n.ref}]` : "") + `   (${KIND_AR[n.kind] || n.kind})` +
-      (n.keyDoc ? "  ★محورية" : "") + (n.proposed ? "  ◇مقترحة" : "") +
+      (n.keyDoc ? "  ★محورية" : "") +
       (n.checkpoint ? "  ⚑نقطة تحقق" : ""));
     if (n.why) console.log(`     لماذا الآن: ${n.why}`);
     if (n.deps && n.deps.length)
@@ -391,7 +389,6 @@ if (process.argv.indexOf("--md") !== -1) {
   P2("| **تعقيد** | كلما زاد زاد احتمال الخطأ — لذلك رُتّبت الأبسط أولاً |");
   P2("| **جداول** | ما تُنشئه في قاعدة البيانات |");
   P2("| ★ | وثيقة محورية |");
-  P2("| ◇ | مقترحة — ليست في شجرة أونيكس عندكم |");
   P2("");
   let lastL = null;
   out.forEach((n, i) => {
@@ -409,7 +406,7 @@ if (process.argv.indexOf("--md") !== -1) {
       P2("");
     }
     P2("### " + (i + 1) + ". " + n.label + (n.ref ? "  `" + n.ref + "`" : "") +
-       (n.keyDoc ? "  ★" : "") + (n.proposed ? "  ◇" : "") + (n.checkpoint ? "  ⚑" : ""));
+       (n.keyDoc ? "  ★" : "") + (n.checkpoint ? "  ⚑" : ""));
     P2("");
     P2("- **النوع:** " + (KIND_AR[n.kind] || n.kind) + (n.system ? "  ·  " + n.system : ""));
     if (n.why) P2("- **لماذا الآن:** " + n.why);

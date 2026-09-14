@@ -33,7 +33,6 @@
     onCredit:     "المبلغ الآجل = total − paid",
     qtyValue:     "قيمة الكمية × التكلفة",
     diffValue:    "قيمة فرق الجرد",
-    depAmount:    "مبلغ الإهلاك للفترة",
     fxDiff:       "فرق العملة"
   };
 
@@ -119,28 +118,6 @@
       ],
       dependsOn: ["cashbox", "bank", "account"],
       feeds: ["journalEntry"]
-    }),
-
-    D("op.4.1.3.1", "إشعارات مدينة", {
-      family: "إشعار مدين", layer: 4,
-      role: "تحميل طرف بمبلغ — يزيد مديونيته.",
-      posting: { legs: [
-        { side: "debit",  account: { from: "header.party.account" }, amount: "total" },
-        { side: "credit", account: { from: "line.account" }, amount: "line.amount" }
-      ]},
-      validations: ["الطرف إلزامي.", "مجموع السطور = إجمالي الإشعار."],
-      dependsOn: ["account", "customer", "supplier"], feeds: ["journalEntry"]
-    }),
-
-    D("op.4.1.3.2", "إشعارات دائنة", {
-      family: "إشعار دائن", layer: 4,
-      role: "تخفيض مديونية طرف أو إثبات التزام له.",
-      posting: { legs: [
-        { side: "debit",  account: { from: "line.account" }, amount: "line.amount" },
-        { side: "credit", account: { from: "header.party.account" }, amount: "total" }
-      ]},
-      validations: ["الطرف إلزامي.", "مجموع السطور = إجمالي الإشعار."],
-      dependsOn: ["account", "customer", "supplier"], feeds: ["journalEntry"]
     }),
 
     D("op.4.1.3.12", "تسوية البنوك", {
@@ -395,77 +372,11 @@
         note: "حساب الوسيط هنا = حساب فروقات الجرد (مصروف أو إيراد حسب الاتجاه)."
       },
       validations: [
-        "التسوية تستند إلى وثيقة جرد معتمدة — لا تسوية بلا جرد.",
+        "التسوية تستند إلى طلب تسوية موثَّق (op.5.1.3.7) — لا تسوية بلا طلب.",
         "سبب الفرق إلزامي.",
-        "صلاحية التسوية أعلى من صلاحية الجرد (فصل المهام)."
+        "صلاحية التسوية أعلى من صلاحية الطلب (فصل المهام)."
       ],
       dependsOn: ["item","warehouse","accountMapping"], feeds: ["stockMovement","journalEntry"]
-    }),
-
-    /* ═══════════════════════ الأصول الثابتة (مقترح) ═══════════════════════ */
-
-    D("prop.assets.ops.1", "إضافة أصل (اقتناء)", {
-      family: "قيد يومية", layer: 4, proposed: true,
-      role: "إثبات اقتناء أصل ثابت.",
-      posting: { legs: [
-        { side: "debit",  account: { from: "asset.assetAccount" }, amount: "total" },
-        { side: "debit",  account: { map: "ضرائب:ضريبة مدخلات" }, amount: "tax", when: "الضريبة مفعّلة" },
-        { side: "credit", account: { from: "header.supplier.account | header.cashbox.account" }, amount: "total" }
-      ]},
-      validations: [
-        "التكلفة تشمل كل ما يلزم لجعل الأصل جاهزاً للاستخدام (نقل، تركيب).",
-        "تاريخ بدء الإهلاك يُحدَّد هنا ولا يُغيَّر بعد أول إهلاك."
-      ],
-      dependsOn: ["fixedAsset","supplier"], feeds: ["journalEntry"]
-    }),
-
-    D("prop.assets.ops.3", "احتساب الإهلاك الدوري", {
-      family: "قيد يومية", layer: 4, proposed: true, keyDoc: true,
-      role: "بديل القيد اليدوي الحالي — يحسب الإهلاك لكل الأصول ويولّد قيداً واحداً.",
-      posting: { legs: [
-        { side: "debit",  account: { from: "asset.depExpenseAccount" }, amount: "depAmount" },
-        { side: "credit", account: { from: "asset.accumDepAccount" },   amount: "depAmount" }
-      ]},
-      validations: [
-        "⛔ لا يُهلَك أصل تحت قيمته التخريدية.",
-        "⛔ لا يُهلَك أصل مستبعد أو لم يبدأ استخدامه.",
-        "لا يتكرر الإهلاك لنفس الأصل في نفس الفترة — مفتاح تفرّد (أصل × فترة).",
-        "مصروف الإهلاك يُحمَّل على مركز تكلفة الأصل."
-      ],
-      dependsOn: ["fixedAsset","fiscalPeriod"], feeds: ["journalEntry"],
-      replaces: "op.4.1.3.14 (القيد اليدوي الحالي)"
-    }),
-
-    D("prop.assets.ops.6", "استبعاد / بيع أصل", {
-      family: "قيد يومية", layer: 4, proposed: true,
-      role: "إخراج الأصل مع إقفال مخصصه واحتساب الربح/الخسارة.",
-      posting: { legs: [
-        { side: "debit",  account: { from: "asset.accumDepAccount" }, amount: "accumDep" },
-        { side: "debit",  account: { from: "header.cashbox.account" }, amount: "paid", when: "بيع" },
-        { side: "credit", account: { from: "asset.assetAccount" },     amount: "cost" },
-        { side: "both",   account: { map: "أصول:فروق تقييم" },         amount: "gainOrLoss",
-          note: "دائن إن كان ربحاً، مدين إن كانت خسارة" }
-      ]},
-      validations: [
-        "⛔ يجب إقفال مخصص الإهلاك المتراكم بالكامل — أشهر خطأ في استبعاد الأصول.",
-        "ربح/خسارة = صافي المتحصل − القيمة الدفترية.",
-        "لا يُستبعد أصل له إهلاك غير مُرحَّل."
-      ],
-      dependsOn: ["fixedAsset"], feeds: ["journalEntry"]
-    }),
-
-    /* ═══════════════════════ الموظفون (مقترح) ═══════════════════════ */
-
-    D("prop.hr.ops.1", "صرف سلفة", {
-      family: "سند صرف", layer: 4, proposed: true,
-      role: "صرف سلفة لموظف — ذمة مدينة لا مصروف.",
-      posting: { legs: [
-        { side: "debit",  account: { from: "employee.account" }, amount: "total" },
-        { side: "credit", account: { from: "header.cashbox.account" }, amount: "total" }
-      ]},
-      validations: ["⛔ السلفة ليست مصروفاً — لا تُرحَّل لـ 3201.",
-                    "لا تتجاوز السقف المحدد لنوع السلفة."],
-      dependsOn: ["employee","cashbox"], feeds: ["journalEntry"]
     })
   ];
 
@@ -478,10 +389,6 @@
      والمتابعة ومنع الازدواج.
      ══════════════════════════════════════════════════════════════════════ */
   var NON_POSTING = [
-    { ref: "op.4.1.3.3",  label: "طلبات سندات القبض",  becomes: "op.4.1.3.4",
-      why: "طلب داخلي — القيد يأتي عند إصدار السند." },
-    { ref: "op.4.1.3.5",  label: "طلبات سندات الصرف",  becomes: "op.4.1.3.6",
-      why: "طلب صرف — يُعتمد ثم يتحوّل لسند." },
     { ref: "op.5.1.3.3",  label: "طلب صرف/تحويل مواد", becomes: "op.5.1.3.4 أو op.5.1.3.5",
       why: "طلب من قسم للمخزن — لا حركة مخزون حتى يُنفَّذ." },
     { ref: "op.5.1.3.7",  label: "طلب تسوية مخزون",    becomes: "op.5.1.3.8",
@@ -490,28 +397,21 @@
       why: "التزام تعاقدي لا محاسبي — القيد عند الاستلام أو الفاتورة." },
     { ref: "op.6.2.3.6",  label: "متابعة أوامر الشراء", becomes: null,
       why: "شاشة متابعة — للعرض فقط." },
-    { ref: "op.7.1.3.1",  label: "طلبات إشعارات العملاء", becomes: "op.7.1.3.2",
-      why: "طلب يُعتمد ثم يصير إشعاراً." },
     { ref: "op.7.5.3.8",  label: "تعديل بيانات فاتورة المبيعات", becomes: null,
-      why: "تعديل حقول وصفية لا مالية (عنوان، مندوب). ⛔ إن مسّ مبلغاً فهو مردود أو إشعار لا تعديل." },
-    { ref: "op.5.1.3.11", label: "إذن توريد أمانات",   becomes: null,
-      why: "بضاعة أمانة لا تملكها — كمية فقط خارج الميزانية. ⚠ يحتاج تأكيد سياستكم." },
-    { ref: "op.5.1.3.12", label: "إذن صرف أمانات",     becomes: null,
-      why: "مقابل التوريد الأماني — كمية فقط." }
+      why: "تعديل حقول وصفية لا مالية (عنوان، مندوب). ⛔ إن مسّ مبلغاً فهو مردود أو إشعار لا تعديل." }
   ];
 
   /* وثائق تُرحَّل لكن مواصفتها لم تُكتب بعد (تُضاف عند الحاجة) */
   var PENDING_SPEC = [
     { ref: "op.4.1.3.9",  label: "إستحقاق شبكات سندات القبض - يدويًا" },
     { ref: "op.4.1.3.10", label: "إستحقاق شبكات سندات الصرف - يدويًا" },
-    { ref: "op.5.1.3.9",  label: "أمر إصلاح خارجي" },
+    { ref: "op.4.1.3.21", label: "قيود بنكية" },
+    { ref: "op.5.1.3.16", label: "أمر التوريد المخزني" },
     { ref: "op.5.1.3.10", label: "طلب صرف توالف" },
     { ref: "op.6.1.3.4",  label: "اشعارات الموردين" },
     { ref: "op.6.2.3.10", label: "إذن توريد المشتريات الخارجية" },
     { ref: "op.7.1.3.2",  label: "إشعارات العملاء" },
-    { ref: "op.7.1.3.3",  label: "إشعارات العملاء المتعدد" },
     { ref: "op.7.1.3.6",  label: "فواتير مردود المبيعات المستحقة للسداد" },
-    { ref: "op.7.1.3.7",  label: "تسوية أقساط العملاء" },
     { ref: "op.7.5.3.5",  label: "مرتجع فاتورة دفعة مقدمة" },
     { ref: "op.5.1.3.15", label: "توريد/صرف عمليات أخرى QR CODE" }
   ];

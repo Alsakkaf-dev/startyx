@@ -6,8 +6,8 @@
 
    تحوي ما ليس إعداداً ولا شاشة تشغيل:
      ① الدليل المحاسبي كاملاً        ② جسور الربط
-     ③ الفجوات البنيوية              ④ الأنظمة المقترحة
-     ⑤ القرارات الحاجبة              ⑥ ثوابت الترحيل
+     ③ الفجوات البنيوية              ④ القرارات الحاجبة
+     ⑤ ثوابت الترحيل
    ========================================================================== */
 (function (root) {
   "use strict";
@@ -138,56 +138,7 @@
     host.appendChild(sec);
   }
 
-  /* ── ④ الأنظمة المقترحة — قوائم مسطّحة، لا شجرة ── */
-  function proposed(host) {
-    var P = root.ONYX_PROPOSED;
-    if (!P || !P.modules || !P.modules.length) return;
-
-    var sec = section("proposed", "الأنظمة المقترحة",
-      "غير مثبَّتة في أونيكس عندكم. صُمِّمت على الورق لأن الدليل المحاسبي يفرض وجودها. " +
-      "تُقرأ هنا كاقتراح — لا تُبنى إلا بقرار منكم.");
-
-    P.modules.forEach(function (m) {
-      var art = document.createElement("article");
-      art.className = "doc__note";
-      art.id = m.ref;
-      art.innerHTML = "<h3>" + esc(m.label) + "</h3>" +
-        "<p><b>لماذا:</b> " + esc(m.why || "") + "</p>";
-
-      if ((m.gapFor || []).length) {
-        var p = document.createElement("p");
-        p.className = "doc__accs";
-        p.innerHTML = "<b>يسدّ فجوة الحسابات:</b> " + m.gapFor.map(function (a) {
-          var n = IDX.resolve(a);
-          return n ? "<a href='#row-" + esc(a) + "'>" + esc(n.code || a) + " " + esc(n.label) + "</a>" : esc(a);
-        }).join(" · ");
-        art.appendChild(p);
-      }
-
-      /* الشاشات: قائمة واحدة مسطّحة مع القيد الناتج — لا تفريعات */
-      var t = document.createElement("table");
-      t.className = "doc__tbl";
-      t.innerHTML = "<thead><tr><th>المجموعة</th><th>الشاشة المقترحة</th><th>القيد الناتج</th></tr></thead>";
-      var tb = document.createElement("tbody");
-      (m.children || []).forEach(function (g) {
-        (g.children || []).forEach(function (s) {
-          var tr = document.createElement("tr");
-          tr.innerHTML =
-            "<td class='doc__grp'>" + esc(g.label) + "</td>" +
-            "<td class='doc__name'>" + esc(s.label) +
-              (s.detail ? "<small>" + esc(s.detail) + "</small>" : "") + "</td>" +
-            "<td class='doc__entry'>" + esc(s.entry || "—") + "</td>";
-          tb.appendChild(tr);
-        });
-      });
-      t.appendChild(tb);
-      art.appendChild(t);
-      sec.appendChild(art);
-    });
-    host.appendChild(sec);
-  }
-
-  /* ── ⑤ القرارات الحاجبة ── */
+  /* ── ④ القرارات الحاجبة ── */
   function blockers(host) {
     var SP = root.ONYX_SPEC || {};
     var list = SP.blockers || [];
@@ -213,7 +164,7 @@
     host.appendChild(sec);
   }
 
-  /* ── ⑥ ثوابت الترحيل ── */
+  /* ── ⑤ ثوابت الترحيل ── */
   function invariants(host) {
     var SP = root.ONYX_SPEC || {};
     var list = SP.invariants || [];
@@ -244,7 +195,6 @@
       ["accounts", "الدليل المحاسبي"],
       ["bridges", "جسور الربط"],
       ["gaps", "الفجوات البنيوية"],
-      ["proposed", "الأنظمة المقترحة"],
       ["blockers", "القرارات الحاجبة"],
       ["invariants", "ثوابت الترحيل"]
     ].filter(function (x) { return document.getElementById(x[0]); });
@@ -308,7 +258,6 @@
     chartOfAccounts(doc);
     bridges(doc);
     gaps(doc);
-    proposed(doc);
     blockers(doc);
     invariants(doc);
     toc(doc);
@@ -320,7 +269,7 @@
     var pr = document.getElementById("docPrint");
     if (pr) pr.addEventListener("click", function () { root.print(); });
 
-    /* رابط مباشر لحساب أو نظام مقترح */
+    /* رابط مباشر لحساب */
     if (location.hash) {
       var h = decodeURIComponent(location.hash.replace(/^#\/?/, ""));
       var el = document.getElementById("row-" + h) || document.getElementById(h);

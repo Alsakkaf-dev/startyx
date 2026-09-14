@@ -142,8 +142,6 @@ body { background: var(--bg-app); }
 .doc__code a { text-decoration: none; }
 .doc__name { color: var(--text-strong); }
 .doc__name small { display: block; font-size: var(--text-xs); color: var(--text-subtle); margin-block-start: 2px; }
-.doc__grp { color: var(--text-subtle); font-size: var(--text-xs); white-space: nowrap; }
-.doc__entry { color: var(--text-muted); font-size: var(--text-xs); }
 .doc__leaf { color: var(--success-fg); }
 
 /* تدرّج بسيط يوضّح عمق الحساب بلا شجرة */

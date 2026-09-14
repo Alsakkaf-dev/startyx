@@ -58,7 +58,7 @@
 
     railScroll.appendChild(U.el('<div class="rail__caption">الأنظمة</div>'));
 
-    /* الأنظمة التشغيلية التسعة وحدها — لا شيء غيرها في الشريط */
+    /* الأنظمة التشغيلية وحدها — لا شيء غيرها في الشريط */
     IDX.coreModules.forEach(function (m) {
       var it = mkRailItem(m, function () { openModule(m); });
       it.dataset.module = m._id;
@@ -66,7 +66,7 @@
       railScroll.appendChild(it);
     });
 
-    /* لا شيء بعد الأنظمة التسعة. الإعدادات والمرجع يُدخل إليهما من أيقونة
+    /* لا شيء بعد الأنظمة التشغيلية. الإعدادات والمرجع يُدخل إليهما من أيقونة
        المستخدم في الشريط العلوي — مدخل واحد، فلا يزاحم شيءٌ الأنظمة هنا. */
   }
 
@@ -208,7 +208,7 @@
     opts = opts || {};
     if (!node) return;
 
-    /* ⛔ الحاجز: حساب أو بند إعدادات أو شاشة مقترحة ليست من نصيب هذه الصفحة.
+    /* ⛔ الحاجز: حساب أو بند إعدادات ليس من نصيب هذه الصفحة.
        تُفتح في settings.html بشجرتها هناك — فلا تُدمج شجرتان في لوحة واحدة. */
     if (!Nav.isLocal(node)) { Nav.go(node, opts.tab); return; }
 
@@ -451,10 +451,10 @@
     applyTheme();
     applyDensity();
 
-    /* لوحة الأوامر هنا تبحث في الأنظمة التسعة وحدها */
+    /* لوحة الأوامر هنا تبحث في الأنظمة التشغيلية وحدها */
     if (Palette.setScope) {
       Palette.setScope(function (n) { return Nav.pageOf(n) === "index"; },
-        "ابحث في شاشات الأنظمة التسعة");
+        "ابحث في شاشات الأنظمة التشغيلية");
     }
 
     /* حالة الشريط — التوسيع سلوك سطح مكتب وحده */
@@ -504,7 +504,7 @@
       var SPB = (root.ONYX_SPEC && root.ONYX_SPEC.blockers) || [];
       SPB.forEach(function (b) {
         items.push({ icon: "info", label: b.title, run: function () {
-          var m = String(b.source).match(/((op|cfg|acc|prop)\.[\w.]+)/);
+          var m = String(b.source).match(/((op|cfg|acc)\.[\w.]+)/);
           var n = m && IDX.resolve(m[1]);
           if (n) open(n);   /* open يحوّل تلقائياً لو كانت العقدة خارج الأنظمة */
         }});

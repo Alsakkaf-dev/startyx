@@ -28,8 +28,7 @@
   var VARIANT_WORDS = {
     operations: ["شاشة", "شاشتان", "شاشات", "شاشة"],
     accounts:   ["حساب", "حسابان", "حسابات", "حساباً"],
-    config:     ["بند", "بندان", "بنود", "بنداً"],
-    proposed:   ["شاشة مقترحة", "شاشتان مقترحتان", "شاشات مقترحة", "شاشة مقترحة"]
+    config:     ["بند", "بندان", "بنود", "بنداً"]
   };
   function countOf(node, n) {
     var v = (node._module && node._module.variant) || "operations";
@@ -215,8 +214,8 @@
 
 
   /* ══════════════════════ مركز المرجع والإعدادات ══════════════════════
-     كل ما ليس نظاماً تشغيلياً يعيش هنا: الدليل المحاسبي، الإعدادات الفعّالة،
-     والأنظمة المقترحة — مفصولة عن الأنظمة التسعة كي تبقى الرئيسية غير مزدحمة. */
+     كل ما ليس نظاماً تشغيلياً يعيش هنا: الدليل المحاسبي والإعدادات الفعّالة —
+     مفصولة عن الأنظمة التشغيلية كي تبقى الرئيسية غير مزدحمة. */
   function hubCard(o) {
     var card = U.el(
       '<button type="button" class="hubcard" data-accent="' + esc(o.accent || "slate") + '"' +
@@ -275,7 +274,7 @@
     h.innerHTML = "";
 
     h.appendChild(setHead("cog", "الإعدادات والمرجع",
-      "الأساس المحاسبي وإعدادات التشغيل — صفحة مستقلة عن شجرة الأنظمة التسعة",
+      "الأساس المحاسبي وإعدادات التشغيل — صفحة مستقلة عن شجرة الأنظمة التشغيلية",
       M.org.short));
 
     h.appendChild(U.el(
@@ -285,7 +284,7 @@
       "لذلك فُصلت بشجرتها الخاصة.</span></div>"
     ));
 
-    h.appendChild(secHead("book", "الأساس المحاسبي", "تعتمد عليه الأنظمة التسعة", "ready"));
+    h.appendChild(secHead("book", "الأساس المحاسبي", "تعتمد عليه الأنظمة التشغيلية", "ready"));
     var g1 = U.el('<div class="hubgrid"></div>');
     var accMod = IDX.modulesInZone("reference")[0];
     if (accMod) {
@@ -329,26 +328,6 @@
       run: goSection("identity")
     }));
     h.appendChild(g2);
-
-    var props = IDX.modulesInZone("proposed");
-    if (props.length) {
-      h.appendChild(secHead("sparkle", "الفجوات والتوسعة", "غير مثبَّتة في أونيكس عندكم", "proposed"));
-      h.appendChild(U.el(
-        '<div class="demo-note">' + I.svg("info", { size: 16, cls: "icon" }) +
-        "<span>ليست أنظمة قائمة بل <b>فجوات يكشفها الدليل المحاسبي</b>: حسابات تعمل بلا شاشات تديرها.</span></div>"
-      ));
-      var g3 = U.el('<div class="hubgrid"></div>');
-      props.forEach(function (m) {
-        g3.appendChild(hubCard({
-          title: m.label, icon: m.icon || "building", accent: m.accent, tone: "proposed",
-          desc: m.note || m.why || "",
-          count: U.plural(m._screenCount, U.COUNT_WORDS.screen),
-          pill: "مقترح", pillKind: "proposed",
-          run: goSection("mod:" + m._id)
-        }));
-      });
-      h.appendChild(g3);
-    }
 
     if ((SP.blockers || []).length) {
       h.appendChild(secHead("info", "ما يحتاج قراراً"));
@@ -657,30 +636,6 @@
       "</div></header>"
     ));
 
-    /* بطاقة «لماذا هذا النظام» للأنظمة المقترحة */
-    if (node.why) {
-      var whyBox = U.el(
-        '<div class="whybox">' +
-          '<div class="whybox__head">' + I.svg("sparkle", { size: 17, cls: "icon" }) +
-          "<b>لماذا هذا النظام مقترح؟</b></div>" +
-          "<p>" + esc(node.why) + "</p>" +
-          '<div class="whybox__accs"></div>' +
-        "</div>"
-      );
-      var accs = whyBox.querySelector(".whybox__accs");
-      (node.gapFor || []).forEach(function (a) {
-        var n = IDX.resolve(a);
-        if (!n) return;
-        var chip = U.el('<button type="button" class="accchip">' +
-          '<span class="accchip__code">' + esc(n.code) + "</span>" +
-          "<span>" + esc(n.label) + "</span>" +
-          '<span class="count">' + U.formatNum(n._screenCount || 0, true) + "</span></button>");
-        chip.addEventListener("click", function () { root.OnyxApp.open(n); });
-        accs.appendChild(chip);
-      });
-      h.appendChild(whyBox);
-    }
-
     /* حساب مجمَّع: أظهر ربطه بالأنظمة والفجوة إن وُجدت */
     if ((m.variant === "accounts") && node.code && root.ONYX_LINKS) {
       var _L = root.ONYX_LINKS;
@@ -833,20 +788,8 @@
             "<b>فجوة بنيوية: " + esc(gap.title) + "</b></div>" +
             "<p>" + esc(gap.detail) + "</p>" +
             "<p style=\"margin-block-start:var(--space-2)\"><b>الأثر:</b> " + esc(gap.impact) + "</p>" +
-            '<div class="whybox__accs"></div>' +
           "</div>"
         );
-        /* اقترح النظام البديل */
-        var prop = (root.ONYX_PROPOSED ? root.ONYX_PROPOSED.modules : []).filter(function (m) {
-          return (m.gapFor || []).indexOf("acc." + link.code) !== -1;
-        })[0];
-        if (prop) {
-          var pb = U.el('<button type="button" class="btn btn--brand" style="margin-block-start:var(--space-3)">' +
-            I.svg("sparkle", { size: 16, cls: "icon-sm" }) +
-            "<span>اطّلع على «" + esc(prop.label) + "» المقترح</span></button>");
-          pb.addEventListener("click", function () { root.OnyxApp.open(prop); });
-          gb.querySelector(".whybox__accs").appendChild(pb);
-        }
         h.appendChild(gb);
       }
     }
@@ -975,39 +918,6 @@
         : "مؤكَّد من داخل النظام المثبَّت.";
       h.appendChild(U.el('<div class="screen__note">' + I.svg(CFG_ICON[node.cfgStatus] || "info", { size: 15, cls: "icon" }) +
         "<span>" + esc(hint) + "</span></div>"));
-      return;
-    }
-
-    /* ── شاشة من نظام مقترح ── */
-    if (node._effStatus === "proposed") {
-      var L = root.ONYX_LINKS;
-      var rows = [
-        ["ماذا تفعل", node.detail],
-        ["القيد المحاسبي الناتج", node.entry],
-        ["الحسابات المتأثرة", node.maps ? (IDX.resolve(node.maps) ?
-            IDX.resolve(node.maps).code + " — " + IDX.resolve(node.maps).label : node.maps) : null],
-        ["ملاحظة", node.note]
-      ];
-      var db = detailRows(rows);
-      if (db) h.appendChild(db);
-
-      if (node.maps) {
-        var acc = IDX.resolve(node.maps);
-        if (acc) {
-          var go = U.el('<button type="button" class="btn btn--outline" ' +
-            'style="margin-block-start:var(--space-4)">' +
-            I.svg("book", { size: 16, cls: "icon-sm" }) +
-            "<span>افتح الحساب في الدليل المحاسبي</span></button>");
-          go.addEventListener("click", function () { root.OnyxApp.open(acc); });
-          h.appendChild(go);
-        }
-      }
-
-      if (root.OnyxSpecView) root.OnyxSpecView.render(h, node.ref, { detailRows: detailRows, open: function (n) { root.OnyxApp.open(n); } });
-
-      h.appendChild(U.el('<div class="screen__note">' + I.svg("sparkle", { size: 15, cls: "icon" }) +
-        "<span>شاشة <b>مقترحة</b> — غير موجودة في أونيكس المثبَّت. صُمّمت لأن الدليل المحاسبي " +
-        "يحوي حسابات تعمل بلا شاشات تديرها.</span></div>"));
       return;
     }
 

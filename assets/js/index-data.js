@@ -18,15 +18,13 @@
   var modules = [];
 
   /* ── المناطق: ما الذي يظهر في شريط الأنظمة وما الذي يُنقل إلى المرجع ──
-       core      : الأنظمة التشغيلية التسعة — وحدها في الشريط الرأسي
+       core      : الأنظمة التشغيلية — وحدها في الشريط الرأسي
        reference : الدليل المحاسبي — يُفتح من نظام الحسابات أو من مركز المرجع
-       settings  : الإعدادات الفعّالة — تُفتح من صفحة الإعدادات
-       proposed  : الأنظمة المقترحة — تُفتح من صفحة الفجوات والتوسعة            */
+       settings  : الإعدادات الفعّالة — تُفتح من صفحة الإعدادات               */
   var ZONE_OF = {
     operations: "core",
     accounts:   "reference",
-    config:     "settings",
-    proposed:   "proposed"
+    config:     "settings"
   };
 
   function idFor(node) {
@@ -63,9 +61,7 @@
     }
 
     /* الحالة الفعلية: فرع بلا أي ذرّية جاهزة = قيد الإعداد */
-    if (node.status === "proposed" || (parent && parent._effStatus === "proposed")) {
-      node._effStatus = "proposed";
-    } else if (node._isLeaf) {
+    if (node._isLeaf) {
       node._effStatus = node.status || "ready";
     } else {
       node._effStatus = (node.status === "ready" || node._hasReady) ? "ready" : "wip";
@@ -80,12 +76,7 @@
 
     var data = root.ONYX_DATA;
     if (!data) { console.error("ONYX_DATA غير محمّل"); built = false; return; }
-    var list = data.modules.slice();
-    /* الأنظمة المقترحة تُضاف بعد الحقيقية */
-    if (root.ONYX_PROPOSED && root.ONYX_PROPOSED.modules) {
-      list = list.concat(root.ONYX_PROPOSED.modules);
-    }
-    list.forEach(function (m) {
+    data.modules.forEach(function (m) {
       m.kind = m.kind || "module";
       m._zone = ZONE_OF[m.variant] || "reference";
       walk(m, null, m);
@@ -151,7 +142,7 @@
     get coreModules() {
       return modules.filter(function (m) { return m._zone === "core"; });
     },
-    /* ما نُقل خارج الشريط: الدليل المحاسبي · الإعدادات · المقترحات */
+    /* ما نُقل خارج الشريط: الدليل المحاسبي · الإعدادات */
     get asideModules() {
       return modules.filter(function (m) { return m._zone !== "core"; });
     },

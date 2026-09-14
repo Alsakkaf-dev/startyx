@@ -48,7 +48,7 @@
           sw("org.multiCompany", "تفعيل أكثر من شركة/فرع", {
             state: "set", value: false, src: "cfg.3.9",
             help: "معطّل عندكم: القوائم المالية لوحدة محاسبية واحدة. تفعيله يفرض بُعد الفرع على كل قيد.",
-            screen: "op.1.1.16"
+            screen: "op.1.1.11"
           })
         ]
       },
@@ -78,10 +78,6 @@
           sw("close.blockPosting", "منع الترحيل في فترة مقفلة", {
             state: "set", value: true, hard: true, src: "cfg.6.4.4", screen: "op.1.1.2",
             help: "ثابت لا يُكسر. إبقاؤه مطفأً يعني أن تقاريرك الصادرة قابلة للتغيير بأثر رجعي."
-          }),
-          sw("close.autoReopen", "السماح بإعادة فتح فترة مقفلة بصلاحية خاصة", {
-            state: "pending", src: "cfg.6.4.3", screen: "op.2.2.4",
-            help: "إن سُمح به فلا بد من أثر تدقيقي يسجّل من أعاد الفتح ومتى."
           }),
           acc("close.retainedEarnings", "حساب الأرباح المرحّلة (إقفال سنوي)", {
             state: "pending", src: "op.1.2.4", prefix: "3",
@@ -215,7 +211,6 @@
         fields: [
           sw("gl.typesJournal", "تفعيل أنواع قيود اليومية", { state: "pending", src: "cfg.6.2.1", screen: "op.4.1.1.6" }),
           sw("gl.typesVoucher", "تفعيل أنواع القبض والصرف", { state: "pending", src: "cfg.6.2.2", screen: "op.4.1.1.7" }),
-          sw("gl.typesNotice", "تفعيل أنواع الإشعارات (مدينة/دائنة)", { state: "pending", src: "cfg.6.2.7", screen: "op.4.1.1.4" }),
           sw("gl.glVars", "متغيرات الأستاذ العام مقروءة ومضبوطة", {
             state: "pending", src: "cfg.6.1.7", screen: "op.4.1.1.1",
             help: "افتح الشاشة واقرأ كل متغيّر، ثم فعّل هذا البند تأكيداً."
@@ -233,8 +228,7 @@
             state: "pending", src: "cfg.6.1.2", screen: "op.1.2.11", bridge: true
           }),
           sw("bridge.projects", "ربط الحسابات بالمشاريع", { state: "pending", src: "cfg.6.1.2", screen: "op.4.1.2.8", bridge: true }),
-          sw("bridge.activities", "ربط الحسابات بالأنشطة", { state: "pending", src: "cfg.6.1.2", screen: "op.4.1.2.9", bridge: true }),
-          sw("bridge.docTypes", "ربط أنواع الوثائق بالحسابات", { state: "pending", src: "cfg.6.1.2", screen: "op.4.6.2", bridge: true })
+          sw("bridge.activities", "ربط الحسابات بالأنشطة", { state: "pending", src: "cfg.6.1.2", screen: "op.4.1.2.9", bridge: true })
         ]
       },
       {
@@ -323,8 +317,7 @@
           sw("inv.typesReceive", "أنواع التوريد", { state: "pending", src: "cfg.6.2.6", screen: "op.5.1.1.8" }),
           sw("inv.typesIssue", "أنواع الصرف", { state: "pending", src: "cfg.6.2.6", screen: "op.5.1.1.9" }),
           sw("inv.typesTransfer", "أنواع التحويل", { state: "pending", src: "cfg.6.2.6", screen: "op.5.1.1.10" }),
-          sw("inv.typesAdjust", "أنواع تسوية المخزون", { state: "pending", src: "cfg.6.2.6", screen: "op.5.1.1.11" }),
-          sw("inv.typesCount", "أنواع الجرد", { state: "pending", src: "cfg.6.2.6", screen: "op.5.3.1" })
+          sw("inv.typesAdjust", "أنواع تسوية المخزون", { state: "pending", src: "cfg.6.2.6", screen: "op.5.1.1.11" })
         ]
       },
       {
@@ -430,16 +423,6 @@
           sw("sales.customerGrades", "درجات العملاء ومعايير تقييمها", { state: "pending", src: "cfg.6.3.9", screen: "op.7.1.1.4" }),
           sw("sales.reps", "نظام المندوبين", { state: "pending", src: "cfg.5.4", screen: "op.7.1.1.6",
             help: "مستنبط من دليلكم: حسابات وسيطة للمندوبين." }),
-          sel("sales.commission", "احتساب عمولة المندوب", [
-            { v: "على البيع", t: "على البيع", h: "تستحق بالفوترة" },
-            { v: "على التحصيل", t: "على التحصيل", h: "تستحق بالقبض — تؤجّل المصروف" },
-            { v: "على البيع والتحصيل معاً", t: "الاثنان", h: "شطران بنسبتين" },
-            { v: "لا عمولة", t: "لا عمولة", h: "" }
-          ], {
-            state: "pending", src: "cfg.5.11", screen: "op.7.2.3", ui: "segmented",
-            help: "العمولة على التحصيل تؤجّل الاستحقاق — فرق جوهري في القيد."
-          }),
-          sw("sales.distribution", "نظام التوزيع وخطوط السير", { state: "pending", src: "cfg.6.1.11", screen: "op.7.6.1.1" }),
           sw("sales.pos", "المنافذ البيعية (POS)", { state: "set", value: false, src: "cfg.3.6" })
         ]
       }
@@ -514,7 +497,6 @@
         fields: [
           sw("doc.review", "نظام مراجعة الوثائق", { state: "set", value: false, src: "cfg.3.2",
             help: "معطّل عندكم — أي أن الوثيقة تنتقل من الحفظ إلى الترحيل مباشرة." }),
-          sw("doc.approval", "مستويات الاعتماد", { state: "pending", src: "cfg.6.4.3", screen: "op.2.2.4" }),
           sel("doc.editPosted", "تعديل وثيقة مرحَّلة", [
             { v: "ممنوع — بعكس القيد فقط", t: "ممنوع — بالعكس", h: "الأثر التدقيقي محفوظ" },
             { v: "مسموح بصلاحية خاصة", t: "مسموح بصلاحية", h: "⛔ يكسر INV-6 ويضيّع الأثر" }
@@ -561,7 +543,7 @@
       {
         label: "المشاريع والأنشطة",
         fields: [
-          sw("dim.projects", "تفعيل المشاريع", { state: "pending", src: "cfg.6.4.6", screen: "op.1.1.15" }),
+          sw("dim.projects", "تفعيل المشاريع", { state: "pending", src: "cfg.6.4.6", screen: "op.1.2.6" }),
           sw("dim.activities", "تفعيل الأنشطة", { state: "pending", src: "cfg.5.8",
             help: "مستنبط من دليلكم: «الأنشطة الشقيقة» — يحتاج تأكيداً." })
         ]
@@ -589,7 +571,6 @@
         label: "الصلاحيات",
         fields: [
           sw("sec.screens", "صلاحيات الشاشات", { state: "pending", src: "cfg.6.4.2", screen: "op.2.2.1" }),
-          sw("sec.tabs", "صلاحيات التبويبات", { state: "pending", src: "cfg.6.4.2", screen: "op.2.2.2" }),
           sw("sec.inputs", "صلاحيات المدخلات", { state: "pending", src: "cfg.6.4.2", screen: "op.2.2.3" }),
           sw("sec.operations", "صلاحيات العمليات (ترحيل / عكس / إقفال)", { state: "pending", src: "cfg.6.4.2", screen: "op.2.2.4",
             help: "أهمها. صلاحية الشاشة تفتح العرض، وصلاحية العملية هي التي تسمح بالترحيل." }),
