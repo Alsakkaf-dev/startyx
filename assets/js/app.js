@@ -214,6 +214,7 @@
 
     currentNode = node;
     currentTab = opts.tab || null;
+    if (window.OnyxScreen && window.OnyxScreen.dismissDialogs) window.OnyxScreen.dismissDialogs();
 
     var m = node._module;
     if (m !== currentModule) showModuleTree(m);

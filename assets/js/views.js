@@ -9,6 +9,7 @@
 
   function host() {
     if (!main) main = document.getElementById("mainInner");
+    main.classList.remove("main__inner--live");
     return main;
   }
 
@@ -837,6 +838,25 @@
     var m = node._module;
     var wip = node._effStatus === "wip";
     var fav = S.isFavorite(node._key);
+
+    /* ── الشاشة الحيّة: تملأ مساحة العمل كاملة بدل الهيكل التوضيحي ── */
+    if (root.OnyxScreen && root.OnyxScreen.has(node.ref)) {
+      h.classList.add("main__inner--live");
+      root.OnyxScreen.render(h, node, {
+        isFavorite: function () { return S.isFavorite(node._key); },
+        toggleFavorite: function () { root.OnyxApp.toggleFavorite(node); },
+        copyLink: function () {
+          root.OnyxUI.copy(location.href.split("#")[0] + "#/" + (node.ref || node._key));
+        },
+        renderDocs: function (box) {
+          return !!(root.OnyxSpecView && root.OnyxSpecView.render(box, node.ref, {
+            detailRows: detailRows,
+            open: function (n) { root.OnyxApp.open(n); }
+          }));
+        }
+      });
+      return;
+    }
 
     h.appendChild(crumbs(node));
 

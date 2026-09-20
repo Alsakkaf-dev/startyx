@@ -1,0 +1,21 @@
+{
+  "name": "startyx-server",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "PetroSpecial ERP engines and API — posting, costing, tax, numbering",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "start": "node --experimental-strip-types src/presentation/http-server.ts",
+    "test": "node --experimental-strip-types --test tests/engines.test.ts",
+    "load": "node --experimental-strip-types migration/load-2026.ts",
+    "accept:api": "node --experimental-strip-types migration/accept-live-api.ts",
+    "backup": "powershell -ExecutionPolicy Bypass -File tools/backup.ps1"
+  },
+  "dependencies": {
+    "@electric-sql/pglite": "^0.3.14",
+    "pg": "^8.16.3"
+  }
+}

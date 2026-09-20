@@ -15,3 +15,10 @@ build/
 # Logs & temp
 *.log
 *.tmp
+**/migration/out/
+# Local runtime / company data
+.runtime/
+.pgdata/
+.env
+backups/
+node_modules/

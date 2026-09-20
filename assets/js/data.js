@@ -2065,7 +2065,7 @@
                 {
                   "id": "op.7.1.1.6",
                   "ref": "op.7.1.1.6",
-                  "label": "أنواع المندوبين",
+                  "label": "أنواع المحصلين",
                   "status": "ready",
                   "kind": "screen"
                 },
@@ -2080,6 +2080,34 @@
                   "id": "op.7.1.1.14",
                   "ref": "op.7.1.1.14",
                   "label": "أنواع الإشعارات",
+                  "status": "ready",
+                  "kind": "screen"
+                },
+                {
+                  "id": "op.7.1.1.N1",
+                  "ref": "op.7.1.1.N1",
+                  "label": "أنواع طلبات الإشعارات",
+                  "status": "ready",
+                  "kind": "screen"
+                },
+                {
+                  "id": "op.7.1.1.N2",
+                  "ref": "op.7.1.1.N2",
+                  "label": "مجموعة بطائق الائتمان",
+                  "status": "ready",
+                  "kind": "screen"
+                },
+                {
+                  "id": "op.7.1.1.N3",
+                  "ref": "op.7.1.1.N3",
+                  "label": "أنواع بطائق الائتمان",
+                  "status": "ready",
+                  "kind": "screen"
+                },
+                {
+                  "id": "op.7.1.1.N4",
+                  "ref": "op.7.1.1.N4",
+                  "label": "بيانات بطاقات الائتمان",
                   "status": "ready",
                   "kind": "screen"
                 }
@@ -2257,6 +2285,13 @@
                   "id": "op.7.1.4.7",
                   "ref": "op.7.1.4.7",
                   "label": "تقارير كشف حساب العملاء",
+                  "status": "ready",
+                  "kind": "screen"
+                },
+                {
+                  "id": "op.7.1.4.N1",
+                  "ref": "op.7.1.4.N1",
+                  "label": "سجل تعاملات العميل",
                   "status": "ready",
                   "kind": "screen"
                 },

@@ -75,7 +75,7 @@
       top = U.clamp(top, 8, window.innerHeight - t.height - 8);
       tipEl.style.top = top + "px";
       tipEl.style.left = left + "px";
-    }, 380);
+    }, 260);
   }
   function hideTip() {
     clearTimeout(tipTimer);

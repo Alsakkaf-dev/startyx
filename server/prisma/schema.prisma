@@ -1,0 +1,114 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+/// مشتق من Finishing/03-database — لا نموذج موازٍ للمعاني
+model DocumentSequence {
+  id             BigInt   @id @default(autoincrement())
+  companyId      BigInt   @map("company_id")
+  branchId       BigInt   @map("branch_id")
+  fiscalYearId   BigInt   @map("fiscal_year_id")
+  docKind        String   @map("doc_kind")
+  sequenceGroup  String   @map("sequence_group")
+  lastValue      BigInt   @map("last_value")
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+  updateCount    Int      @default(0) @map("update_count")
+
+  @@unique([companyId, branchId, fiscalYearId, docKind, sequenceGroup])
+  @@map("document_sequence")
+}
+
+model EinvoiceDeviceSequence {
+  id         BigInt   @id @default(autoincrement())
+  companyId  BigInt   @map("company_id")
+  branchId   BigInt   @map("branch_id")
+  deviceKey  String   @map("device_key")
+  docFamily  String   @map("doc_family")
+  lastIcv    BigInt   @map("last_icv")
+  lastPih    String   @map("last_pih")
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  @@unique([companyId, branchId, deviceKey, docFamily])
+  @@map("einvoice_device_sequence")
+}
+
+model FiscalPeriod {
+  id           BigInt   @id @default(autoincrement())
+  companyId    BigInt   @map("company_id")
+  fiscalYearId BigInt   @map("fiscal_year_id")
+  no           Int
+  nameAr       String   @map("name_ar")
+  fromDate     DateTime @map("from_date") @db.Date
+  toDate       DateTime @map("to_date") @db.Date
+  status       String
+  inactive     Boolean  @default(false)
+
+  @@unique([companyId, fiscalYearId, no])
+  @@map("fiscal_period")
+}
+
+model PeriodBranchClose {
+  id               BigInt   @id @default(autoincrement())
+  companyId        BigInt   @map("company_id")
+  branchId         BigInt   @map("branch_id")
+  periodId         BigInt   @map("period_id")
+  inventoryClosed  Boolean  @default(false) @map("inventory_closed")
+  glClosed         Boolean  @default(false) @map("gl_closed")
+
+  @@unique([companyId, branchId, periodId])
+  @@map("period_branch_close")
+}
+
+model GlEntry {
+  id          BigInt    @id @default(autoincrement())
+  companyId   BigInt    @map("company_id")
+  docKind     String    @map("doc_kind")
+  date        DateTime  @db.Date
+  periodId    BigInt    @map("period_id")
+  branchId    BigInt    @map("branch_id")
+  status      String
+  docNo       String    @map("doc_no")
+  description String
+  sourceKind  String    @map("source_kind")
+  postedAt    DateTime? @map("posted_at")
+  documentId  BigInt?   @map("document_id")
+  lines       GlEntryLine[]
+
+  @@map("gl_entry")
+}
+
+model GlEntryLine {
+  id            BigInt  @id @default(autoincrement())
+  companyId     BigInt  @map("company_id")
+  entryId       BigInt  @map("entry_id")
+  lineNo        Int     @map("line_no")
+  accountId     BigInt  @map("account_id")
+  analyticType  String  @map("analytic_type")
+  analyticId    BigInt? @map("analytic_id")
+  currencyId    BigInt  @map("currency_id")
+  debit         Decimal @db.Decimal(28, 10)
+  credit        Decimal @db.Decimal(28, 10)
+  fxRate        Decimal @map("fx_rate") @db.Decimal(28, 10)
+  entry         GlEntry @relation(fields: [entryId], references: [id])
+
+  @@unique([companyId, entryId, lineNo])
+  @@map("gl_entry_line")
+}
+
+model ItemCost {
+  id          BigInt  @id @default(autoincrement())
+  companyId   BigInt  @map("company_id")
+  itemId      BigInt  @map("item_id")
+  qtyBase     Decimal @map("qty_base") @db.Decimal(28, 10)
+  avgCost     Decimal @map("avg_cost") @db.Decimal(28, 10)
+
+  @@unique([companyId, itemId])
+  @@map("item_cost")
+}
