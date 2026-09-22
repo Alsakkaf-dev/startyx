@@ -694,3 +694,12 @@
 .stat[data-link="1"] { cursor: pointer; }
 .stat[data-link="1"]:hover { border-color: var(--brand); box-shadow: var(--shadow-sm); }
 .stat[data-link="1"]:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
+
+/* Empty screen content, independent of the surrounding application theme. */
+.main__inner.main__inner--blank {
+  max-width: none;
+  min-height: 100%;
+  margin: 0;
+  padding: 0;
+  background: #fff;
+}

@@ -702,7 +702,7 @@
       var tr = el("tr");
       cols.forEach(function (colName, i) {
         var v = r[i] == null ? "" : r[i];
-        var editable = t.editable && num[i] && v !== "";
+        var editable = t.editable && num[i];
         var td = el("td", (num[i] ? "n" : "") + (editable ? " edit" : ""));
         td.setAttribute("data-col", colName || "");
         if (editable) {
@@ -796,7 +796,19 @@
           b.actions.forEach(function (a) {
             var mb = el("button", "mini", esc(a.t));
             mb.type = "button";
-            mb.addEventListener("click", function () { note("إجراء سطور — عرض توضيحي"); });
+            mb.addEventListener("click", function () {
+              if (a.t === "+ سطر جديد") {
+                if (st.mode === "view") { note("ابدأ الإضافة أو التعديل أولاً"); return; }
+                if (!b.rows) b.rows = [];
+                b.rows.push((b.cols || []).map(function (col, i) {
+                  return i === 0 && col === "#" ? b.rows.length + 1 : "";
+                }));
+                renderWork();
+                note("أضيف سطر جديد — أدخل الصنف والكمية والسعر ثم احفظ");
+                return;
+              }
+              note("إجراء سطور — عرض توضيحي");
+            });
             f.appendChild(mb);
           });
           f.appendChild(el("span", "hint", "الأرقام هنا مثال ثابت للتصميم"));

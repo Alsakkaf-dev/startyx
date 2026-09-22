@@ -9,7 +9,7 @@
 
   function host() {
     if (!main) main = document.getElementById("mainInner");
-    main.classList.remove("main__inner--live");
+    main.classList.remove("main__inner--live", "main__inner--blank");
     return main;
   }
 
@@ -834,149 +834,9 @@
   /* ═════════════════ معاينة الشاشة ═════════════════ */
   function renderScreen(node, tabId) {
     var h = host();
-    h.innerHTML = "";
-    var m = node._module;
-    var wip = node._effStatus === "wip";
-    var fav = S.isFavorite(node._key);
-
-    /* ── الشاشة الحيّة: تملأ مساحة العمل كاملة بدل الهيكل التوضيحي ── */
-    if (root.OnyxScreen && root.OnyxScreen.has(node.ref)) {
-      h.classList.add("main__inner--live");
-      root.OnyxScreen.render(h, node, {
-        isFavorite: function () { return S.isFavorite(node._key); },
-        toggleFavorite: function () { root.OnyxApp.toggleFavorite(node); },
-        copyLink: function () {
-          root.OnyxUI.copy(location.href.split("#")[0] + "#/" + (node.ref || node._key));
-        },
-        renderDocs: function (box) {
-          return !!(root.OnyxSpecView && root.OnyxSpecView.render(box, node.ref, {
-            detailRows: detailRows,
-            open: function (n) { root.OnyxApp.open(n); }
-          }));
-        }
-      });
-      return;
-    }
-
-    h.appendChild(crumbs(node));
-
-    var head = U.el(
-      '<header class="page-head" data-accent="' + esc(m.accent || "slate") + '"><div class="page-head__row">' +
-        '<div class="screen__title"><h1>' + esc(node.label) + "</h1>" +
-          (node.code ? '<span class="refchip">' + esc(node.code) + "</span>" :
-           node.ref  ? '<span class="refchip">' + esc(node.ref)  + "</span>" : "") +
-          (node.cfgStatus
-            ? '<span class="pill pill--' + node.cfgStatus.replace(/_/g, "-") + '">' +
-              esc(CFG_LABEL[node.cfgStatus]) + "</span>"
-            : "") +
-        "</div>" +
-        '<div class="page-head__spacer"></div>' +
-        '<div class="page-head__actions">' +
-          '<button type="button" class="btn btn--outline" data-fav>' +
-            I.svg(fav ? "starFill" : "star", { size: 16, cls: "icon-sm" }) +
-            "<span>" + (fav ? "في المفضلة" : "إضافة للمفضلة") + "</span></button>" +
-          '<button type="button" class="btn btn--outline" data-copy>' +
-            I.svg("hash", { size: 16, cls: "icon-sm" }) + "<span>نسخ الرابط</span></button>" +
-        "</div>" +
-      "</div></header>"
-    );
-    head.querySelector("[data-fav]").addEventListener("click", function () {
-      root.OnyxApp.toggleFavorite(node);
-    });
-    head.querySelector("[data-copy]").addEventListener("click", function () {
-      root.OnyxUI.copy(location.href.split("#")[0] + "#/" + (node.ref || node._key));
-    });
-    h.appendChild(head);
-
-    var variant = m.variant || "operations";
-
-    /* شريط الأوامر الوهمي — للشاشات التشغيلية فقط */
-    var bar = U.el('<div class="cmdbar"></div>');
-    if (variant !== "operations") bar.hidden = true;
-    [["plus", "إضافة"], ["settings", "تعديل"], ["close", "حذف"], null,
-     ["search", "بحث"], ["list", "عرض"], ["printer", "طباعة"]].forEach(function (c) {
-      if (!c) { bar.appendChild(U.el('<span class="cmdbar__sep"></span>')); return; }
-      var b = U.el('<button type="button" disabled>' + I.svg(c[0], { size: 16, cls: "icon-sm" }) +
-        "<span>" + c[1] + "</span></button>");
-      root.OnyxUI.tip(b, "عرض توضيحي فقط — لا تُنفَّذ عمليات");
-      bar.appendChild(b);
-    });
-    h.appendChild(bar);
-
-    /* التبويبات */
-    if (node.tabs && node.tabs.length) {
-      var active = tabId && node.tabs.indexOf(tabId) !== -1 ? tabId : node.tabs[0];
-      var tabs = U.el('<div class="tabs" role="tablist"></div>');
-      node.tabs.forEach(function (t) {
-        var b = U.el('<button type="button" role="tab" aria-selected="' + (t === active ? "true" : "false") +
-          '">' + esc(t) + "</button>");
-        b.addEventListener("click", function () { root.OnyxApp.open(node, { tab: t }); });
-        tabs.appendChild(b);
-      });
-      h.appendChild(tabs);
-    }
-
-    /* ── حساب من الدليل المحاسبي ── */
-    if (variant === "accounts") {
-      renderAccount(h, node);
-      return;
-    }
-
-    /* ── بند من الإعدادات الفعّالة ── */
-    if (variant === "config") {
-      h.appendChild(detailRows([
-        ["الحالة", CFG_LABEL[node.cfgStatus] || "—"],
-        ["التفصيل", node.detail],
-        ["المصدر", node.source],
-        ["الرقم المرجعي", node.ref],
-        ["القسم", node._parent ? node._parent.label : "—"]
-      ]) || U.el("<div></div>"));
-      var hint = node.cfgStatus === "pending"
-        ? "بند بانتظار التحقق من داخل شاشات النظام."
-        : node.cfgStatus === "inferred"
-        ? "مُستنبط من الدليل المحاسبي — يحتاج تأكيداً بالشاشات."
-        : "مؤكَّد من داخل النظام المثبَّت.";
-      h.appendChild(U.el('<div class="screen__note">' + I.svg(CFG_ICON[node.cfgStatus] || "info", { size: 15, cls: "icon" }) +
-        "<span>" + esc(hint) + "</span></div>"));
-      return;
-    }
-
-    if (wip) {
-      h.appendChild(U.el(
-        '<div class="empty empty--wip"><div class="empty__icon">' + I.svg("sliders", { size: 26, cls: "icon" }) + "</div>" +
-        "<h3>هذه الشاشة قيد الإعداد</h3><p>" +
-        esc(node.note || "الشاشة موجودة في شجرة النظام، ولم تُوثَّق تفاصيلها في الأدلة المتوفرة بعد.") +
-        "</p></div>"
-      ));
-      return;
-    }
-
-    /* عقد الشاشة من طبقة المواصفات */
-    var hasSpec = root.OnyxSpecView &&
-      root.OnyxSpecView.render(h, node.ref, { detailRows: detailRows, open: function (n) { root.OnyxApp.open(n); } });
-
-    /* هيكل نموذج توضيحي */
-    if (hasSpec) h.appendChild(U.el('<div class="section-head">' +
-      I.svg("panel", { size: 18, cls: "icon" }) + "<h2>شكل الشاشة</h2></div>"));
-    var form = U.el('<div class="formskel"></div>');
-    var fields = 8;
-    for (var i = 0; i < fields; i++) {
-      form.appendChild(U.el('<div class="formskel__field"><div class="skel"></div><div class="skel"></div></div>'));
-    }
-    form.appendChild(U.el('<div class="formskel__field formskel__wide"><div class="skel"></div><div class="skel"></div></div>'));
-    h.appendChild(form);
-
-    h.appendChild(U.el('<div class="screen__note">' + I.svg("info", { size: 15, cls: "icon" }) +
-      "<span>هذه معاينة لشكل الشاشة ضمن نسخة التصفح — الحقول والبيانات غير فعّالة." +
-      (node.manualPage ? " (مرجع الدليل: صفحة " + U.formatNum(node.manualPage, true) + ")" : "") +
-      "</span></div>"));
-
-    if (node.note) {
-      h.appendChild(U.el('<div class="screen__note">' + I.svg("info", { size: 15, cls: "icon" }) +
-        "<span>" + esc(node.note) + "</span></div>"));
-    }
+    h.replaceChildren();
+    h.classList.add("main__inner--blank");
   }
-
   root.OnyxViews = {
     renderHome: renderHome,
     renderSettings: renderSettings,
