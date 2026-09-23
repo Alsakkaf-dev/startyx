@@ -3,7 +3,8 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 const SERVER_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
-const PGLITE_DIR = path.join(SERVER_ROOT, ".pgdata", "pglite");
+/* PGLITE_DIR: فحوص القبول تعمل على نسخة من القاعدة لا على دفتر الشركة */
+const PGLITE_DIR = process.env.PGLITE_DIR ?? path.join(SERVER_ROOT, ".pgdata", "pglite");
 const DEFAULT_URL = process.env.DATABASE_URL ?? "postgresql://erp:erp@127.0.0.1:5432/startyx";
 
 export type DbKind = "postgres" | "pglite";

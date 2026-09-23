@@ -12,18 +12,23 @@ export class MemoryTx implements SequenceStore, PeriodStore, PostingStore {
   periods: PeriodRow[] = [];
   gl = new Map<number, GlEntryLine[]>();
   glSeq = 1;
-  private snap: { sequences: Map<string, number> } | null = null;
+  private snap: { sequences: Map<string, number>; glSeq: number; glKeys: Set<number> } | null = null;
 
   begin(): void {
-    this.snap = { sequences: new Map(this.sequences) };
+    this.snap = { sequences: new Map(this.sequences), glSeq: this.glSeq, glKeys: new Set(this.gl.keys()) };
   }
 
   commit(): void {
     this.snap = null;
   }
 
+  /** الرفض يعيد كل ما حُجز في الذاكرة: الأرقام وعدّاد القيود والقيد المؤقت */
   rollback(): void {
-    if (this.snap) this.sequences = this.snap.sequences;
+    if (this.snap) {
+      this.sequences = this.snap.sequences;
+      this.glSeq = this.snap.glSeq;
+      for (const k of [...this.gl.keys()]) if (!this.snap.glKeys.has(k)) this.gl.delete(k);
+    }
     this.snap = null;
   }
 
@@ -52,7 +57,8 @@ export class MemoryTx implements SequenceStore, PeriodStore, PostingStore {
   applyClose(row: PeriodRow, step: CloseStep): void {
     row.closeStep = step;
     if (step === "inventory") row.inventoryClosed = true;
-    if (step === "annual") row.glClosed = true;
+    /* SY-R9: إقفال الأرباح والخسائر يقفل الفترة مالياً */
+    if (step === "profit_and_loss" || step === "annual") row.glClosed = true;
   }
 
   nextGlId(): number {

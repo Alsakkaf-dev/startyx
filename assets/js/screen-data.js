@@ -1,7 +1,9 @@
 /* ============================================================================
    ONYX ERP — تعريف الشاشات الحيّة
    كل شاشة تُعرَّف هنا إعلانياً: أوامرها، حقولها، تبويباتها، جداولها، لوحتها الجانبية.
-   القيم أمثلة للعرض البصري فقط — لا قاعدة بيانات ولا حسابات فعلية.
+   شاشات البيانات الأساسية للطبقتين ٠ و١ (المعرّفة في masters-ui.js — 22 شاشة) **حيّة**:
+   حقولها فاضية هنا ويملؤها الخادم عبر assets/js/masters-ui.js — لا قيم أمثلة فيها.
+   بقية الشاشات: القيم أمثلة للعرض البصري فقط — لا قاعدة بيانات ولا حسابات فعلية.
    الشاشة غير المعرّفة هنا تبقى على العرض التوثيقي القديم.
    ========================================================================== */
 (function (root) {
@@ -859,51 +861,36 @@
     /* ═══ مجموعة العملاء ═══ */
     "op.7.1.2.2": {
       state: { label: "نشط", cls: "s-posted" },
-      rec: { i: 4, n: 14 },
+      rec: { i: 0, n: 0 },
       cmds: ["add", "edit", "delete", "save", "cancelEntry", "search", "quick",
-             "navFirst", "navPrev", "navNext", "navLast", "related",
-             "print", "allScreens", "newWindow", "lockSession", "exit"],
-      audit: { by: "1 · محسن السقاف", at: "12/01/2023 10:11:04", dev: "—", prints: 0, upd: "—", updc: 0, ver: "V8.1.14" },
+             "navFirst", "navPrev", "navNext", "navLast", "print", "allScreens", "lockSession", "exit"],
+      audit: { by: "—", at: "—", dev: "—", prints: "—", upd: "—", updc: 0, ver: "V8.1.14" },
       blocks: [
-        { kind: "panel", title: "هوية المجموعة", pill: "حساب الرقابة هنا لا على العميل", grid: [
-          F("رقم المجموعة", { span: 2, req: true, value: "104", mono: true }),
-          F("اسم المجموعة", { span: 5, req: true, value: "عملاء التجزئة" }),
-          F("الاسم الأجنبي", { span: 5, value: "Retail customers" }),
-          F("حساب المجموعة", { span: 6, req: true, type: "ref", code: "1203010001", text: "عملاء المبيعات الآجلة", lk: "account" }),
-          F("بادئة رقم العميل", { span: 2, value: "104" }),
-          F("موقوف", { span: 2, type: "select", options: ["لا", "نعم"] })
+        { kind: "panel", title: "المجموعة", grid: [
+          F("رقم المجموعة", { span: 3, req: true, mono: true }),
+          F("اسم المجموعة", { span: 5, req: true }),
+          F("الاسم الأجنبي", { span: 5 }),
+          F("رقم حساب المجموعة", { span: 3, req: true, mono: true }),
+          F("حساب إضافي", { span: 3, mono: true })
         ]},
-        { kind: "tabs", tabs: [
-          { t: "الحسابات الخاصة", n: 6, body: [
-            { kind: "table", editable: true, max: "28vh",
-              cols: ["الدور", "رقم الحساب", "اسم الحساب", "موقف", "سبب التوقيف"],
-              rows: [
-                ["خصم مسموح به", "4102010001", "خصم مبيعات مسموح به", "", ""],
-                ["مردود مبيعات", "4101020001", "مردود مبيعات", "", ""],
-                ["تكلفة مبيعات", "5101010001", "تكلفة المبيعات", "", ""],
-                ["مجاني", "3101050001", "تكلفة الكميات المجانية", "", ""]
-              ],
-              actions: [{ t: "+ دور حساب" }] }
-          ]},
-          { t: "حدود الائتمان", n: 1, body: [
-            { kind: "table", editable: true, max: "22vh",
-              cols: ["العملة", "الحد الأدنى", "الحد الأعلى", "حد العملية", "سياسة التجاوز", "نسبة التجاوز %"],
-              num: [1, 2, 3, 5],
-              rows: [["SAR", "0.00", "50,000.00", "15,000.00", "تحذير مع صلاحية", "10"]],
-              actions: [{ t: "+ عملة" }] },
-            { kind: "note", text: "حدود المجموعة مرجعية. الحد الفعّال فعلياً على بطاقة العميل (`CU-R11`)." }
-          ]},
-          { t: "الإحصاء", n: 3, body: [
-            { kind: "table", max: "22vh",
-              cols: ["نوع الحركة", "العملة", "المبلغ"],
-              num: [2],
-              rows: [["مبيعات الفترة", "SAR", "1,240,000.00"], ["مردودات", "SAR", "18,400.00"], ["تحصيل", "SAR", "980,000.00"]] }
-          ]}
-        ]}
+        { kind: "panel", title: "حد الدين", grid: [
+          F("رقم المجموعة", { span: 3, req: true, mono: true }),
+          F("العملة", { span: 3, req: true }),
+          F("النوع", { span: 3, req: true, type: "select", options: ["مدين", "دائن", "كلاهما"] }),
+          F("الحد الأدنى", { span: 3, mono: true }),
+          F("الحد الأعلى", { span: 3, mono: true }),
+          F("أدنى حد للعملية", { span: 3, mono: true }),
+          F("أعلى حد للعملية", { span: 3, mono: true }),
+          F("تجاوز حدود الحسابات", { span: 3, type: "select", options: ["لا يسمح", "يسمح", "يسمح مع التنبيه"] }),
+          F("نسبة التجاوز", { span: 3, mono: true }),
+          F("اعلى حد متاح", { span: 3, ro: true }),
+          F("الفرع", { span: 3, mono: true }),
+          F("موقوف", { span: 3, type: "select", options: ["لا", "نعم"] })
+        ]},
+        { kind: "table", title: "المجموعات", max: "32vh", cols: [], rows: [] }
       ],
       side: [
-        { kind: "panel", title: "استخدام المجموعة", links: [["عملاء مربوطون", "1,120"], ["فواتير 2026", "—"], ["لا حذف مع عملاء", "قاعدة"]] },
-        { kind: "note", text: "الحذف الحقيقي مسموح فقط إذا لا عملاء تحت المجموعة. إيقاف التعامل بديل دائم." }
+        { kind: "note", text: "أونيكس: 29 مجموعة · حدّا دين. الحساب فرعي تحليليه «عميل» (CG-R2) · لا حذف لمجموعة لها عملاء (CG-R9) · «اعلى حد متاح» محسوب." }
       ]
     },
 
@@ -1163,34 +1150,21 @@
     /* ═══ مجموعة الموردين ═══ */
     "op.6.1.2.1": {
       state: { label: "نشط", cls: "s-posted" },
-      rec: { i: 1, n: 6 },
+      rec: { i: 0, n: 0 },
       cmds: ["add", "edit", "delete", "save", "cancelEntry", "search", "quick",
-             "navFirst", "navPrev", "navNext", "navLast", "related",
-             "print", "allScreens", "newWindow", "lockSession", "exit"],
-      audit: { by: "1 · محسن السقاف", at: "17/12/2022 16:50:56", dev: "—", prints: 0, upd: "—", updc: 0, ver: "V8.1.14" },
+             "navFirst", "navPrev", "navNext", "navLast", "print", "allScreens", "lockSession", "exit"],
+      audit: { by: "—", at: "—", dev: "—", prints: "—", upd: "—", updc: 0, ver: "V8.1.14" },
       blocks: [
-        { kind: "panel", title: "هوية المجموعة", pill: "حساب الرقابة هنا لا على المورد", grid: [
-          F("رقم المجموعة", { span: 2, req: true, value: "2", mono: true }),
-          F("اسم المجموعة", { span: 5, req: true, value: "موردين محليين" }),
-          F("الاسم الأجنبي", { span: 5, value: "Local vendors" }),
-          F("حساب المجموعة", { span: 6, req: true, type: "ref", code: "2202020001", text: "موردون محليون", lk: "account" }),
-          F("بادئة رقم المورد", { span: 2, value: "2" }),
-          F("موقوف", { span: 2, type: "select", options: ["لا", "نعم"] })
+        { kind: "panel", title: "المجموعة", grid: [
+          F("رقم المجموعة", { span: 3, req: true, mono: true }),
+          F("اسم المجموعة", { span: 5, req: true }),
+          F("الاسم الأجنبي", { span: 5 }),
+          F("حساب المجموعة", { span: 3, req: true, mono: true })
         ]},
-        { kind: "table", title: "كل المجموعات", max: "28vh",
-          cols: ["الرقم", "الاسم", "الحساب", "موردون", "نطاق الأرقام"],
-          rows: [
-            ["2", "موردين محليين", "2202020001", "76", "20001–20077"],
-            ["3", "موردون - متنوعون", "2202020002", "12", "30001–30013"],
-            ["4", "موردون عارف زين", "2202020001", "24", "40000–40023"],
-            ["5", "موردين الخدمات", "2202020003", "0", "—"],
-            ["6", "موردين سميح التومي", "2202020001", "16", "1–… بلا بادئة"],
-            ["7", "مجموعة موردين بلاستيك", "2202020001", "2", "10200001–10200002"]
-          ] }
+        { kind: "table", title: "المجموعات", max: "32vh", cols: [], rows: [] }
       ],
       side: [
-        { kind: "panel", title: "استخدام المجموعة", links: [["موردون مربوطون", "76"], ["4 مجموعات على حساب واحد", "118/130"], ["لا حذف مع موردين", "قاعدة"]] },
-        { kind: "note", text: "الحساب من نوع «مورد» فقط. تغييره ينعكس على الحركات اللاحقة لكل موردي المجموعة (`AP-R12`)." }
+        { kind: "note", text: "أونيكس: 6 مجموعات. الحساب من نوع «مورد» (AP-R11) · تغييره ممنوع إذا على القديم حركة (AP-R14, 5798)." }
       ]
     },
 
@@ -1575,34 +1549,33 @@
     /* ═══ وحدات القياس ═══ */
     "op.5.1.1.2": {
       state: { label: "نشط", cls: "s-posted" },
-      rec: { i: 1, n: 8 },
-      cmds: ["addFrom", "add", "edit", "delete", "save", "cancelEntry", "search", "quick",
-             "navFirst", "navPrev", "navNext", "navLast", "importExcel", "print", "allScreens", "lockSession", "exit"],
-      audit: { by: "1 · محسن السقاف", at: "20/12/2022 10:00:00", dev: "—", prints: 0, upd: "—", updc: 0, ver: "V8.1.14" },
+      rec: { i: 0, n: 0 },
+      cmds: ["add", "edit", "delete", "save", "cancelEntry", "search", "quick",
+             "navFirst", "navPrev", "navNext", "navLast", "print", "allScreens", "lockSession", "exit"],
+      audit: { by: "—", at: "—", dev: "—", prints: "—", upd: "—", updc: 0, ver: "V8.1.14" },
       blocks: [
         { kind: "panel", title: "الوحدة", grid: [
-          F("رمز الوحدة", { span: 3, req: true, value: "كرتون", mono: true }),
-          F("اسم الوحدة", { span: 4, req: true, value: "كرتون" }),
-          F("الاسم الأجنبي", { span: 3, value: "—" }),
-          F("نوع الوحدة", { span: 3, type: "select", options: ["عددية", "مقاسة"] }),
-          F("نوع وحدة القياس", { span: 3, type: "select", options: ["تجزئة", "جملة", "كلي"] }),
-          F("غير قابل للتعديل", { span: 3, type: "select", options: ["لا", "نعم"] })
+          F("رمز الوحدة", { span: 3, req: true, mono: true }),
+          F("اسم الوحدة", { span: 5, req: true }),
+          F("الاسم الأجنبي", { span: 5 }),
+          F("رمز وحدة القياس العالمية", { span: 3, mono: true }),
+          F("العبوة الافتراضية", { span: 3, mono: true }),
+          F("غير قابل للتعديل", { span: 3, type: "select", options: ["لا", "نعم"] }),
+          F("نوع الوحدة", { span: 3, req: true, type: "select", options: ["عددية", "مقاسة"] }),
+          F("تصنيف الوحدة", { span: 3, type: "select", options: ["—", "وزن", "حجم", "مساحة", "أطوال", "سوائل", "عدد"] }),
+          F("مرتبطة بوحدات عددية", { span: 3, type: "select", options: ["لا", "نعم"] }),
+          F("نوع وحدة القياس", { span: 3, type: "select", options: ["كلي", "تجزئة", "جملة"] })
         ]},
-        { kind: "table", title: "الوحدات الثمان", max: "28vh",
-          cols: ["الرمز", "الاسم", "النوع", "مبيعات 2026"],
-          rows: [
-            ["كرتون", "كرتون", "عددية · كلي", "71٪ من أسطر البيع"],
-            ["حبة", "حبة", "عددية · كلي", "—"],
-            ["برميل", "برميل", "عددية · كلي", "—"],
-            ["درزن", "درزن", "عددية · كلي", "—"],
-            ["طن", "طن", "عددية · كلي", "—"],
-            ["سطل", "سطل", "عددية · كلي", "—"],
-            ["كيلو", "كيلو", "عددية · كلي", "—"],
-            ["لتر", "لتر", "عددية · كلي", "—"]
-          ] }
+        { kind: "panel", title: "التحويل بين الوحدات", grid: [
+          F("المجموعة", { span: 3, mono: true }),
+          F("من وحدة", { span: 3, req: true, mono: true }),
+          F("إلى وحدة", { span: 3, req: true, mono: true }),
+          F("المعامل", { span: 3, req: true, mono: true })
+        ]},
+        { kind: "table", title: "الوحدات", max: "32vh", cols: [], rows: [] }
       ],
       side: [
-        { kind: "note", text: "الاسم يُرسل حرفياً للهيئة (`unitCode`). معامل التحويل (حبة في الكرتون) على بطاقة الصنف لا هنا. 217 صنفاً فقط بوحدتين." }
+        { kind: "note", text: "أونيكس: 8 وحدات عددية «كلي» · 13 سطر تحويل خلف «نظام الأوزان» المطفأ (IV-R28). الرمز فريد بلا تمييز حالة (IV-R21) · النوع والارتباط يُقفلان بعد استخدام الوحدة في صنف (IV-R25)." }
       ]
     },
 
@@ -1727,31 +1700,32 @@
     /* ═══ بيانات المجموعة الرئيسية ═══ */
     "op.5.1.2.1": {
       state: { label: "نشط", cls: "s-posted" },
-      rec: { i: 3, n: 14 },
-      cmds: ["addFrom", "add", "edit", "delete", "save", "cancelEntry", "search", "quick",
-             "navFirst", "navPrev", "navNext", "navLast", "related", "importExcel", "print", "allScreens", "lockSession", "exit"],
-      audit: { by: "1 · محسن السقاف", at: "17/12/2022 16:50:56", dev: "—", prints: 0, upd: "—", updc: 0, ver: "V8.1.14" },
+      rec: { i: 0, n: 0 },
+      cmds: ["add", "edit", "delete", "save", "cancelEntry", "search", "quick",
+             "navFirst", "navPrev", "navNext", "navLast", "print", "allScreens", "lockSession", "exit"],
+      audit: { by: "—", at: "—", dev: "—", prints: "—", upd: "—", updc: 0, ver: "V8.1.14" },
       blocks: [
-        { kind: "panel", title: "المجموعة الرئيسية", pill: "مفتاح القيد المحاسبي", grid: [
-          F("رقم المجموعة", { span: 2, req: true, value: "003", mono: true }),
-          F("الاسم", { span: 5, req: true, value: "التام" }),
-          F("بادئة رقم الصنف", { span: 2, value: "003" }),
-          F("نسبة الضريبة الافتراضية", { span: 3, value: "15" })
+        { kind: "panel", title: "المجموعة الرئيسية", grid: [
+          F("رقم المجموعة", { span: 3, req: true, mono: true }),
+          F("اسم المجموعة", { span: 5, req: true }),
+          F("الاسم الأجنبي", { span: 5 }),
+          F("كود رقم الصنف", { span: 3, mono: true }),
+          F("نسبة الضريبة الافتراضية", { span: 3, mono: true }),
+          F("مزامنة إلى موقع الويب", { span: 3, type: "select", options: ["لا", "نعم"] }),
+          F("إستخدام سعر البيع كسعر شراء", { span: 3, type: "select", options: ["لا", "نعم"] }),
+          F("يسمح بالخصم — مبيعات", { span: 3, type: "select", options: ["لا", "نعم"] }),
+          F("يسمح بالخصم — مشتريات", { span: 3, type: "select", options: ["لا", "نعم"] }),
+          F("الحد الأدنى لسعر البيع من", { span: 3, mono: true }),
+          F("الإشارة", { span: 3, mono: true }),
+          F("نوع القيمة", { span: 3, type: "select", options: ["—", "نسبة", "قيمة"] }),
+          F("المعامل", { span: 3, mono: true }),
+          F("حد كمية المجموعة", { span: 3 }),
+          F("الترتيب", { span: 3, mono: true })
         ]},
-        { kind: "table", title: "14 مجموعة · 2,228 صنفاً", max: "36vh",
-          cols: ["الرقم", "الاسم", "أصناف", "سطور مبيعات", "ربط محاسبي"],
-          rows: [
-            ["001", "الخام", "85", "30", "✔"],
-            ["003", "التام", "48", "12,440", "✔"],
-            ["004", "اصناف المندوب عارف زين", "986", "8,056", "✔"],
-            ["007", "منتجات المعرض", "222", "760", "✔"],
-            ["010", "مجموعة اصناف سميح التومي", "567", "2,226", "✔"],
-            ["012", "الخام (مكرر)", "0", "0", "✘"],
-            ["014", "مجموعة طلبات الاصناف", "118", "0", "✘"]
-          ] }
+        { kind: "table", title: "المجموعات", max: "32vh", cols: [], rows: [] }
       ],
       side: [
-        { kind: "note", text: "المستويات الأدنى فارغة. 012 و014 بلا ربط محاسبي. الحسابات من `op.5.1.2.16`." }
+        { kind: "note", text: "أونيكس: 14 مجموعة. نسبة الضريبة لازم تكون شريحة معرّفة (IV-R74) · لا حذف لمجموعة عليها أصناف أو ربط محاسبي (IV-R71)." }
       ]
     },
 
@@ -1896,24 +1870,40 @@
     /* ═══ ربط حسابات المخزون ═══ */
     "op.5.1.2.16": {
       state: { label: "نشط", cls: "s-posted" },
-      rec: { i: 1, n: 12 },
+      rec: { i: 0, n: 0 },
       cmds: ["add", "edit", "delete", "save", "cancelEntry", "search", "quick",
              "navFirst", "navPrev", "navNext", "navLast", "print", "allScreens", "lockSession", "exit"],
-      audit: { by: "1 · محسن السقاف", at: "17/12/2022 16:50:56", dev: "—", prints: 0, upd: "3", updc: 0, ver: "V8.1.14" },
+      audit: { by: "—", at: "—", dev: "—", prints: "—", upd: "—", updc: 0, ver: "V8.1.14" },
       blocks: [
-        { kind: "panel", title: "ربط مجموعة 003 التام", pill: "حسب مجموعات الأصناف", grid: [
-          F("المجموعة", { span: 4, req: true, type: "ref", code: "003", text: "التام", lk: "itemGroup" }),
-          F("حساب المخزون", { span: 8, req: true, type: "ref", code: "1202010001", text: "المخزون السلعي للبضائع", lk: "account" }),
-          F("المبيعات", { span: 4, type: "ref", code: "4101010001", text: "مبيعات البضائع", lk: "account" }),
-          F("مردود المبيعات", { span: 4, type: "ref", code: "4101020001", text: "مردودات المبيعات", lk: "account" }),
-          F("خصم مسموح به", { span: 4, type: "ref", code: "4101030001", text: "خصم مبيعات", lk: "account" }),
-          F("تكلفة المبيعات", { span: 4, type: "ref", code: "3101010001", text: "تكلفة المبيعات", lk: "account" }),
-          F("تكلفة المردود", { span: 4, type: "ref", code: "3101040001", text: "تكلفة مردود المبيعات", lk: "account" }),
-          F("تكلفة المجاني", { span: 4, type: "ref", code: "3101050001", text: "تكلفة الكميات المجانية", lk: "account" })
-        ]}
+        { kind: "panel", title: "الربط", grid: [
+          F("حسب", { span: 3, req: true, type: "select", options: ["مجموعات الأصناف", "مجموعات المخازن"] }),
+          F("المجموعة", { span: 3, req: true, mono: true }),
+          F("حساب المخزون", { span: 3, mono: true }),
+          F("المبيعات", { span: 3, mono: true }),
+          F("مردود المبيعات", { span: 3, mono: true }),
+          F("خصم مسموح به", { span: 3, mono: true }),
+          F("خصم مكتسب", { span: 3, mono: true }),
+          F("تكلفة المبيعات", { span: 3, mono: true }),
+          F("تكلفة المردود", { span: 3, mono: true }),
+          F("مردود مبيعات سنوات سابقة", { span: 3, mono: true }),
+          F("تكلفة مردود سنوات سابقة", { span: 3, mono: true }),
+          F("تكلفة المجاني", { span: 3, mono: true }),
+          F("تكلفة المجاني — مشتريات", { span: 3, mono: true }),
+          F("تكلفة مردود المجاني", { span: 3, mono: true }),
+          F("المشتريات", { span: 3, mono: true }),
+          F("إيرادات مقدمة", { span: 3, mono: true }),
+          F("مشتريات الخدمات", { span: 3, mono: true }),
+          F("مبيعات مؤجلة", { span: 3, mono: true }),
+          F("تكلفة مبيعات مؤجلة", { span: 3, mono: true }),
+          F("مبيعات دفعة مقدمة", { span: 3, mono: true }),
+          F("مردود دفعة مقدمة", { span: 3, mono: true }),
+          F("تكلفة التعويض", { span: 3, mono: true }),
+          F("فروق الأسعار", { span: 3, mono: true })
+        ]},
+        { kind: "table", title: "الروابط", max: "32vh", cols: [], rows: [] }
       ],
       side: [
-        { kind: "note", text: "12 ربطاً من 14 مجموعة. 012 و014 بلا ربط. حساب المخزون لا يُعدَّل بعد الحفظ. 013 المجاني يرحّل التكلفة على هدايا الوكلاء." }
+        { kind: "note", text: "أونيكس: 12 ربطاً. الحسابات الخمسة الأساسية إلزامية (IV-R130) · كلها فرعية (IV-R132) · حساب المخزون لا يُغيَّر بعد الحركة (IV-R131, 5798)." }
       ]
     },
 
@@ -2188,6 +2178,25 @@
       ]
     },
 
+    /* ═══ ربط الحسابات بالأنشطة — حيّة من erp.account_activity ═══ */
+    "op.4.1.2.9": {
+      state: { label: "نشط", cls: "s-posted" },
+      rec: { i: 0, n: 0 },
+      cmds: ["add", "delete", "save", "cancelEntry", "search", "quick",
+             "navFirst", "navPrev", "navNext", "navLast", "print", "allScreens", "lockSession", "exit"],
+      audit: { by: "—", at: "—", dev: "—", prints: "—", upd: "—", updc: 0, ver: "V8.1.14" },
+      blocks: [
+        { kind: "panel", title: "الربط", grid: [
+          F("رقم الحساب", { span: 4, req: true, mono: true, lk: "account" }),
+          F("رقم النشاط", { span: 4, req: true, mono: true })
+        ]},
+        { kind: "table", title: "الروابط", max: "34vh", cols: [], rows: [] }
+      ],
+      side: [
+        { kind: "note", text: "بعد الأنشطة فارغ في بتروسبيشل: 0 نشاط · 0 ربط · 0 سطر قيد يحمل نشاطاً، وشاشة «بيانات الأنشطة» (GENI004) موقوفة في أونيكس نفسه. الربط على حسابات الحركة فقط (GL-R45) — GL-Q7." }
+      ]
+    },
+
     /* ═══ الأرصدة الافتتاحية (أستاذ) ═══ */
     "op.4.1.2.10": {
       state: { label: "غير مرحّلة", cls: "s-draft" },
@@ -2281,52 +2290,66 @@
       ]
     },
 
-    /* ═══ إعداد فترات النظام ═══ */
+    /* ═══ إعداد فترات النظام — حيّة من erp.fiscal_period ═══ */
     "op.1.1.2": {
       state: { label: "نشط", cls: "s-posted" },
-      rec: { i: 1, n: 1 },
-      cmds: ["edit", "save", "cancelEntry", "print", "allScreens", "lockSession", "exit"],
-      audit: { by: "1 · محسن السقاف", at: "31/12/2025 13:35:00", dev: "—", prints: 0, upd: "—", updc: 0, ver: "V8.1.14" },
+      rec: { i: 0, n: 0 },
+      cmds: ["add", "edit", "delete", "save", "cancelEntry", "search", "quick",
+             "navFirst", "navPrev", "navNext", "navLast", "print", "allScreens", "lockSession", "exit"],
+      audit: { by: "—", at: "—", dev: "—", prints: "—", upd: "—", updc: 0, ver: "V8.1.14" },
       blocks: [
-        { kind: "panel", title: "السنة المالية 2026", grid: [
-          F("نوع الفترات", { span: 3, type: "select", options: ["شهرية", "فترات المستخدم"] }),
-          F("من", { span: 3, value: "01/01/2026" }),
-          F("إلى", { span: 3, value: "31/12/2026" }),
-          F("بدء عمل المخزون", { span: 3, value: "☑ 31/12/2025", ro: true })
+        { kind: "panel", title: "الفترة", grid: [
+          F("الرقم", { span: 2, mono: true }),
+          F("الاسم", { span: 4, req: true }),
+          F("الاسم الأجنبي", { span: 3 }),
+          F("السنة المالية", { span: 3, mono: true }),
+          F("من", { span: 3, req: true, mono: true }),
+          F("إلى", { span: 3, req: true, mono: true }),
+          F("الحالة", { span: 3, type: "select", options: ["مفتوحة", "مقفلة"], ro: true }),
+          F("الفترة الضريبية", { span: 3, mono: true }),
+          F("موقوفة", { span: 3, type: "select", options: ["لا", "نعم"] })
         ]},
-        { kind: "table", title: "12 فترة — الأسماء مزاحة 3 أشهر (SY-Q2)", max: "36vh",
-          cols: ["الرقم", "الاسم المخزّن", "من", "إلى"],
-          rows: [
-            ["1", "اكتوبر", "01/01/2026", "31/01/2026"],
-            ["4", "يناير", "01/04/2026", "30/04/2026"],
-            ["12", "سبتمبر", "01/12/2026", "31/12/2026"]
-          ] }
+        { kind: "panel", title: "السنة", grid: [
+          F("عدد الفترات", { span: 4, ro: true, mono: true }),
+          F("بداية السنة", { span: 4, ro: true, mono: true }),
+          F("نهاية السنة", { span: 4, ro: true, mono: true })
+        ]},
+        { kind: "table", title: "الفترات", max: "32vh", cols: [], rows: [] }
       ],
       side: [
-        { kind: "note", text: "الإقفال كله 0. الأسماء الخاطئة تظهر في ميزان المراجعة بالفترة." }
+        { kind: "note", text: "الأسماء كما في أونيكس (مزاحة 3 أشهر — SY-Q2). الحالة تتغيّر بالإقفال الشهري (op.2.4.x) لا من هنا." }
       ]
     },
 
-    /* ═══ تهيئة العملات ═══ */
+    /* ═══ تهيئة العملات — حيّة من erp.currency ═══ */
     "op.1.1.3": {
       state: { label: "نشط", cls: "s-posted" },
-      rec: { i: 1, n: 1 },
+      rec: { i: 0, n: 0 },
       cmds: ["add", "edit", "delete", "save", "cancelEntry", "search", "quick",
              "navFirst", "navPrev", "navNext", "navLast", "print", "allScreens", "lockSession", "exit"],
-      audit: { by: "1 · محسن السقاف", at: "17/12/2022 16:50:56", dev: "—", prints: 0, upd: "1", updc: 0, ver: "V8.1.14" },
+      audit: { by: "—", at: "—", dev: "—", prints: "—", upd: "—", updc: 0, ver: "V8.1.14" },
       blocks: [
         { kind: "panel", title: "العملة", grid: [
-          F("الرقم", { span: 2, value: "1", mono: true }),
-          F("الاسم", { span: 4, req: true, value: "ريال سعودي" }),
-          F("الرمز الدولي", { span: 2, value: "SAR", mono: true }),
-          F("محلية", { span: 2, type: "select", options: ["نعم", "لا"] }),
-          F("عملة المخزون", { span: 3, type: "select", options: ["نعم"] }),
-          F("سعر التحويل", { span: 2, value: "1.000000" }),
-          F("الأرقام العشرية", { span: 3, value: "2" })
-        ]}
+          F("الرقم", { span: 2, req: true, mono: true }),
+          F("الاسم", { span: 4, req: true }),
+          F("الاسم الأجنبي", { span: 3 }),
+          F("الرمز", { span: 3, req: true, mono: true }),
+          F("الرمز الدولي", { span: 3, req: true, mono: true }),
+          F("الكسر", { span: 3 }),
+          F("الكسر الأجنبي", { span: 3 }),
+          F("محلية", { span: 3, type: "select", options: ["لا", "نعم"] }),
+          F("عملة المخزون", { span: 3, type: "select", options: ["لا", "نعم"] }),
+          F("المعامل", { span: 3, type: "select", options: ["×", "÷"] }),
+          F("سعر التحويل", { span: 3, req: true, mono: true }),
+          F("أدنى سعر", { span: 3, mono: true }),
+          F("أعلى سعر", { span: 3, mono: true }),
+          F("الأرقام العشرية", { span: 3, mono: true }),
+          F("موقوفة", { span: 3, type: "select", options: ["لا", "نعم"] })
+        ]},
+        { kind: "table", title: "العملات", max: "24vh", cols: [], rows: [] }
       ],
       side: [
-        { kind: "note", text: "عملة واحدة. الأجنبية مفعّلة في المتغيرات وبلا حركة. الكسر فارغ (يؤثر على التفقيط)." }
+        { kind: "note", text: "الرمز الدولي إلزامي (SY-R14 — يُرسل في XML). عملة المخزون لا تتغيّر بعد أول حركة مخزون (SY-R12)." }
       ]
     },
 
@@ -2358,158 +2381,404 @@
       ]
     },
 
-    /* ═══ بيانات الفروع ═══ */
+    /* ═══ بيانات الفروع — حيّة من erp.branch ═══ */
     "op.1.1.12": {
       state: { label: "نشط", cls: "s-posted" },
-      rec: { i: 1, n: 6 },
+      rec: { i: 0, n: 0 },
       cmds: ["add", "edit", "delete", "save", "cancelEntry", "search", "quick",
              "navFirst", "navPrev", "navNext", "navLast", "print", "allScreens", "lockSession", "exit"],
-      audit: { by: "1 · محسن السقاف", at: "17/12/2022 16:50:56", dev: "—", prints: 0, upd: "—", updc: 0, ver: "V8.1.14" },
+      audit: { by: "—", at: "—", dev: "—", prints: "—", upd: "—", updc: 0, ver: "V8.1.14" },
       blocks: [
-        { kind: "panel", title: "الفرع", grid: [
-          F("الشركة", { span: 2, value: "1" }),
-          F("رقم الفرع", { span: 2, value: "1", mono: true }),
-          F("الاسم", { span: 5, req: true, value: "الإدارة" }),
-          F("سنة البدء", { span: 3, value: "2023" })
+        { kind: "panel", title: "الهوية", grid: [
+          F("الشركة", { span: 2, req: true, mono: true }),
+          F("رقم الفرع", { span: 2, req: true, mono: true }),
+          F("الاسم", { span: 5, req: true }),
+          F("الاسم الأجنبي", { span: 3 }),
+          F("سنة البدء", { span: 3, mono: true }),
+          F("تسلسل الفرع", { span: 3, mono: true }),
+          F("موقوف", { span: 3, type: "select", options: ["لا", "نعم"] })
         ]},
-        { kind: "table", title: "الفروع", max: "28vh",
-          cols: ["الفرع", "الاسم", "الشركة", "سطور قيود 2026"],
-          num: [3],
-          rows: [
-            ["1", "الإدارة", "1", "79,562"],
-            ["2", "التجزئة", "1", "10,646"],
-            ["3", "سميح التومي", "1", "3,752"],
-            ["4", "قمم البعد", "2", "15,826"],
-            ["5", "البلاستيك", "2", "287"],
-            ["6", "أنشطة شقيقة", "—", "0"]
-          ] }
+        { kind: "panel", title: "الضريبة والعنوان الوطني", grid: [
+          F("الرقم الضريبي", { span: 4, mono: true }),
+          F("السجل التجاري", { span: 4, mono: true }),
+          F("فاتورة إلكترونية", { span: 4, type: "select", options: ["لا", "نعم"] }),
+          F("المدينة", { span: 3 }),
+          F("الحي", { span: 3 }),
+          F("الشارع", { span: 3 }),
+          F("رقم المبنى", { span: 2, mono: true }),
+          F("الرمز البريدي", { span: 3, mono: true })
+        ]},
+        { kind: "table", title: "الفروع", max: "26vh", cols: [], rows: [] }
       ],
       side: [
-        { kind: "note", text: "صفوف `S_BRN` غير مقروءة (BLOB). الأسماء من المستخدم. العنوان الوطني للفرع غير معروف (SY-Q4)." }
+        { kind: "note", text: "صفوف `S_BRN` غير مقروءة (BLOB) ⇒ الرقم والاسم فقط معروفان؛ بقية الحقول فاضية حتى تُدخَل (SY-Q4). الشركة مثبتة بالمستخرج للفروع 1–5 فقط؛ فرع 6 «انشطة شقيقة» شركته غير معروفة ويجب اختيارها قبل أي تعديل عليه. تفعيل الفاتورة الإلكترونية يطلب الرقم الضريبي والعنوان الوطني كاملاً (SY-R23)." }
       ]
     },
 
-    /* ═══ الدليل المحاسبي ═══ */
+    /* ═══ الدليل المحاسبي — حيّ من erp.account ═══ */
     "op.1.2.3": {
       state: { label: "نشط", cls: "s-posted" },
-      rec: { i: 289, n: 384 },
+      rec: { i: 0, n: 0 },
       cmds: ["add", "edit", "delete", "save", "cancelEntry", "search", "quick",
-             "navFirst", "navPrev", "navNext", "navLast", "accountMove", "related", "importExcel",
-             "print", "openReport", "allScreens", "lockSession", "suspend", "exit"],
-      audit: { by: "1 · محسن السقاف", at: "20/12/2022 10:00:00", dev: "—", prints: 0, upd: "—", updc: 0, ver: "V8.1.14" },
+             "navFirst", "navPrev", "navNext", "navLast", "related",
+             "print", "openReport", "allScreens", "lockSession", "exit"],
+      audit: { by: "—", at: "—", dev: "—", prints: "—", upd: "—", updc: 0, ver: "V8.1.14" },
       blocks: [
-        { kind: "panel", title: "الحساب", pill: "مستوى 5 · حركة", grid: [
-          F("الحساب الأعلى", { span: 3, value: "120301", mono: true }),
-          F("رقم الحساب", { span: 3, req: true, value: "1203010001", mono: true }),
-          F("الاسم", { span: 6, req: true, value: "عملاء المبيعات الآجلة" }),
-          F("المستوى", { span: 2, value: "5", ro: true }),
-          F("النوع", { span: 2, type: "select", options: ["فرعي (حركة)", "رئيسي"] }),
-          F("الطبيعة", { span: 2, type: "select", options: ["مدين", "دائن"] }),
-          F("التقرير", { span: 2, type: "select", options: ["ميزانية", "أرباح وخسائر"] }),
-          F("التحليلي", { span: 3, type: "select", options: ["عميل", "عام", "صندوق", "بنك", "مورد", "موظف"] }),
-          F("استخدام المراكز", { span: 3, type: "select", options: ["اختياري", "إجباري", "غير مستخدم"] })
-        ]}
+        { kind: "panel", title: "الحساب", grid: [
+          F("الحساب الأعلى", { span: 3, mono: true }),
+          F("رقم الحساب", { span: 3, req: true, mono: true }),
+          F("الاسم", { span: 6, req: true }),
+          F("الاسم الأجنبي", { span: 4 }),
+          F("المستوى", { span: 2, ro: true, mono: true }),
+          F("النوع", { span: 3, type: "select", options: ["فرعي (حركة)", "رئيسي"] }),
+          F("الطبيعة", { span: 3, type: "select", options: ["مدين", "دائن"], ro: true }),
+          F("التقرير", { span: 3, type: "select", options: ["ميزانية", "أرباح وخسائر"], ro: true }),
+          F("التحليلي", { span: 3, type: "select", options: ["عام", "صندوق", "بنك", "عميل", "مورد", "موظف"] }),
+          F("استخدام المراكز", { span: 3, type: "select", options: ["غير مستخدم", "اختياري", "إجباري"] }),
+          F("موقوف", { span: 3, type: "select", options: ["لا", "نعم"] }),
+          F("سبب التوقيف", { span: 4 })
+        ]},
+        { kind: "table", title: "الدليل", max: "34vh", cols: [], rows: [] }
       ],
       side: [
-        { kind: "panel", title: "الشجرة", links: [["حسابات", "384"], ["حركة L5", "289"], ["موقوفون", "6"]] },
-        { kind: "note", text: "1 أصول · 2 خصوم وحقوق · 3 مصروفات · 4 إيرادات. المصروفات والإيرادات: المركز إجباري." }
+        { kind: "note", text: "الرقم آلي من الأب بطول المستوى (1·2·4·6·10 — SY-R25). الطبيعة والتقرير يورَّثان من الأب ولا يُدخَلان (SY-R26). لا حذف لحساب له حركة أو أبناء (SY-R30)." }
+      ]
+    },
+
+    /* ═══ مراكز التكلفة — حيّة من erp.cost_center ═══ */
+    /* ═══ op.5.1.2.8 — حيّة من الخادم (الطبقة ١) ═══ */
+    "op.5.1.2.8": {
+      state: { label: "نشط", cls: "s-posted" },
+      rec: { i: 0, n: 0 },
+      cmds: ["add", "edit", "delete", "save", "cancelEntry", "search", "quick",
+             "navFirst", "navPrev", "navNext", "navLast", "print", "allScreens", "lockSession", "exit"],
+      audit: { by: "—", at: "—", dev: "—", prints: "—", upd: "—", updc: 0, ver: "V8.1.14" },
+      blocks: [
+        { kind: "panel", title: "مجموعة المخازن", grid: [
+          F("رقم المجموعة", { span: 3, req: true, mono: true }),
+          F("اسم المجموعة", { span: 5, req: true }),
+          F("الاسم الأجنبي", { span: 5 })
+        ]},
+        { kind: "table", title: "مجموعات المخازن", max: "32vh", cols: [], rows: [] }
+      ],
+      side: [
+        { kind: "note", text: "أونيكس: 4 مجموعات. لا حذف لمجموعة مستخدمة في مخزن أو في ربط حسابات المخزون (نوع 2) [مساعدة: INVI004]." }
+      ]
+    },
+
+    /* ═══ op.1.2.11 — حيّة من الخادم (الطبقة ١) ═══ */
+    "op.1.2.11": {
+      state: { label: "نشط", cls: "s-posted" },
+      rec: { i: 0, n: 0 },
+      cmds: ["add", "edit", "delete", "save", "cancelEntry", "search", "quick",
+             "navFirst", "navPrev", "navNext", "navLast", "print", "allScreens", "lockSession", "exit"],
+      audit: { by: "—", at: "—", dev: "—", prints: "—", upd: "—", updc: 0, ver: "V8.1.14" },
+      blocks: [
+        { kind: "panel", title: "الربط", grid: [
+          F("الرقم", { span: 3, req: true, mono: true }),
+          F("الاسم", { span: 5, req: true }),
+          F("الاسم الأجنبي", { span: 5 }),
+          F("رقم الحساب", { span: 3, req: true, mono: true }),
+          F("نوع الحساب", { span: 3, ro: true, type: "select", options: ["", "مدينة أخرى", "دائنة أخرى"] }),
+          F("النوع التفصيلي", { span: 3, type: "select", options: ["مدينة ودائنة أخرى"] })
+        ]},
+        { kind: "table", title: "الروابط", max: "32vh", cols: [], rows: [] }
+      ],
+      side: [
+        { kind: "note", text: "أونيكس: ربط واحد. الحساب فرعي ونوعه «مدينة أخرى/دائنة أخرى» (4544) عند الإضافة أو تغيير الحساب [مساعدة: GENI025]." }
+      ]
+    },
+
+    /* ═══ op.1.2.4 — حيّة من الخادم (الطبقة ١) ═══ */
+    "op.1.2.4": {
+      state: { label: "نشط", cls: "s-posted" },
+      rec: { i: 0, n: 0 },
+      cmds: ["edit", "save", "cancelEntry", "search", "quick",
+             "navFirst", "navPrev", "navNext", "navLast", "print", "allScreens", "lockSession", "exit"],
+      audit: { by: "—", at: "—", dev: "—", prints: "—", upd: "—", updc: 0, ver: "V8.1.14" },
+      blocks: [
+        { kind: "panel", title: "الحساب العام ← نوع التدفق", grid: [
+          F("رقم الحساب العام", { span: 3, ro: true, mono: true }),
+          F("نوع التدفق", { span: 3, type: "select", options: ["—", "تشغيلي", "استثماري", "تمويلي"] }),
+          F("تحديث دليل الحسابات", { span: 3, type: "select", options: ["لا", "نعم"] })
+        ]},
+        { kind: "panel", title: "حساب الدليل ← الحساب العام", grid: [
+          F("رقم الحساب", { span: 3, ro: true, mono: true }),
+          F("الحساب العام", { span: 3, mono: true }),
+          F("نوع التدفق", { span: 3, ro: true, type: "select", options: ["", "تشغيلي", "استثماري", "تمويلي"] })
+        ]},
+        { kind: "table", title: "الحسابات العامة", max: "32vh", cols: [], rows: [] }
+      ],
+      side: [
+        { kind: "note", text: "ربط فقط — لا إضافة ولا حذف. 147 حساباً عاماً · 289 حساب حركة. نوع التدفق في حساب الدليل يُشتق من حسابه العام، و«تحديث دليل الحسابات» ينزله على الحسابات المربوطة [مساعدة: GENI006]." }
+      ]
+    },
+
+    /* ═══ op.1.1.13 — حيّة من الخادم (الطبقة ١) ═══ */
+    "op.1.1.13": {
+      state: { label: "نشط", cls: "s-posted" },
+      rec: { i: 0, n: 0 },
+      cmds: ["add", "edit", "delete", "save", "cancelEntry", "search", "quick",
+             "navFirst", "navPrev", "navNext", "navLast", "print", "allScreens", "lockSession", "exit"],
+      audit: { by: "—", at: "—", dev: "—", prints: "—", upd: "—", updc: 0, ver: "V8.1.14" },
+      blocks: [
+        { kind: "panel", title: "أنواع الحسابات", grid: [
+          F("الرقم", { span: 3, req: true, mono: true }),
+          F("الاسم", { span: 5, req: true }),
+          F("الاسم الأجنبي", { span: 5 }),
+          F("يتأثر بالحركة", { span: 3, type: "select", options: ["لا", "نعم"] })
+        ]},
+        { kind: "panel", title: "أنواع التقارير الختامية", grid: [
+          F("الرقم", { span: 3, req: true, mono: true }),
+          F("الاسم", { span: 5, req: true }),
+          F("الاسم الأجنبي", { span: 5 }),
+          F("ميزانية", { span: 3, type: "select", options: ["لا", "نعم"] })
+        ]},
+        { kind: "panel", title: "مجموعات الحسابات", grid: [
+          F("الرقم", { span: 3, req: true, mono: true }),
+          F("الاسم", { span: 5, req: true }),
+          F("الاسم الأجنبي", { span: 5 })
+        ]},
+        { kind: "panel", title: "تصنيفات الحسابات", grid: [
+          F("الرقم", { span: 3, req: true, mono: true }),
+          F("الاسم", { span: 5, req: true }),
+          F("الاسم الأجنبي", { span: 5 })
+        ]},
+        { kind: "table", title: "أنواع الحسابات", max: "32vh", cols: [], rows: [] }
+      ],
+      side: [
+        { kind: "note", text: "أونيكس: نوعا حساب (رئيسي/فرعي) · نوعا تقرير (ميزانية/أرباح وخسائر) · المجموعات والتصنيفات فارغة. نوع واحد فقط «يتأثر بالحركة» [مساعدة: GENS021]." }
+      ]
+    },
+
+    /* ═══ op.1.2.1 — حيّة من الخادم (الطبقة ١) ═══ */
+    "op.1.2.1": {
+      state: { label: "نشط", cls: "s-posted" },
+      rec: { i: 0, n: 0 },
+      cmds: ["add", "edit", "delete", "save", "cancelEntry", "search", "quick",
+             "navFirst", "navPrev", "navNext", "navLast", "print", "allScreens", "lockSession", "exit"],
+      audit: { by: "—", at: "—", dev: "—", prints: "—", upd: "—", updc: 0, ver: "V8.1.14" },
+      blocks: [
+        { kind: "panel", title: "الحساب العام", grid: [
+          F("الحساب الأعلى", { span: 3, mono: true }),
+          F("رقم الحساب", { span: 3, req: true, mono: true }),
+          F("الاسم", { span: 5, req: true }),
+          F("الاسم الأجنبي", { span: 5 }),
+          F("المستوى", { span: 3, ro: true, mono: true }),
+          F("رئيسي", { span: 3, type: "select", options: ["لا", "نعم"] }),
+          F("التقرير", { span: 3, req: true, type: "select", options: ["ميزانية", "أرباح وخسائر"] }),
+          F("الطبيعة مدين", { span: 3, type: "select", options: ["لا", "نعم"] }),
+          F("نوع التدفق", { span: 3, type: "select", options: ["—", "تشغيلي", "استثماري", "تمويلي"] }),
+          F("نوع التحليلي", { span: 3 }),
+          F("الترتيب", { span: 3, mono: true }),
+          F("رمز الترتيب", { span: 3, mono: true }),
+          F("ملاحظات", { span: 5 })
+        ]},
+        { kind: "table", title: "الحسابات العامة", max: "32vh", cols: [], rows: [] }
+      ],
+      side: [
+        { kind: "note", text: "أونيكس: 147 حساباً عاماً على 4 مستويات (1 · 11 · 111 · 11101). المستوى آلي من طول الرقم ويجب أن يكون أعلى من الأب بواحد (6039) · لا حذف لحساب له أبناء أو حسابات دليل مربوطة." }
+      ]
+    },
+
+    /* ═══ op.4.1.2.8 — حيّة من الخادم (الطبقة ١) ═══ */
+    "op.4.1.2.8": {
+      state: { label: "نشط", cls: "s-posted" },
+      rec: { i: 0, n: 0 },
+      cmds: ["add", "edit", "delete", "save", "cancelEntry", "search", "quick",
+             "navFirst", "navPrev", "navNext", "navLast", "print", "allScreens", "lockSession", "exit"],
+      audit: { by: "—", at: "—", dev: "—", prints: "—", upd: "—", updc: 0, ver: "V8.1.14" },
+      blocks: [
+        { kind: "panel", title: "الربط", grid: [
+          F("رقم الحساب", { span: 3, req: true, mono: true }),
+          F("رقم المشروع", { span: 3, req: true, mono: true })
+        ]},
+        { kind: "table", title: "الروابط", max: "32vh", cols: [], rows: [] }
+      ],
+      side: [
+        { kind: "note", text: "أونيكس: 0 ربط — الشاشة فاضية كما هي. الحساب فرعي والمشروع موجود · لا حذف لربط مشروع عليه حركة [مساعدة: GLSI009]." }
+      ]
+    },
+
+    "op.1.2.5": {
+      state: { label: "نشط", cls: "s-posted" },
+      rec: { i: 0, n: 0 },
+      cmds: ["add", "edit", "delete", "save", "cancelEntry", "search", "quick",
+             "navFirst", "navPrev", "navNext", "navLast", "print", "allScreens", "lockSession", "exit"],
+      audit: { by: "—", at: "—", dev: "—", prints: "—", upd: "—", updc: 0, ver: "V8.1.14" },
+      blocks: [
+        { kind: "panel", title: "المركز", grid: [
+          F("المركز الأعلى", { span: 3, mono: true }),
+          F("رمز المركز", { span: 3, req: true, mono: true }),
+          F("الرقم", { span: 2, req: true, mono: true }),
+          F("الاسم", { span: 5, req: true }),
+          F("الاسم الأجنبي", { span: 4 }),
+          F("المستوى", { span: 2, ro: true, mono: true }),
+          F("النوع", { span: 3, type: "select", options: ["فرعي (حركة)", "رئيسي"] }),
+          F("التسلسل", { span: 2, mono: true }),
+          F("المجموعة", { span: 2, mono: true }),
+          F("موقوف", { span: 3, type: "select", options: ["لا", "نعم"] }),
+          F("موقوف في المبيعات", { span: 3, type: "select", options: ["لا", "نعم"] }),
+          F("سبب التوقيف", { span: 4 })
+        ]},
+        { kind: "table", title: "المراكز", max: "32vh", cols: [], rows: [] }
+      ],
+      side: [
+        { kind: "note", text: "البعد التحليلي الوحيد المستخدم فعلاً: 86,126 من 110,073 سطر قيد 2026 تحمل مركزاً (28 مركزاً من 40). الحركة على الفرعي فقط (SY-R38) · المصروفات والإيرادات مركزها إجباري (SY-R39) · لا حذف لمركز له حركة أو أبناء (SY-R40)." }
+      ]
+    },
+
+    /* ═══ بيانات المشاريع — حيّة من erp.project ═══ */
+    "op.1.2.6": {
+      state: { label: "نشط", cls: "s-posted" },
+      rec: { i: 0, n: 0 },
+      cmds: ["add", "edit", "delete", "save", "cancelEntry", "search", "quick",
+             "navFirst", "navPrev", "navNext", "navLast", "print", "allScreens", "lockSession", "exit"],
+      audit: { by: "—", at: "—", dev: "—", prints: "—", upd: "—", updc: 0, ver: "V8.1.14" },
+      blocks: [
+        { kind: "panel", title: "المشروع", grid: [
+          F("المشروع الأعلى", { span: 3, mono: true }),
+          F("رقم المشروع", { span: 3, req: true, mono: true }),
+          F("الاسم", { span: 6, req: true }),
+          F("الاسم الأجنبي", { span: 4 }),
+          F("المستوى", { span: 2, ro: true, mono: true }),
+          F("مشروع حركة", { span: 3, type: "select", options: ["لا", "نعم"] }),
+          F("التسلسل", { span: 2, mono: true }),
+          F("المجموعة", { span: 2, mono: true }),
+          F("موقوف", { span: 3, type: "select", options: ["لا", "نعم"] }),
+          F("سبب التوقيف", { span: 4 })
+        ]},
+        { kind: "table", title: "المشاريع", max: "30vh", cols: [], rows: [] }
+      ],
+      side: [
+        { kind: "note", text: "10 مشاريع معرّفة (أسطول الباصات + رافعة) بصفر حركة 2026 — البعد مبنيّ كاملاً ويبقى خلف مفتاح ميزة حتى يُطلب (SY-R46 · SY-Q6)." }
       ]
     },
 
     /* ═══ الحسابات الوسيطة ═══ */
     "op.1.2.9": {
       state: { label: "نشط", cls: "s-posted" },
-      rec: { i: 1, n: 5 },
-      cmds: ["edit", "save", "cancelEntry", "search", "quick",
+      rec: { i: 0, n: 0 },
+      cmds: ["add", "edit", "delete", "save", "cancelEntry", "search", "quick",
              "navFirst", "navPrev", "navNext", "navLast", "print", "allScreens", "lockSession", "exit"],
-      audit: { by: "1 · محسن السقاف", at: "20/12/2022 10:00:00", dev: "—", prints: 0, upd: "—", updc: 0, ver: "V8.1.14" },
+      audit: { by: "—", at: "—", dev: "—", prints: "—", upd: "—", updc: 0, ver: "V8.1.14" },
       blocks: [
-        { kind: "panel", title: "وسطاء الفرع 1", pill: "متطابق في 1–5", grid: [
-          F("الفرع", { span: 3, type: "ref", code: "1", text: "الإدارة", lk: "branch" }),
-          F("VAT مخرجات", { span: 5, type: "ref", code: "2202070001", text: "ضريبة القيمة المضافة مخرجات", lk: "account" }),
-          F("VAT مدخلات", { span: 4, type: "ref", code: "1207030001", text: "ضريبة القيمة المضافة مدخلات", lk: "account" }),
-          F("فروق الكسور", { span: 4, type: "ref", code: "3101060001", text: "فروق الكسور", lk: "account" }),
-          F("فروق التكلفة", { span: 4, type: "ref", code: "3101060002", text: "فروق التكلفة", lk: "account" }),
-          F("فروق التحويل المخزني", { span: 4, type: "ref", code: "3101060001", text: "فروق الكسور", lk: "account" }),
-          F("فروق العملة", { span: 4, type: "ref", code: "3201010032", text: "فروق عملة", lk: "account" })
+        { kind: "panel", title: "حسابات الفرع الوسيطة", grid: [
+          F("الفرع", { span: 3, req: true, mono: true }),
+          F("VAT مخرجات", { span: 3, mono: true }),
+          F("VAT مدخلات", { span: 3, mono: true }),
+          F("فروق العملة", { span: 3, mono: true }),
+          F("فروق الكسور", { span: 3, mono: true }),
+          F("فروق الكسور بعد الضريبة", { span: 3, mono: true }),
+          F("فروق التحويل المخزني", { span: 3, mono: true }),
+          F("فروق تكلفة مردود المشتريات", { span: 3, mono: true }),
+          F("فروق الصرف المخزني", { span: 3, mono: true })
         ]},
-        { kind: "feature", text: "أوراق القبض/الدفع · جاري الفروع · الكمبيالات · الأصول · HR · قطاعي — فارغة خلف الميزات. الفرع 6 بلا صف." }
+        { kind: "table", title: "الفروع", max: "32vh", cols: [], rows: [] }
       ],
       side: [
-        { kind: "note", text: "تغيير حساب مستخدم يُفحص على القيود أولاً." }
+        { kind: "note", text: "أونيكس: 5 فروع (الفرع 6 بلا صف). الحساب فرعي (SY-R33) · تغيير حساب عليه حركة ممنوع (5798). بقية الأعمدة الـ53 محفوظة في الخادم وفارغة في أونيكس." }
       ]
     },
 
     /* ═══ أنواع الضرائب ═══ */
     "op.3.2": {
       state: { label: "نشط", cls: "s-posted" },
-      rec: { i: 1, n: 1 },
+      rec: { i: 0, n: 0 },
       cmds: ["add", "edit", "delete", "save", "cancelEntry", "search", "quick",
              "navFirst", "navPrev", "navNext", "navLast", "print", "allScreens", "lockSession", "exit"],
-      audit: { by: "1 · محسن السقاف", at: "20/12/2022 10:00:00", dev: "—", prints: 0, upd: "1", updc: 0, ver: "V8.1.14" },
+      audit: { by: "—", at: "—", dev: "—", prints: "—", upd: "—", updc: 0, ver: "V8.1.14" },
       blocks: [
         { kind: "panel", title: "نوع الضريبة", grid: [
-          F("الرقم", { span: 2, value: "1", mono: true }),
-          F("الاسم", { span: 5, req: true, value: "ضريبة القيمة المضافة" }),
-          F("الرمز", { span: 2, value: "VAT", mono: true }),
-          F("طريقة الاحتساب", { span: 3, type: "select", options: ["الكل", "مبيعات", "مشتريات"] }),
-          F("افتراضي", { span: 2, type: "select", options: ["نعم"] })
+          F("رقم النوع", { span: 3, req: true, mono: true }),
+          F("الاسم", { span: 5, req: true }),
+          F("الاسم الأجنبي", { span: 5 }),
+          F("رمز النوع", { span: 3, req: true, mono: true }),
+          F("طريقة الاحتساب", { span: 3, req: true, type: "select", options: ["الكل", "مبيعات", "مشتريات"] }),
+          F("عدد الجهات", { span: 3, ro: true }),
+          F("افتراضي", { span: 3, type: "select", options: ["لا", "نعم"] }),
+          F("الشركة", { span: 3 }),
+          F("الاحتساب على المستند", { span: 3, type: "select", options: ["لا", "نعم"] }),
+          F("صنف الضريبة", { span: 3 }),
+          F("فئة الضريبة", { span: 3 }),
+          F("خصم من المنبع", { span: 3, type: "select", options: ["لا", "نعم"] }),
+          F("الحد الأدنى", { span: 3, mono: true }),
+          F("نسبة على الدفعة المقدمة", { span: 3, mono: true }),
+          F("مزامنة", { span: 3, type: "select", options: ["لا", "نعم"] }),
+          F("موقوف", { span: 3, type: "select", options: ["لا", "نعم"] }),
+          F("سبب التوقيف", { span: 5 })
         ]},
-        { kind: "table", title: "الجهة والشريحة", max: "20vh",
-          cols: ["الجهة", "النسبة", "مخرجات", "مدخلات"],
-          rows: [["1", "15%", "2202070001", "1207030001"]] }
+        { kind: "panel", title: "الجهة", grid: [
+          F("رقم النوع", { span: 3, req: true, mono: true }),
+          F("رقم الجهة", { span: 3, req: true, mono: true }),
+          F("الاسم", { span: 5, req: true }),
+          F("الاسم الأجنبي", { span: 5 }),
+          F("حساب المبيعات", { span: 3, mono: true }),
+          F("حساب المشتريات", { span: 3, mono: true }),
+          F("حساب الضريبة المستحقة", { span: 3, mono: true }),
+          F("النسبة", { span: 3, mono: true })
+        ]},
+        { kind: "panel", title: "الشريحة", grid: [
+          F("رقم الشريحة", { span: 3, req: true, mono: true }),
+          F("الاسم", { span: 5, req: true }),
+          F("الاسم الأجنبي", { span: 5 }),
+          F("النسبة", { span: 3, req: true, mono: true }),
+          F("افتراضي", { span: 3, type: "select", options: ["لا", "نعم"] }),
+          F("موقوف", { span: 3, type: "select", options: ["لا", "نعم"] }),
+          F("سبب التوقيف", { span: 5 })
+        ]},
+        { kind: "table", title: "الأنواع", max: "32vh", cols: [], rows: [] }
       ],
       side: [
-        { kind: "note", text: "نوع واحد · جهة واحدة · شريحة 15%. لا معفى ولا صفري على الأصناف." }
+        { kind: "note", text: "أونيكس: نوع واحد VAT (الكل) · جهة واحدة: مبيعات 2202070001 / مشتريات 1207030001 · شريحة واحدة 15%. الرمز لا يتكرر (TX-R5) · حساب الجهة فرعي (TX-R2) · لا حذف لنوع له جهات أو أصناف أو حسابات." }
       ]
     },
 
     /* ═══ ربط الحسابات بالضريبة ═══ */
     "op.3.4": {
       state: { label: "نشط", cls: "s-posted" },
-      rec: { i: 1, n: 199 },
-      cmds: ["add", "edit", "delete", "save", "cancelEntry", "search", "importExcel",
-             "print", "allScreens", "lockSession", "exit"],
-      audit: { by: "1 · محسن السقاف", at: "20/12/2022 10:00:00", dev: "—", prints: 0, upd: "—", updc: 0, ver: "V8.1.14" },
+      rec: { i: 0, n: 0 },
+      cmds: ["add", "edit", "delete", "save", "cancelEntry", "search", "quick",
+             "navFirst", "navPrev", "navNext", "navLast", "print", "allScreens", "lockSession", "exit"],
+      audit: { by: "—", at: "—", dev: "—", prints: "—", upd: "—", updc: 0, ver: "V8.1.14" },
       blocks: [
-        { kind: "criteria", fields: [
-          F("من حساب", { span: 3, value: "—" }), F("إلى", { span: 3, value: "—" }),
-          F("نوع الضريبة", { span: 3, value: "1 VAT" })
+        { kind: "panel", title: "الربط", grid: [
+          F("الحساب", { span: 3, req: true, mono: true }),
+          F("نوع الضريبة", { span: 3, req: true, mono: true }),
+          F("الجهة", { span: 3, req: true, mono: true }),
+          F("النسبة", { span: 3, req: true, mono: true })
         ]},
-        { kind: "table", title: "199 حساباً × VAT 15%", editable: true, max: "46vh",
-          cols: ["الحساب", "النوع", "النسبة"],
-          rows: [
-            ["3201010008 · هدايا وكافآت", "VAT", "15"],
-            ["3101010001 · تكلفة المبيعات", "VAT", "15"]
-          ],
-          actions: [{ t: "تحميل من مجموعة" }] }
+        { kind: "table", title: "الحسابات المربوطة", max: "32vh", cols: [], rows: [] }
       ],
       side: [
-        { kind: "note", text: "يفتح حقول ضريبة المصروف في السند/القيد. استخدام 2026 = 0. ربط الخصوم/الإيرادات مشكوك (TX-Q1)." }
+        { kind: "note", text: "أونيكس: 199 حساباً × VAT 15%. الحساب فرعي (TX-R8) · النسبة من الشرائح (TX-R11) · لا حذف لربط عليه حركة ضريبية (TX-R7)." }
       ]
     },
 
     /* ═══ ربط الأصناف بالضريبة ═══ */
     "op.3.5": {
       state: { label: "نشط", cls: "s-posted" },
-      rec: { i: 1, n: 2228 },
-      cmds: ["add", "edit", "delete", "save", "cancelEntry", "search", "importExcel",
-             "print", "allScreens", "lockSession", "exit"],
-      audit: { by: "1 · محسن السقاف", at: "20/12/2022 10:00:00", dev: "—", prints: 0, upd: "—", updc: 0, ver: "V8.1.14" },
+      rec: { i: 0, n: 0 },
+      cmds: ["add", "edit", "delete", "save", "cancelEntry", "search", "quick",
+             "navFirst", "navPrev", "navNext", "navLast", "print", "allScreens", "lockSession", "exit"],
+      audit: { by: "—", at: "—", dev: "—", prints: "—", upd: "—", updc: 0, ver: "V8.1.14" },
       blocks: [
-        { kind: "criteria", fields: [
-          F("من صنف", { span: 3, value: "—" }), F("إلى", { span: 3, value: "—" }),
-          F("العملية", { span: 3, type: "select", options: ["عرض البيانات", "جلب بيانات", "تعديل"] })
+        { kind: "panel", title: "الربط", grid: [
+          F("الصنف", { span: 3, req: true, mono: true }),
+          F("نوع الضريبة", { span: 3, req: true, mono: true }),
+          F("رمز النوع", { span: 3, ro: true, mono: true }),
+          F("الجهة", { span: 3, req: true, mono: true }),
+          F("النسبة", { span: 3, req: true, mono: true }),
+          F("فئة الضريبة (الهيئة)", { span: 3, req: true, type: "select", options: ["S", "Z", "E", "O"] }),
+          F("رمز سبب الإعفاء", { span: 5, mono: true }),
+          F("نص سبب الإعفاء", { span: 5 }),
+          F("حد أدنى", { span: 3, mono: true }),
+          F("إعفاء مبلغ الحمولة حسب الجنسية", { span: 3, type: "select", options: ["لا", "نعم"] })
         ]},
-        { kind: "table", title: "2,228 صنفاً = الكل · فئة S", editable: true, max: "46vh",
-          cols: ["الصنف", "VAT", "النسبة", "فئة الهيئة"],
-          rows: [
-            ["001065 · زيت أساس SN300", "1", "15", "S"],
-            ["003004 · جي تي توريون بلاستيك", "1", "15", "S"]
-          ] }
+        { kind: "table", title: "الأصناف المربوطة", max: "32vh", cols: [], rows: [] }
       ],
       side: [
-        { kind: "note", text: "فئة `S` تظهر في XML. يُضاف الربط مع كل صنف جديد." }
+        { kind: "note", text: "أونيكس: 2,228 صنفاً = الكل · فئة S. الفئة E/Z/O تستلزم رمز ونص سبب الإعفاء (TX-R12) · لا حذف لربط عليه حركة ضريبية." }
       ]
     },
 

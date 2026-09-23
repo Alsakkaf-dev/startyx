@@ -6,9 +6,3 @@ export class DomainError extends Error {
     this.code = code;
   }
 }
-
-export class PeriodClosedError extends DomainError {
-  constructor(reason: "not_generated" | "closed_inventory" | "closed_full") {
-    super("PERIOD_CLOSED", reason);
-  }
-}

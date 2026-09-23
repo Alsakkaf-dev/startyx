@@ -489,3 +489,13 @@ button.t--go:hover b { color: var(--brand-fg); }
   width: 112px; direction: ltr; text-align: end; font-variant-numeric: tabular-nums; white-space: nowrap;
 }
 #scrJournal td:first-child { white-space: normal; line-height: 1.35; }
+
+/* تبويب الجداول في شاشة بأكثر من جدول (masters-ui.js · sets) */
+.msets { flex: 0 0 auto; display: flex; gap: var(--space-1, 4px); flex-wrap: wrap; }
+.msets button {
+  font-size: var(--text-xs); padding: 4px 12px; cursor: pointer;
+  color: var(--text-muted); background: var(--bg-surface);
+  border: 1px solid var(--scr-line, var(--border)); border-radius: var(--radius-sm);
+}
+.msets button:hover { background: var(--bg-hover); }
+.msets button[aria-selected="true"] { color: var(--accent); border-color: var(--accent); background: var(--accent-tint); font-weight: 600; }

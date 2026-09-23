@@ -170,6 +170,29 @@ export async function seedDocumentSequences(db: Db): Promise<void> {
   );
 }
 
+async function loadMissingTables(db: Db): Promise<string[]> {
+  const extractRoot = path.resolve(serverRoot(), "../../_onyx-extract/db");
+  if (!fs.existsSync(extractRoot)) return [];
+  const have = new Set(
+    (await db.query(`SELECT table_name FROM information_schema.tables WHERE table_schema = 'extract'`)).rows.map(
+      (r) => String(r.table_name),
+    ),
+  );
+  const out: string[] = [];
+  for (const d of fs.readdirSync(extractRoot, { withFileTypes: true })) {
+    if (!d.isDirectory() || d.name.startsWith("_") || have.has(d.name)) continue;
+    const tsv = path.join(extractRoot, d.name, "rows.tsv");
+    if (!fs.existsSync(tsv)) continue;
+    try {
+      await loadTsv(db, d.name, tsv);
+      out.push(d.name);
+    } catch (e) {
+      process.stderr.write(`FAIL ${d.name}: ${(e as Error).message}\n`);
+    }
+  }
+  return out;
+}
+
 export async function ensureLoaded(force = false): Promise<{ allPass: boolean; report: unknown }> {
   const db = await openDb();
   await applySchema(db);
@@ -178,8 +201,11 @@ export async function ensureLoaded(force = false): Promise<{ allPass: boolean; r
     "SELECT all_pass, rows_loaded FROM erp.extract_load_log WHERE all_pass = true ORDER BY id DESC LIMIT 1",
   );
   if (!force && last.rows.length && Number(last.rows[0].rows_loaded) > 1000) {
+    /* جداول استُخرجت بعد آخر تحميل كامل (مثل CUSTOMER_GROUP للطبقة ١) تُحمَّل الآن —
+       بدونها تبقى المزامنة فاضية بصمت ويظهر الكيان «صفر سجل» وهو في أونيكس غير فارغ */
+    const late = await loadMissingTables(db);
     await seedDocumentSequences(db);
-    const report = { skipped: true, engine: db.kind, message: "already loaded", sequencesSeeded: true };
+    const report = { skipped: true, engine: db.kind, message: "already loaded", sequencesSeeded: true, lateTables: late };
     return { allPass: true, report };
   }
 
@@ -251,9 +277,11 @@ export async function ensureLoaded(force = false): Promise<{ allPass: boolean; r
   );
   await trySql(
     db,
+    /* الشركات من المستخرج: 1 ⇒ فروع 1,2,3 · 2 ⇒ فروع 4,5 (IAS_BILL_MST · GR_NOTE).
+       فرع 6 «انشطة شقيقة» لا يظهر في أي صف ⇒ شركته NULL لا 1 (GO/01-system-setup.md §١ = «—»). */
     `INSERT INTO erp.branch (id, company_id, no, name_ar) VALUES
       (1,1,1,'الادارة'),(2,1,2,'التجزئة'),(3,1,3,'سميح التومي'),
-      (4,2,4,'قمم البعد'),(5,2,5,'البلاستيك'),(6,1,6,'انشطة شقيقة')
+      (4,2,4,'قمم البعد'),(5,2,5,'البلاستيك'),(6,NULL,6,'انشطة شقيقة')
      ON CONFLICT (id) DO NOTHING`,
   );
   await trySql(

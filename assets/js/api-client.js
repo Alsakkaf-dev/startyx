@@ -65,6 +65,15 @@
     counts: function () {
       return get("/api/masters/counts");
     },
+    masters: function (entity, query) {
+      return get("/api/masters/" + entity + (query || ""));
+    },
+    saveMaster: function (entity, mode, values) {
+      return post("/api/masters/" + entity, { mode: mode, values: values });
+    },
+    deleteMaster: function (entity, key) {
+      return post("/api/masters/" + entity + "/delete", { key: key });
+    },
     tax: function (body) {
       return post("/api/engines/tax", body);
     },

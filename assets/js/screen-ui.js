@@ -376,10 +376,10 @@
       headerDiscount: money(fieldVal(spec.headerDiscount || "")),
       headerCharges: "0",
       skipIcv: true,
-      partyAnalyticId: spec.party ? partyId(fieldVal(spec.party)) : 1,
+      partyAnalyticId: spec.party ? partyId(fieldVal(spec.party)) : null,
       cashAccount: (function () {
         var c = accCode(fieldVal(spec.cash || "الصندوق") || fieldText(spec.cash || "الصندوق"));
-        return c && c.length >= 8 ? c : "1201010001";
+        return c && c.length >= 8 ? c : "";
       })(),
       lines: []
     };
@@ -484,8 +484,9 @@
     return n.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   }
   function accName(code) {
-    var N = root.StartyxPostMap && root.StartyxPostMap.NAMES;
-    return (N && N[code]) ? code + " · " + N[code] : String(code);
+    /* الاسم من الدليل عبر الخادم (accountNames) — لا قائمة أسماء ثابتة في الواجهة */
+    var N = st.accNames || {};
+    return N[code] ? code + " · " + N[code] : String(code);
   }
   function applyRecon(j) {
     if (!st.host || !j) return;
@@ -581,8 +582,27 @@
     dlg.showModal();
   }
 
+  /* جسر شاشات البيانات الأساسية — تقرأ وتكتب من الخادم بدل اللقطة */
+  function mastersHooks() {
+    return {
+      st: st,
+      setMode: function (m) { st.mode = m; renderBar(); },
+      rec: function (i, n) { st.def.rec = { i: i, n: n }; renderRec(); },
+      audit: function (a) { st.def.audit = a; renderAudit(); },
+      state: renderState,
+      applyMode: applyMode,
+      note: note
+    };
+  }
+  function masters() {
+    var M = root.StartyxMasters;
+    return M && M.handles(st.ref) ? M : null;
+  }
+
   /* ═══════════ تنفيذ الأوامر ═══════════ */
   function run(id) {
+    var M = masters();
+    if (M && M.command(id, mastersHooks())) return;
     switch (id) {
       case "add":         st.mode = "add";  note("وضع الإضافة — «تراجع» يحلّ محل «خروج»"); break;
       case "addFrom":     st.mode = "add";  note("إضافة من مستند سابق — الرقم الجديد من المحرّك بعد الحفظ"); break;
@@ -634,6 +654,7 @@
     }
     var body = buildPostBody(spec);
     root.StartyxApi.postDocument(body).then(function (r) {
+      st.accNames = r.accountNames || {};
       applyPosted(r);
       if (r.status === "posted") note("مرحّل — رقم " + r.documentNumber + " · قيد " + r.glEntryId);
       else note("معلّق — فرق " + r.imbalance + " — لا قيد في الدفتر");
@@ -1265,6 +1286,8 @@
     }
 
     renderBar(); renderWork(); renderRec(); renderAudit();
+    var M = masters();
+    if (M) M.mount(mastersHooks());
     if (root.StartyxApi && root.StartyxApi.ping) {
       root.StartyxApi.ping().then(function (h) {
         st.apiOk = !!h;

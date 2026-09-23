@@ -6,10 +6,14 @@ import { Decimal, d } from "../shared-kernel/decimal.ts";
 import { DomainError } from "../shared-kernel/errors.ts";
 import { computeLineTax, computeInvoiceTotals, computePurchaseTax, isValidVatNumber } from "../engines/tax.ts";
 import { recalcWeightedAverage, unitCostAfterFreeQtyDistribution, purchaseReturnCostDiff } from "../engines/costing.ts";
-import { blankLine, type GlEntryDocKind, type PostDocumentRequest } from "../engines/posting.ts";
-import { MemoryTx, deps, numReq, openPeriod, runPost, liveStore, seedFy2026Periods } from "../infrastructure/memory.ts";
+import { liveStore } from "../infrastructure/memory.ts";
+import { postLive, serialPost } from "../application/post-live.ts";
+import { loadPeriods } from "../application/posting-context.ts";
 import { openDb, currentDb } from "../infrastructure/db.ts";
-import { persistLive, hydrateFromDb, readFacts, mastersCounts, type LedgerRow } from "../infrastructure/postgres.ts";
+import { isEntity, listMasters, getMaster, saveMaster, deleteMaster, type MasterEntity } from "../application/masters.ts";
+import { syncMasters } from "../application/masters-sync.ts";
+import { syncLayer1 } from "../application/masters-sync-layer1.ts";
+import { hydrateFromDb, readFacts, mastersCounts, type LedgerRow } from "../infrastructure/postgres.ts";
 import { ensureLoaded } from "../../migration/load-2026.ts";
 
 const PORT = Number(process.env.PORT ?? "8787");
@@ -94,6 +98,52 @@ export function createServer(): http.Server {
         json(res, 200, await mastersCounts(db));
         return;
       }
+      if (url.pathname.startsWith("/api/masters/")) {
+        const db = currentDb();
+        if (!db) {
+          json(res, 503, { error: "no_db" });
+          return;
+        }
+        const parts = url.pathname.slice("/api/masters/".length).split("/").filter(Boolean).map(decodeURIComponent);
+        const name = parts[0] ?? "";
+        if (!isEntity(name)) {
+          json(res, 404, { error: "unknown_entity", message: name });
+          return;
+        }
+        const entity = name as MasterEntity;
+        if (req.method === "GET" && parts.length === 1) {
+          const out = await listMasters(db, entity, {
+            q: url.searchParams.get("q") ?? "",
+            limit: Number(url.searchParams.get("limit") ?? "500"),
+          });
+          json(res, 200, out);
+          return;
+        }
+        if (req.method === "GET" && parts.length === 2) {
+          const row = await getMaster(db, entity, String(parts[1]));
+          if (!row) {
+            json(res, 404, { error: "not_found" });
+            return;
+          }
+          json(res, 200, row);
+          return;
+        }
+        if (req.method === "POST" && parts.length === 2 && parts[1] === "delete") {
+          const b = (await readBody(req)) as Record<string, unknown>;
+          json(res, 200, await deleteMaster(db, entity, String(b.key ?? "")));
+          return;
+        }
+        if (req.method === "POST" && parts.length === 1) {
+          const b = (await readBody(req)) as Record<string, unknown>;
+          const mode = b.mode === "edit" ? "edit" : "add";
+          const values = (b.values ?? {}) as Record<string, unknown>;
+          const user = String(b.user ?? "1 · محسن السقاف");
+          json(res, 200, { saved: await saveMaster(db, entity, mode, values, user) });
+          return;
+        }
+        json(res, 404, { error: "not_found" });
+        return;
+      }
       if (req.method === "GET" && url.pathname === "/api/health") {
         json(res, 200, {
           ok: true,
@@ -164,93 +214,48 @@ export function createServer(): http.Server {
         return;
       }
       if (req.method === "POST" && url.pathname === "/api/documents/post") {
-        const b = (await readBody(req)) as Record<string, unknown>;
-        const kind = String(b.docKind ?? "sales_invoice") as GlEntryDocKind;
-        const branchId = Number(b.branchId ?? 1);
-        const reqDoc: PostDocumentRequest = {
-          docKind: kind,
-          branchId,
-          docDate: new Date(String(b.docDate ?? "2026-09-20")),
-          currencyId: Number(b.currencyId ?? 1),
-          fxRate: dec(b.fxRate, "1"),
-          fxOperator: (b.fxOperator as "mul" | "div") ?? "mul",
-          paymentMethod: (b.paymentMethod as PostDocumentRequest["paymentMethod"]) ?? "credit",
-          headerDiscount: dec(b.headerDiscount),
-          headerCharges: dec(b.headerCharges),
-          numbering: numReq(kind, branchId),
-          isExportZeroRated: Boolean(b.isExportZeroRated),
-          salesReturnPriorYear: Boolean(b.salesReturnPriorYear),
-          freeQtyCostAccount: String(b.freeQtyCostAccount ?? "3101050001"),
-          issueEinvoice: Boolean(b.issueEinvoice),
-          existingIcv: b.existingIcv == null ? null : Number(b.existingIcv),
-          cashAccount: String(b.cashAccount ?? "1201010001"),
-          partyAnalyticId: b.partyAnalyticId == null ? 1 : Number(b.partyAnalyticId),
-          skipIcv: b.skipIcv !== false,
-          lines: Array.isArray(b.lines)
-            ? (b.lines as Record<string, unknown>[]).map((ln) =>
-                blankLine({
-                  qty: dec(ln.qty),
-                  price: dec(ln.price),
-                  lineDiscountShare: dec(ln.lineDiscountShare),
-                  currentAvg: dec(ln.currentAvg),
-                  incomingUnitCost: dec(ln.incomingUnitCost, ln.price as string | undefined),
-                  supplierOriginalPrice: dec(ln.supplierOriginalPrice, ln.price as string | undefined),
-                  amount: dec(ln.amount),
-                  taxPct: dec(ln.taxPct, ln.itemTaxLink ? String((ln.itemTaxLink as { pct?: string }).pct ?? "0.15") : "0"),
-                  isFree: Boolean(ln.isFree),
-                  headerAccount: ln.headerAccount ? String(ln.headerAccount) : undefined,
-                  accountCode: ln.accountCode ? String(ln.accountCode) : undefined,
-                  analyticType: (ln.analyticType as "customer") ?? undefined,
-                  analyticId: ln.analyticId == null || ln.analyticId === "" ? undefined : Number(ln.analyticId),
-                  side: (ln.side as "debit") ?? undefined,
-                  inclusiveOfTax: Boolean(ln.inclusiveOfTax),
-                  itemTaxLink: ln.itemTaxLink
-                    ? {
-                        taxTypeId: 1,
-                        pct: dec((ln.itemTaxLink as { pct: string }).pct, "0.15"),
-                        zatcaCategory: ((ln.itemTaxLink as { zatcaCategory?: "S" }).zatcaCategory ?? "S"),
-                        exemptionReasonCode: (ln.itemTaxLink as { exemptionReasonCode?: string }).exemptionReasonCode,
-                      }
-                    : undefined,
-                }),
-              )
-            : [],
-        };
-        const { result } = runPost(reqDoc, liveStore);
-        const row: LedgerRow = {
-          glEntryId: result.status === "posted" ? result.glEntryId : null,
-          documentNumber: result.documentNumber,
-          docKind: kind,
-          screenRef: String(b.screenRef ?? ""),
-          status: result.status,
-          imbalance: result.status === "pending" ? String(result.imbalance) : undefined,
-          lines: result.status === "posted" ? result.lines : [],
-          at: new Date().toISOString(),
-        };
-        ledger.push(row);
         const db = currentDb();
-        if (db) {
-          await persistLive(db, row, result.status === "posted" ? result.lines : [], branchId, reqDoc.docDate);
+        if (!db) {
+          json(res, 503, { error: "no_db", message: "الترحيل يتطلب القاعدة — لا ترحيل في الذاكرة وحدها" });
+          return;
         }
-        json(res, 200, result);
+        const b = (await readBody(req)) as Record<string, unknown>;
+        const out = await serialPost(() => postLive(db, b, ledger));
+        json(res, 200, out);
         return;
       }
       json(res, 404, { error: "not_found" });
     } catch (e) {
       const err = e as Error;
-      const code = e instanceof DomainError ? 400 : 500;
-      json(res, code, { error: err instanceof DomainError ? err.code : "INTERNAL", message: err.message });
+      /* رفض القاعدة (مشغّلات INV-* أو تفرّد الرقم) خطأ عمل لا خطأ خادم */
+      const pgCode = (e as { code?: string }).code;
+      const dbRule = pgCode === "23514" || pgCode === "23505" || /^INV-\d+/.test(err.message ?? "");
+      const code = e instanceof DomainError || dbRule ? 400 : 500;
+      json(res, code, { error: e instanceof DomainError ? err.code : dbRule ? "DB_RULE" : "INTERNAL", message: err.message });
     }
   });
 }
 
 export async function bootServer(port = PORT): Promise<http.Server> {
-  seedFy2026Periods(liveStore);
   const db = await openDb();
   await ensureLoaded();
+  await syncMasters(db);
+  await syncLayer1(db);
   await hydrateFromDb(db, liveStore, ledger);
+  await loadPeriods(db, liveStore);
   return await new Promise((resolve) => {
     const s = createServer();
+    /* إغلاق نظيف: قتل العملية وPGlite مفتوح يترك مجلد البيانات تالفاً ولا يُفتح بعدها */
+    let closing = false;
+    const shutdown = (): void => {
+      if (closing) return;
+      closing = true;
+      s.close();
+      void db.close().catch(() => undefined).finally(() => process.exit(0));
+    };
+    for (const sig of ["SIGINT", "SIGTERM", "SIGHUP", "SIGBREAK"] as const) {
+      process.on(sig, shutdown);
+    }
     s.listen(port, "127.0.0.1", () => {
       process.stdout.write(`startyx-server http://127.0.0.1:${port} store=${db.kind}\n`);
       resolve(s);
@@ -271,6 +276,3 @@ void computePurchaseTax;
 void isValidVatNumber;
 void unitCostAfterFreeQtyDistribution;
 void purchaseReturnCostDiff;
-void MemoryTx;
-void deps;
-void openPeriod;
