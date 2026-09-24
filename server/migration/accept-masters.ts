@@ -106,13 +106,19 @@ async function main(): Promise<void> {
   /* قواعد الفروع والفترات */
   await expectOnyx("branch-moved-delete", "op.1.1.12", "branch/delete", { key: "1" },
     "ONYX-4921", "لا يمكن الإضافة أو الحذف لوجود حركة لهذا الفرع");
-  /* الفرع 5 شركته مثبَتة بالمستخرج (CMP_NO=2) — لا يُستعمل الفرع 6 هنا لأن شركته غير معروفة */
+  /* الفرع 5 (الفاتورة الإلكترونية غير مفعّلة في أونيكس): تفعيلها مع مسح الرقم الضريبي ⇒ 6272 */
   await expectOnyx("branch-einvoice-vat", "op.1.1.12", "branch",
-    { mode: "edit", values: { no: 5, einvoice_enabled: true } },
+    { mode: "edit", values: { no: 5, einvoice_enabled: true, vat_no: "" } },
     "ONYX-6272", "يجب ادخال الرقم الضريبي للفرع في بيانات الفروع");
-  add("branch-6-no-company", "op.1.1.12",
-    String(brn.rows.find((r) => Number(r.no) === 6)?.company_id ?? "null"), "null",
-    "فرع «انشطة شقيقة» بلا شركة في أي مصدر — لا تُخترع");
+  /* S_BRN مقروء الآن: الشركة لكل فرع من CMP_NO (6 «انشطة شقيقة» ⇒ 1) والفاتورة الإلكترونية USE_E_INVOICE */
+  add("branch-companies", "op.1.1.12",
+    brn.rows.slice().sort((a, b) => Number(a.no) - Number(b.no)).map((r) => r.no + ":" + r.company_id).join(" "),
+    "1:1 2:1 3:1 4:2 5:2 6:1", "S_BRN.CMP_NO");
+  add("branch-einvoice", "op.1.1.12",
+    brn.rows.filter((r) => r.einvoice_enabled).map((r) => String(r.no)).sort().join(","), "1,2,3,4", "S_BRN.USE_E_INVOICE");
+  add("branch-1-national-address", "op.1.1.12",
+    (() => { const b1 = brn.rows.find((r) => Number(r.no) === 1)!; return [b1.vat_no, b1.cr_no, b1.building_no, b1.street, b1.district, b1.city, b1.postal_code].join("|"); })(),
+    "311300283900003|4030399323|5050|طريق مكة القديم|حي الفاروق|جدة|22349", "S_BRN");
   await expectOnyx("period-overlap", "op.1.1.2", "fiscal_period",
     { mode: "add", values: { no: 13, name_ar: "x", from_date: "2026-03-01", to_date: "2026-03-31", fiscal_year_id: 2026 } },
     "ONYX-3462", "يوجد تداخل فى الفترات الرجاء مراجعة الفترات");

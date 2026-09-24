@@ -80,5 +80,18 @@
     costing: function (body) {
       return post("/api/engines/costing", body);
     },
+    /* الطبقة ٤ — قراءة المستندات: القائمة · المستند برأسه وسطوره · الرقم التالي (لا يُستهلك) · ملخص الشاشة */
+    docs: function (screen, query) {
+      return get("/api/docs/" + encodeURIComponent(screen) + (query || ""));
+    },
+    doc: function (screen, key) {
+      return get("/api/docs/" + encodeURIComponent(screen) + "/" + encodeURIComponent(key));
+    },
+    docNext: function (screen, query) {
+      return get("/api/docs/" + encodeURIComponent(screen) + "/next" + (query || ""));
+    },
+    docSummary: function (screen) {
+      return get("/api/docs/" + encodeURIComponent(screen) + "/summary");
+    },
   };
 })(window);

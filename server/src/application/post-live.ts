@@ -81,6 +81,9 @@ export function parsePostBody(b: Record<string, unknown>): PostDocumentRequest {
     costCenter: str(b.costCenter) || null,
     project: str(b.project) || null,
     skipIcv: b.skipIcv !== false,
+    description: str(b.description),
+    refNo: str(b.refNo),
+    jvType: optInt(b.jvType),
     lines: lines.map((ln) => {
       const at = str(ln.analyticType) as AnalyticType;
       const link = ln.itemTaxLink as { pct?: string; zatcaCategory?: "S" | "Z" | "E" | "O"; exemptionReasonCode?: string } | undefined;
@@ -106,6 +109,7 @@ export function parsePostBody(b: Record<string, unknown>): PostDocumentRequest {
         project: str(ln.project) || null,
         side: str(ln.side) === "credit" ? "credit" : "debit",
         inclusiveOfTax: ln.inclusiveOfTax === true,
+        description: str(ln.description),
         itemTaxLink: link
           ? {
               taxTypeId: 1,

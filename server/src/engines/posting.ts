@@ -153,6 +153,8 @@ export interface RawLine {
   costMethod: "supplier_price" | "final_avg_cost" | "last_supply_price";
   inclusiveOfTax: boolean;
   taxPct: Decimal;
+  /** بيان السطر (IAS_POST_DTL.DOC_DESC) — القيد اليدوي: إلزامي بـREQUEST_DESC_GL، ويرث بيان الرأس إن فرغ */
+  description?: string;
 }
 
 export function blankLine(over: Partial<RawLine> = {}): RawLine {
@@ -222,6 +224,10 @@ export interface PostDocumentRequest {
   costCenter?: string | null;
   project?: string | null;
   skipIcv: boolean;
+  /** بيان الرأس · رقم المرجع · نوع القيد (op.4.1.1.6 — JV_TYPES) */
+  description?: string;
+  refNo?: string;
+  jvType?: number | null;
 }
 
 export interface GlEntryLine {
@@ -234,6 +240,7 @@ export interface GlEntryLine {
   project: string | null;
   branchId: number;
   isGenerated: boolean;
+  description?: string | null;
 }
 
 export interface GlEntryDraft {
@@ -321,6 +328,7 @@ function line(
     project?: string | null;
     branchId?: number;
     generated?: boolean;
+    description?: string | null;
   },
 ): GlEntryLine {
   return {
@@ -333,6 +341,7 @@ function line(
     project: p.project ?? req.project ?? null,
     branchId: p.branchId ?? req.branchId,
     isGenerated: p.generated ?? false,
+    description: p.description ?? req.description ?? null,
   };
 }
 
@@ -672,6 +681,7 @@ function buildManual(req: PostDocumentRequest, deps: EngineDependencies): Built 
       credit: ln.side === "credit" ? amt : Decimal.zero(),
       analyticType: ln.analyticType,
       analyticId: ln.analyticId,
+      description: ln.description || req.description || null,
       ...lineDims(ln),
     });
   });

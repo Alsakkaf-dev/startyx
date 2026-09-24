@@ -29,6 +29,12 @@ export const SCHEMA_FILES = [
   "sql/003-dimensions.sql",
   "sql/004-layer1.sql",
   "sql/005-posting-foundation.sql",
+  "sql/006-layer2.sql",
+  "sql/007-layer2b.sql",
+  "sql/008-employees.sql",
+  "sql/009-opening.sql",
+  "sql/010-opening-stock.sql",
+  "sql/011-documents.sql",
 ] as const;
 
 /**
@@ -66,8 +72,9 @@ export async function persistDocument(db: Db, p: PersistInput): Promise<PersistO
     const doc = await db.query(
       `INSERT INTO erp.live_document
          (document_number, doc_kind, screen_ref, status, imbalance, payload,
-          branch_id, fiscal_year_id, doc_date, currency_id, fx_rate, fx_operator, created_by, icv)
-       VALUES ($1,$2,$3,$4,$5,$6::jsonb,$7,$8,$9,$10,$11,$12,$13,$14) RETURNING id`,
+          branch_id, fiscal_year_id, doc_date, currency_id, fx_rate, fx_operator, created_by, icv,
+          jv_type, ref_no, description)
+       VALUES ($1,$2,$3,$4,$5,$6::jsonb,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17) RETURNING id`,
       [
         result.documentNumber,
         req.docKind,
@@ -83,6 +90,9 @@ export async function persistDocument(db: Db, p: PersistInput): Promise<PersistO
         req.fxOperator,
         p.user,
         result.icv,
+        req.jvType ?? null,
+        req.refNo || null,
+        req.description || null,
       ],
     );
     const liveDocumentId = Number(doc.rows[0].id);
@@ -93,11 +103,12 @@ export async function persistDocument(db: Db, p: PersistInput): Promise<PersistO
           `INSERT INTO erp.gl_entry
              (company_id, doc_kind, date, period_id, branch_id, status, doc_no, description, source_kind, posted_at,
               screen_ref, fiscal_year_id, currency_id, fx_rate, fx_operator, live_document_id, created_by)
-           VALUES (COALESCE((SELECT company_id FROM erp.branch WHERE no = $4), 1), $1, $2, $3, $4, 'posted', $5, '', 'live', now(),
+           VALUES (COALESCE((SELECT company_id FROM erp.branch WHERE no = $4), 1), $1, $2, $3, $4, 'posted', $5, $13, 'live', now(),
                    $6, $7, $8, $9, $10, $11, $12) RETURNING id`,
           [
             req.docKind, date, result.periodId, entry.branchId, String(result.documentNumber),
             p.screenRef, fy, req.currencyId, req.fxRate.toString(), req.fxOperator, liveDocumentId, p.user,
+            req.description || "",
           ],
         );
         const entryId = Number(ins.rows[0].id);
@@ -107,12 +118,12 @@ export async function persistDocument(db: Db, p: PersistInput): Promise<PersistO
           await db.query(
             `INSERT INTO erp.gl_entry_line
                (company_id, entry_id, line_no, account_code, analytic_type, analytic_id, debit, credit,
-                branch_id, cost_center_code, project_no, is_generated)
-             VALUES (COALESCE((SELECT company_id FROM erp.branch WHERE no = $9), 1), $1,$2,$3,$4,$5,$6,$7,$8,$10,$11,$12)`,
+                branch_id, cost_center_code, project_no, is_generated, description)
+             VALUES (COALESCE((SELECT company_id FROM erp.branch WHERE no = $9), 1), $1,$2,$3,$4,$5,$6,$7,$8,$10,$11,$12,$13)`,
             [
               entryId, n++, ln.accountCode, ln.analyticType, ln.analyticId,
               ln.debit.toString(), ln.credit.toString(), ln.branchId, ln.branchId,
-              ln.costCenter, ln.project, ln.isGenerated,
+              ln.costCenter, ln.project, ln.isGenerated, ln.description ?? null,
             ],
           );
         }
@@ -133,9 +144,13 @@ export async function persistDocument(db: Db, p: PersistInput): Promise<PersistO
       await db.query(`UPDATE erp.live_document SET gl_entry_id = $1 WHERE id = $2`, [glEntryIds[0] ?? null, liveDocumentId]);
     }
     /* INV-10: الرقم محجوز للمعلّق كما للمرحّل — وإلا أعاد التشغيل التالي استخدامه */
+    /* مفتاح التسلسل من نطاق ترقيم الوثيقة نفسه (القيد اليدوي: لكل فرع ومجموعة تسلسل نوع القيد — GL-R7) */
+    const sc = req.numbering.scope;
     const key = scopeKey({
       entity: req.docKind,
-      scope: { kind: "per_branch_year", branchId: req.branchId, fiscalYearId: fy },
+      scope: sc.kind === "per_branch_year" || sc.kind === "per_branch_year_type"
+        ? { ...sc, fiscalYearId: fy }
+        : { kind: "per_branch_year", branchId: req.branchId, fiscalYearId: fy },
     });
     await db.query(
       `INSERT INTO erp.document_sequence (company_id, branch_id, fiscal_year_id, doc_kind, sequence_group, last_value)

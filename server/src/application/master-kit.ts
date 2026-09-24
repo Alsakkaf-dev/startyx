@@ -42,8 +42,20 @@ export interface EntityDef {
    */
   noAdd?: boolean;
   noDelete?: boolean;
-  validate(db: Db, mode: "add" | "edit", v: Values, before: Row | null): Promise<void>;
+  /** حد القراءة الافتراضي إن زاد الجدول عن 500 (الأصناف 2,228 · العملاء ~1,850) */
+  listLimit?: number;
+  validate(db: Db, mode: "add" | "edit", v: Values, before: Row | null, user: string): Promise<void>;
   guardDelete(db: Db, before: Row): Promise<void>;
+  /** بعد الكتابة وفي نفس المعاملة: ما يشتقّه أونيكس بعد الحفظ (POST_FORMS_COMMIT) */
+  afterSave?(db: Db, mode: "add" | "edit", saved: Row, payload: Values, before: Row | null, user: string): Promise<void>;
+  /** قبل حذف السجل وفي نفس المعاملة: حذف تفاصيله التابعة له (وحدات الصنف …) */
+  cascade?(db: Db, before: Row): Promise<void>;
+  /** بعد الحذف وفي نفس المعاملة */
+  afterDelete?(db: Db, before: Row, user: string): Promise<void>;
+  /** الرقم المقترح لسجل جديد (رقم العميل = المجموعة + تسلسل …) — GET /api/masters/<كيان>/next?… */
+  nextKey?(db: Db, hint: Record<string, string>): Promise<string>;
+  /** تنبيهات أونيكس التي لا تمنع الحفظ (IV-R107 …) */
+  warnings?(db: Db, saved: Row): Promise<string[]>;
 }
 
 export function s(v: unknown): string {

@@ -144,6 +144,20 @@ export async function seedDocumentSequences(db: Db): Promise<void> {
             MAX(CAST(NULLIF("DOC_NO",'') AS bigint)) mx
      FROM extract."IAS_POST_MST" WHERE "DOC_TYPE"='1' GROUP BY 1,2`,
   );
+  /* GL-R7 — قيود اليومية تُرقَّم لكل فرع ولكل «مجموعة تسلسل» نوع القيد (JV_TYPES.SEQUENCED: 1 يومية ⇐ 1 · 11 بنكية ⇐ 4).
+     المفتاح = scopeKey(per_branch_year_type) — فرع 3: اليومية 3 والبنكية 429 لا 429 للاثنين */
+  await trySql(
+    db,
+    `INSERT INTO erp.document_sequence (company_id, branch_id, fiscal_year_id, doc_kind, sequence_group, last_value)
+     SELECT cmp, brn, 2026, 'manual_journal', 'manual_journal|byt|' || brn::text || '|2026|' || seq::text || '|0', mx
+     FROM (SELECT CAST(NULLIF(m."CMP_NO",'') AS bigint) cmp, CAST(NULLIF(m."BRN_NO",'') AS bigint) brn,
+                  CAST(NULLIF(j."SEQUENCED",'') AS bigint) seq, MAX(CAST(NULLIF(m."DOC_NO",'') AS bigint)) mx
+             FROM extract."IAS_POST_MST" m JOIN extract."JV_TYPES" j ON j."JV_TYPE" = m."JV_TYPE"
+            WHERE m."DOC_TYPE" = '1' GROUP BY 1, 2, 3) s
+     WHERE cmp IS NOT NULL AND brn IS NOT NULL AND seq IS NOT NULL AND mx IS NOT NULL
+     ON CONFLICT (company_id, branch_id, fiscal_year_id, doc_kind, sequence_group)
+     DO UPDATE SET last_value = GREATEST(erp.document_sequence.last_value, EXCLUDED.last_value)`,
+  );
   await seed(
     "stock_issue",
     `SELECT CAST(NULLIF("CMP_NO",'') AS bigint) cmp, CAST(NULLIF("BRN_NO",'') AS bigint) brn,
@@ -170,7 +184,31 @@ export async function seedDocumentSequences(db: Db): Promise<void> {
   );
 }
 
-async function loadMissingTables(db: Db): Promise<string[]> {
+/** بصمة ملف المستخرج (الحجم + وقت التعديل) — تُسجَّل بعد كل تحميل ناجح */
+async function recordFile(db: Db, table: string, file: string, rows: number): Promise<void> {
+  const st = fs.statSync(file);
+  await db.query(
+    `INSERT INTO erp.extract_file (name, size, mtime_ms, rows_loaded, loaded_at) VALUES ($1, $2, $3, $4, now())
+     ON CONFLICT (name) DO UPDATE SET size = EXCLUDED.size, mtime_ms = EXCLUDED.mtime_ms,
+       rows_loaded = EXCLUDED.rows_loaded, loaded_at = now()`,
+    [table, st.size, Math.trunc(st.mtimeMs), rows],
+  );
+}
+
+function fileRows(file: string): number {
+  const t = fs.readFileSync(file, "utf8");
+  let n = 0;
+  for (const l of t.split(/\r?\n/)) if (l.length) n++;
+  return Math.max(0, n - 1);
+}
+
+/**
+ * يحمّل كل جدول مستخرج غائب عن `extract` **أو تغيّر ملفه** منذ آخر تحميل.
+ * كان يحمّل الغائب فقط ⇒ جدول أُعيد استخراجه بعد تصحيح القارئ (CUSTOMER بصفر صف · S_BRN بصف تالف ·
+ * IAS_MNDTRY_SCR_FIELDS بصفر صف — كلها بسبب أعمدة LOB) يبقى بنسخته الخاطئة للأبد.
+ * جدول حُمِّل قبل هذا التتبّع بلا بصمة: يُقارن عدد صفوفه بعدد أسطر ملفه مرة واحدة.
+ */
+async function loadChangedTables(db: Db): Promise<string[]> {
   const extractRoot = path.resolve(serverRoot(), "../../_onyx-extract/db");
   if (!fs.existsSync(extractRoot)) return [];
   const have = new Set(
@@ -178,13 +216,33 @@ async function loadMissingTables(db: Db): Promise<string[]> {
       (r) => String(r.table_name),
     ),
   );
+  const prints = new Map(
+    (await db.query(`SELECT name, size, mtime_ms FROM erp.extract_file`)).rows.map((r) => [
+      String(r.name), `${r.size}|${r.mtime_ms}`,
+    ]),
+  );
   const out: string[] = [];
   for (const d of fs.readdirSync(extractRoot, { withFileTypes: true })) {
-    if (!d.isDirectory() || d.name.startsWith("_") || have.has(d.name)) continue;
+    if (!d.isDirectory() || d.name.startsWith("_")) continue;
     const tsv = path.join(extractRoot, d.name, "rows.tsv");
     if (!fs.existsSync(tsv)) continue;
+    const st = fs.statSync(tsv);
+    const now = `${st.size}|${Math.trunc(st.mtimeMs)}`;
+    if (have.has(d.name)) {
+      const was = prints.get(d.name);
+      if (was === now) continue;
+      if (was === undefined) {
+        const inDb = Number((await db.query(`SELECT count(*) c FROM extract.${ident(d.name)}`)).rows[0]?.c ?? 0);
+        const inFile = fileRows(tsv);
+        if (inDb === inFile) {
+          await recordFile(db, d.name, tsv, inDb);
+          continue;
+        }
+      }
+    }
     try {
-      await loadTsv(db, d.name, tsv);
+      const n = await loadTsv(db, d.name, tsv);
+      await recordFile(db, d.name, tsv, n);
       out.push(d.name);
     } catch (e) {
       process.stderr.write(`FAIL ${d.name}: ${(e as Error).message}\n`);
@@ -203,7 +261,7 @@ export async function ensureLoaded(force = false): Promise<{ allPass: boolean; r
   if (!force && last.rows.length && Number(last.rows[0].rows_loaded) > 1000) {
     /* جداول استُخرجت بعد آخر تحميل كامل (مثل CUSTOMER_GROUP للطبقة ١) تُحمَّل الآن —
        بدونها تبقى المزامنة فاضية بصمت ويظهر الكيان «صفر سجل» وهو في أونيكس غير فارغ */
-    const late = await loadMissingTables(db);
+    const late = await loadChangedTables(db);
     await seedDocumentSequences(db);
     const report = { skipped: true, engine: db.kind, message: "already loaded", sequencesSeeded: true, lateTables: late };
     return { allPass: true, report };
@@ -221,6 +279,7 @@ export async function ensureLoaded(force = false): Promise<{ allPass: boolean; r
     try {
       const n = await loadTsv(db, d.name, tsv);
       perTable[d.name] = n;
+      await recordFile(db, d.name, tsv, n);
       tables++;
       rows += n;
     } catch (e) {

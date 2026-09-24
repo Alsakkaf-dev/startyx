@@ -5,6 +5,9 @@ import {
   type EntityDef, type FieldDef, type MasterEntity, type Row, type Values,
 } from "./master-kit.ts";
 import { LAYER1 } from "./masters-layer1.ts";
+import { LAYER2 } from "./masters-layer2.ts";
+import { LAYER2B } from "./masters-layer2b.ts";
+import { LAYER3 } from "./masters-layer3.ts";
 
 /**
  * البيانات الأساسية — الطبقة ٠ (GO/01-system-setup.md) + الطبقة ١ (masters-layer1.ts).
@@ -31,6 +34,10 @@ async function stockMovement(db: Db): Promise<number> {
  * يُعامَل كأنّ له حركة (منع الحذف) بدل السماح صامتاً وفقد بُعد مستخدَم.
  */
 async function dimensionMovement(db: Db, col: "CC_CODE" | "PJ_NO" | "ACTV_NO", value: string): Promise<number> {
+  /* القيد الافتتاحي الحيّ (op.4.1.2.10) — سطر أُضيف في startyx لا يوجد في المستخرج */
+  const openCol = { CC_CODE: "cost_center", PJ_NO: "project_no", ACTV_NO: "activity_no" }[col];
+  const opening = await count(db, `SELECT count(*) c FROM erp.opening_balance_line WHERE ${openCol} = $1`, [value]);
+  if (opening > 0) return opening;
   const exists = await count(
     db,
     `SELECT count(*) c FROM information_schema.tables WHERE table_schema = 'extract' AND table_name = 'IAS_POST_DTL'`,
@@ -179,7 +186,8 @@ const ENTITIES: Record<MasterEntity, EntityDef> = {
     table: "erp.branch",
     screen: "op.1.1.12",
     listSql: `SELECT no, company_id, name_ar, name_en, code, start_year, seq_no, is_main, vat_no, cr_no,
-                     city, district, street, building_no, postal_code, einvoice_enabled, inactive,
+                     city, city_no, district, street, building_no, postal_code, additional_no, short_address, id_scheme,
+                     einvoice_enabled, inactive,
                      created_by, to_char(created_at,'DD/MM/YYYY HH24:MI:SS') created_at,
                      updated_by, to_char(updated_at,'DD/MM/YYYY HH24:MI:SS') updated_at, update_count
               FROM erp.branch`,
@@ -200,6 +208,10 @@ const ENTITIES: Record<MasterEntity, EntityDef> = {
       street: { col: "street", kind: "text" },
       building_no: { col: "building_no", kind: "text" },
       postal_code: { col: "postal_code", kind: "text" },
+      city_no: { col: "city_no", kind: "int" },
+      additional_no: { col: "additional_no", kind: "text" },
+      short_address: { col: "short_address", kind: "text" },
+      id_scheme: { col: "id_scheme", kind: "text" },
       einvoice_enabled: { col: "einvoice_enabled", kind: "bool" },
       inactive: { col: "inactive", kind: "bool" },
     },
@@ -450,6 +462,15 @@ ENTITIES.account_activity = {
 
 /* الطبقة ١ — التهيئة (بنود 13–27 في BUILD-ORDER.md) تُسجَّل هنا بنفس المحرّك */
 Object.assign(ENTITIES, LAYER1);
+/* الطبقة ٢ — البيانات الأساسية (بنود 28–36) */
+Object.assign(ENTITIES, LAYER2);
+Object.assign(ENTITIES, LAYER2B);
+Object.assign(ENTITIES, LAYER3);
+
+/** تعريف كيان بالاسم — لفحص كل سجل أونيكس على قواعد شاشته (verify-*-records) */
+export function entityDef(name: MasterEntity): EntityDef {
+  return ENTITIES[name];
+}
 
 export function isEntity(name: string): name is MasterEntity {
   return Object.prototype.hasOwnProperty.call(ENTITIES, name);
@@ -518,7 +539,7 @@ function castValue(f: FieldDef, raw: unknown): unknown {
 export async function listMasters(
   db: Db,
   name: MasterEntity,
-  opts: { q?: string; limit?: number } = {},
+  opts: { q?: string; limit?: number; eq?: Record<string, string> } = {},
 ): Promise<{ rows: Row[]; total: number }> {
   const def = ENTITIES[name];
   const key = keyField(def);
@@ -533,11 +554,25 @@ export async function listMasters(
     params.push(val);
     conds.push(`${c} = $${params.length}`);
   }
+  /* تصفية تفصيلي برأسه (وحدات الصنف المعروض …) — على أعمدة الكيان المعرّفة فقط */
+  const byCol = new Map(Object.values(def.fields).map((f) => [f.col, f]));
+  for (const [c, raw] of Object.entries(opts.eq ?? {})) {
+    const f = byCol.get(c);
+    if (!f) continue;
+    params.push(castValue(f, raw));
+    conds.push(`${c} = $${params.length}`);
+  }
   const where = conds.length ? " WHERE " + conds.join(" AND ") : "";
   const total = await count(db, `SELECT count(*) c FROM ${def.table}${where}`, params);
-  const limit = Math.min(Math.max(Number(opts.limit ?? 500), 1), 5000);
+  const limit = Math.min(Math.max(Number(opts.limit ?? def.listLimit ?? 500), 1), 5000);
   const r = await db.query(`${def.listSql}${where} ORDER BY ${def.orderBy ?? key.col} LIMIT ${limit}`, params);
   return { rows: r.rows, total };
+}
+
+/** الرقم المقترح لسجل جديد — الكيان الذي لا يعرّف قاعدته يرجع فارغاً (الواجهة تُكمل بأكبر رقم + 1) */
+export async function nextMasterKey(db: Db, name: MasterEntity, hint: Record<string, string>): Promise<string> {
+  const def = ENTITIES[name];
+  return def.nextKey ? await def.nextKey(db, hint) : "";
 }
 
 export async function getMaster(db: Db, name: MasterEntity, key: string): Promise<Row | null> {
@@ -547,7 +582,7 @@ export async function getMaster(db: Db, name: MasterEntity, key: string): Promis
   return r.rows[0] ?? null;
 }
 
-export async function saveMaster(
+async function saveMasterTx(
   db: Db,
   name: MasterEntity,
   mode: "add" | "edit",
@@ -582,7 +617,7 @@ export async function saveMaster(
     if (s(payload[fname]) === "") throw onyxError(4048);
   }
 
-  await def.validate(db, mode, payload, before);
+  await def.validate(db, mode, payload, before, user);
 
   /* يُكتب: ما أرسلته الواجهة + ما اشتقّته القواعد (المستوى · الطبيعة · نوع التقرير) */
   const writeKeys = new Set<string>(mode === "add" ? Object.keys(payload) : Object.keys(values));
@@ -624,18 +659,57 @@ export async function saveMaster(
     await db.query(`UPDATE ${def.table} SET ${sets.join(", ")} WHERE ${w.sql}`, [...vals, ...w.params]);
   }
 
-  const saved = await getMaster(db, name, key);
+  let saved = await getMaster(db, name, key);
   if (!saved) throw new DomainError("SAVE_FAILED", "لم يُحفظ السجل");
+  if (def.afterSave) {
+    await def.afterSave(db, mode, saved, payload, before, user);
+    saved = (await getMaster(db, name, key)) ?? saved;
+  }
   return saved;
 }
 
-export async function deleteMaster(db: Db, name: MasterEntity, key: string): Promise<{ deleted: string }> {
+/** معاملة واحدة لكل حفظ/حذف: قاعدة تفشل بعد الكتابة (أو في afterSave) لا تترك نصف سجل */
+async function inTx<T>(db: Db, fn: () => Promise<T>): Promise<T> {
+  await db.exec("BEGIN");
+  try {
+    const out = await fn();
+    await db.exec("COMMIT");
+    return out;
+  } catch (e) {
+    await db.exec("ROLLBACK");
+    throw e;
+  }
+}
+
+export async function saveMaster(
+  db: Db,
+  name: MasterEntity,
+  mode: "add" | "edit",
+  values: Values,
+  user: string,
+): Promise<Row> {
+  return inTx(db, () => saveMasterTx(db, name, mode, values, user));
+}
+
+/** تنبيهات لا تمنع الحفظ (IV-R107 «مركب بلا مكونات» …) — تُعرض بعد الحفظ */
+export async function masterWarnings(db: Db, name: MasterEntity, saved: Row): Promise<string[]> {
+  const def = ENTITIES[name];
+  return def.warnings ? await def.warnings(db, saved) : [];
+}
+
+export async function deleteMaster(db: Db, name: MasterEntity, key: string, user = "—"): Promise<{ deleted: string }> {
+  return inTx(db, () => deleteMasterTx(db, name, key, user));
+}
+
+async function deleteMasterTx(db: Db, name: MasterEntity, key: string, user: string): Promise<{ deleted: string }> {
   const def = ENTITIES[name];
   const before = await getMaster(db, name, key);
   if (!before) throw onyxError(3428);
   if (def.noDelete) throw onyxError(3428);
   await def.guardDelete(db, before);
+  if (def.cascade) await def.cascade(db, before);
   const w = keyClause(def, key);
   await db.query(`DELETE FROM ${def.table} WHERE ${w.sql}`, w.params);
+  if (def.afterDelete) await def.afterDelete(db, before, user);
   return { deleted: key };
 }

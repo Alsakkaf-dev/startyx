@@ -78,8 +78,9 @@ Eq "1" "items" (StatsRows "IAS_ITM_MST") 2228 "items"
 Eq "1" "warehouses" (StatsRows "WAREHOUSE_DETAILS") 40 "warehouses"
 Eq "1" "vendors" (StatsRows "V_DETAILS") 130 "vendors"
 Eq "1" "companies" (StatsRows "S_CMPNY") 2 "companies"
-$cust = StatsRows "CUSTOMER"
-Add-Check "1" "customers-lob" "$cust" "0" "CUSTOMER extract is LOB-empty; skip row match" ($cust -eq 0)
+# CUSTOMER was 0 rows while the reader skipped LOB tables; re-extracted 2026-09-24 with the LOB fix
+Eq "1" "customers" (StatsRows "CUSTOMER") 1863 "customers"
+Eq "1" "employees" (StatsRows "S_EMP") 47 "employees"
 
 # --- cycle 2 stock vs GL ---
 $os = Read-Tsv (Join-Path $db "IAS_OPEN_STOCK\rows.tsv")

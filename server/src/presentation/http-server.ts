@@ -10,9 +10,15 @@ import { liveStore } from "../infrastructure/memory.ts";
 import { postLive, serialPost } from "../application/post-live.ts";
 import { loadPeriods } from "../application/posting-context.ts";
 import { openDb, currentDb } from "../infrastructure/db.ts";
-import { isEntity, listMasters, getMaster, saveMaster, deleteMaster, type MasterEntity } from "../application/masters.ts";
+import { isEntity, listMasters, getMaster, saveMaster, deleteMaster, masterWarnings, nextMasterKey, type MasterEntity } from "../application/masters.ts";
 import { syncMasters } from "../application/masters-sync.ts";
 import { syncLayer1 } from "../application/masters-sync-layer1.ts";
+import { syncLayer2 } from "../application/masters-sync-layer2.ts";
+import { syncLayer2b } from "../application/masters-sync-layer2b.ts";
+import { syncVendors } from "../application/masters-sync-vendors.ts";
+import { syncEmployees } from "../application/masters-sync-employees.ts";
+import { syncOpening, syncOpeningStock } from "../application/masters-sync-opening.ts";
+import { docScreens, docSummary, getDoc, listDocs, peekNext, syncDocuments } from "../application/documents.ts";
 import { hydrateFromDb, readFacts, mastersCounts, type LedgerRow } from "../infrastructure/postgres.ts";
 import { ensureLoaded } from "../../migration/load-2026.ts";
 
@@ -98,6 +104,34 @@ export function createServer(): http.Server {
         json(res, 200, await mastersCounts(db));
         return;
       }
+      if (url.pathname === "/api/test/shutdown" && process.env.STARTYX_TEST_SHUTDOWN === "1") return;
+      /* الطبقة ٤ — قراءة المستندات لشاشاتها: /api/docs/<شاشة>[/summary|/next|/<مفتاح>] */
+      if (req.method === "GET" && url.pathname.startsWith("/api/docs/")) {
+        const db = currentDb();
+        if (!db) {
+          json(res, 503, { error: "no_db" });
+          return;
+        }
+        const parts = url.pathname.slice("/api/docs/".length).split("/").filter(Boolean).map(decodeURIComponent);
+        const screen = parts[0] ?? "";
+        if (!docScreens().includes(screen)) {
+          json(res, 404, { error: "not_found" });
+          return;
+        }
+        const int = (k: string): number | null => (url.searchParams.get(k) ? Number(url.searchParams.get(k)) : null);
+        if (parts.length === 1) {
+          json(res, 200, await listDocs(db, screen, { q: url.searchParams.get("q") ?? "", limit: int("limit") ?? 5000, branch: int("branch"), jvType: int("jvType") }));
+        } else if (parts[1] === "summary") {
+          json(res, 200, await docSummary(db, screen));
+        } else if (parts[1] === "next") {
+          json(res, 200, { next: await peekNext(db, liveStore, screen, int("branch") ?? 0, int("jvType")) });
+        } else {
+          const doc = await getDoc(db, screen, parts.slice(1).join("/"));
+          if (!doc) json(res, 404, { error: "not_found", message: "المستند غير موجود" });
+          else json(res, 200, doc);
+        }
+        return;
+      }
       if (url.pathname.startsWith("/api/masters/")) {
         const db = currentDb();
         if (!db) {
@@ -114,9 +148,15 @@ export function createServer(): http.Server {
         if (req.method === "GET" && parts.length === 1) {
           const out = await listMasters(db, entity, {
             q: url.searchParams.get("q") ?? "",
-            limit: Number(url.searchParams.get("limit") ?? "500"),
+            limit: url.searchParams.has("limit") ? Number(url.searchParams.get("limit")) : undefined,
+            /* eq.<عمود>=قيمة — تفصيل برأسه (وحدات الصنف المعروض …) */
+            eq: Object.fromEntries([...url.searchParams].filter(([k]) => k.startsWith("eq.")).map(([k, v]) => [k.slice(3), v])),
           });
           json(res, 200, out);
+          return;
+        }
+        if (req.method === "GET" && parts.length === 2 && parts[1] === "next") {
+          json(res, 200, { next: await nextMasterKey(db, entity, Object.fromEntries(url.searchParams)) });
           return;
         }
         if (req.method === "GET" && parts.length === 2) {
@@ -130,7 +170,8 @@ export function createServer(): http.Server {
         }
         if (req.method === "POST" && parts.length === 2 && parts[1] === "delete") {
           const b = (await readBody(req)) as Record<string, unknown>;
-          json(res, 200, await deleteMaster(db, entity, String(b.key ?? "")));
+          /* الكتابة في نفس طابور الترحيل: اتصال واحد ⇒ معاملتان لا تتداخلان */
+          json(res, 200, await serialPost(() => deleteMaster(db, entity, String(b.key ?? ""), String(b.user ?? "1 · محسن السقاف"))));
           return;
         }
         if (req.method === "POST" && parts.length === 1) {
@@ -138,7 +179,8 @@ export function createServer(): http.Server {
           const mode = b.mode === "edit" ? "edit" : "add";
           const values = (b.values ?? {}) as Record<string, unknown>;
           const user = String(b.user ?? "1 · محسن السقاف");
-          json(res, 200, { saved: await saveMaster(db, entity, mode, values, user) });
+          const saved = await serialPost(() => saveMaster(db, entity, mode, values, user));
+          json(res, 200, { saved, warnings: await masterWarnings(db, entity, saved) });
           return;
         }
         json(res, 404, { error: "not_found" });
@@ -241,6 +283,13 @@ export async function bootServer(port = PORT): Promise<http.Server> {
   await ensureLoaded();
   await syncMasters(db);
   await syncLayer1(db);
+  await syncLayer2(db);
+  await syncLayer2b(db);
+  await syncVendors(db);
+  await syncEmployees(db);
+  await syncOpening(db);
+  await syncOpeningStock(db);
+  await syncDocuments(db);
   await hydrateFromDb(db, liveStore, ledger);
   await loadPeriods(db, liveStore);
   return await new Promise((resolve) => {
@@ -255,6 +304,17 @@ export async function bootServer(port = PORT): Promise<http.Server> {
     };
     for (const sig of ["SIGINT", "SIGTERM", "SIGHUP", "SIGBREAK"] as const) {
       process.on(sig, shutdown);
+    }
+    /* فحوص القبول على نسخة من القاعدة: ويندوز لا يوصل SIGINT لعملية منفصلة، والقتل القسري يُتلف PGlite.
+       المسار موجود فقط حين STARTYX_TEST_SHUTDOWN=1 — لا يُفعَّل في تشغيل الشركة. */
+    if (process.env.STARTYX_TEST_SHUTDOWN === "1") {
+      s.on("request", (req, res) => {
+        if (req.method === "POST" && req.url === "/api/test/shutdown") {
+          res.writeHead(200, { "content-type": "application/json" });
+          res.end('{"ok":true}');
+          shutdown();
+        }
+      });
     }
     s.listen(port, "127.0.0.1", () => {
       process.stdout.write(`startyx-server http://127.0.0.1:${port} store=${db.kind}\n`);

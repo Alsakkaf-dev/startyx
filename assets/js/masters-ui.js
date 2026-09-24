@@ -110,6 +110,10 @@
         "الشارع": { f: "street" },
         "رقم المبنى": { f: "building_no" },
         "الرمز البريدي": { f: "postal_code" },
+        "رقم المدينة": { f: "city_no" },
+        "الرقم الاضافي": { f: "additional_no" },
+        "العنوان المختصر": { f: "short_address" },
+        "نوع المعرف": { f: "id_scheme" },
         "فاتورة إلكترونية": { f: "einvoice_enabled", bool: true },
         "موقوف": { f: "inactive", bool: true }
       }
@@ -757,7 +761,1646 @@
     }
   };
 
-  var st = { ref: null, cfg: null, set: 0, rows: [], idx: -1, h: null, q: "" };
+  /* ═══════════ الطبقة ٢ — البيانات الأساسية (بنود 28–36) ═══════════ */
+
+  /* ═══ op.5.1.2.10 — بيانات الأصناف · IAS_ITM_MST + تفاصيله [GO/05-warehouse.md] ═══
+     تبويب «الصنف» رأس، والبقية تفاصيل الصنف المعروض (detailOf: تُقرأ بـ eq.<عمود> = رقمه) */
+  MAP["op.5.1.2.10"] = { sets: [
+    {
+      entity: "item", panel: "الصنف", title: "الأصناف",
+      key: "code", keyLabel: "رقم الصنف",
+      /* IV-R75 · IV-R95 — المجموعة ذات البادئة تُنزّل الرقم التالي، والبقية يُكتب الرقم يدوياً */
+      autoCode: { groupLabel: "المجموعة", codeLabel: "رقم الصنف" },
+      addFrom: true,
+      cols: [
+        { c: "code", t: "الرقم" },
+        { c: "name_ar", t: "الاسم" },
+        { c: "group_code", t: "المجموعة" },
+        { c: "units", t: "الوحدات" },
+        { c: "available_qty", t: "المتوفر", n: true },
+        { c: "avg_cost", t: "المتوسط", n: true },
+        { c: "last_receipt_date", t: "آخر وارد" },
+        { c: "is_kit", t: "مركب", bool: true },
+        { c: "inactive", t: "موقوف", bool: true }
+      ],
+      fields: {
+        "رقم الصنف": { f: "code" },
+        "اسم الصنف": { f: "name_ar" },
+        "الاسم الأجنبي": { f: "name_en" },
+        "المجموعة": { f: "group_code" },
+        "الوحدة الرئيسية": { f: "main_unit", addOnly: true },
+        "الوحدات": { f: "units", ro: true },
+        "الاسم المختصر": { f: "short_name_ar" },
+        "الاسم المختصر الأجنبي": { f: "short_name_en" },
+        "المواصفات": { f: "description_ar" },
+        "المواصفات بالأجنبي": { f: "description_en" },
+        "صورة الصنف": { f: "image_ref" },
+        "تكلفة بداية التعامل": { f: "initial_cost" },
+        "التكلفة الأولية": { f: "primary_cost" },
+        "متوسط التكلفة": { f: "avg_cost", ro: true },
+        "الكمية المتوفرة": { f: "available_qty", ro: true },
+        "تاريخ آخر وارد": { f: "last_receipt_date", ro: true },
+        "خدمي": { f: "is_service", bool: true },
+        "مركب": { f: "is_kit", bool: true },
+        "يستخدم في تكوين المركب": { f: "used_in_kit", bool: true },
+        "محجوز": { f: "is_blocked", bool: true },
+        "غير قابل للبيع": { f: "no_sale", bool: true },
+        "يباع نقداً": { f: "cash_sale_only", bool: true },
+        "غير قابل للإرتجاع": { f: "no_return", bool: true },
+        "فترة الإرتجاع": { f: "return_period_days" },
+        "إستخدام الكسور": { f: "allow_fraction", bool: true },
+        "الأرقام العشرية": { f: "qty_decimals" },
+        "التصنيف الضريبي": { f: "tax_classification" },
+        "رقم الصنف العالمي GTIN": { f: "gtin" },
+        "مستخدم في طلبات الموظفين": { f: "used_in_emp_requests", bool: true },
+        "مستورد من إكسل": { f: "imported_from_excel", bool: true, ro: true },
+        "تحتاج مراجعة": { f: "needs_review", bool: true, ro: true },
+        "موقوف": { f: "inactive", bool: true },
+        "سبب التوقيف": { f: "inactive_reason" },
+        "تاريخ التوقيف": { f: "inactive_date", ro: true },
+        "الموقِف": { f: "inactive_by", ro: true }
+      }
+    },
+    {
+      entity: "item_unit", panel: "وحدة الصنف", title: "الوحدات",
+      key: "unit_code", keyCols: ["item_code", "unit_code"], keyLabel: "الوحدة",
+      detailOf: { col: "item_code", from: "code", label: "رقم الصنف" },
+      cols: [
+        { c: "level_no", t: "الترتيب", n: true },
+        { c: "unit_code", t: "الوحدة" },
+        { c: "pack_size", t: "العبوة", n: true },
+        { c: "is_main", t: "رئيسية", bool: true },
+        { c: "is_sale", t: "بيع", bool: true },
+        { c: "is_purchase", t: "شراء", bool: true },
+        { c: "is_stock", t: "جرد", bool: true },
+        { c: "is_transfer", t: "تحويل", bool: true },
+        { c: "barcode", t: "الباركود" },
+        { c: "inactive", t: "موقوفة", bool: true }
+      ],
+      fields: {
+        "رقم الصنف": { f: "item_code" },
+        "الوحدة": { f: "unit_code" },
+        "العبوة": { f: "pack_size" },
+        "الترتيب": { f: "level_no", ro: true },
+        "رئيسية": { f: "is_main", bool: true },
+        "وحدة بيع": { f: "is_sale", bool: true },
+        "وحدة شراء": { f: "is_purchase", bool: true },
+        "وحدة جرد": { f: "is_stock", bool: true },
+        "وحدة تحويل": { f: "is_transfer", bool: true },
+        "غير قابلة للبيع": { f: "no_sale", bool: true },
+        "الباركود": { f: "barcode" },
+        "الوصف": { f: "desc_ar" },
+        "الوصف الأجنبي": { f: "desc_en" },
+        "موقوفة": { f: "inactive", bool: true },
+        "سبب التوقيف": { f: "inactive_reason" }
+      }
+    },
+    {
+      entity: "item_vendor", panel: "مورد الصنف", title: "الموردون",
+      key: "vendor_code", keyCols: ["item_code", "vendor_code", "unit_code", "pack_size"], keyLabel: "المورد",
+      detailOf: { col: "item_code", from: "code", label: "رقم الصنف" },
+      cols: [
+        { c: "vendor_code", t: "المورد" },
+        { c: "vendor_name", t: "الاسم" },
+        { c: "unit_code", t: "الوحدة" },
+        { c: "pack_size", t: "العبوة", n: true },
+        { c: "price", t: "السعر", n: true },
+        { c: "currency", t: "العملة" },
+        { c: "vendor_item_code", t: "رقمه عند المورد" },
+        { c: "is_main", t: "رئيسي", bool: true }
+      ],
+      fields: {
+        "رقم الصنف": { f: "item_code" },
+        "المورد": { f: "vendor_code" },
+        "الوحدة": { f: "unit_code" },
+        "العبوة": { f: "pack_size" },
+        "السعر": { f: "price" },
+        "العملة": { f: "currency" },
+        "رقم الصنف عند المورد": { f: "vendor_item_code" },
+        "مورد رئيسي": { f: "is_main", bool: true }
+      }
+    },
+    {
+      entity: "kit_component", panel: "مكوّن المركب", title: "المكونات",
+      key: "component_code", keyCols: ["kit_item_code", "component_code", "unit_code"], keyLabel: "المكوّن",
+      detailOf: { col: "kit_item_code", from: "code", label: "الصنف المركب" },
+      emptyNote: "لا مكونات — الصنف ليس مركباً أو مركب بلا مكونات (IV-Q15)",
+      cols: [
+        { c: "component_code", t: "المكوّن" },
+        { c: "component_name", t: "الاسم" },
+        { c: "unit_code", t: "الوحدة" },
+        { c: "qty", t: "الكمية", n: true },
+        { c: "cost_pct", t: "نسبة التكلفة", n: true },
+        { c: "default_warehouse", t: "المخزن الافتراضي" }
+      ],
+      fields: {
+        "الصنف المركب": { f: "kit_item_code" },
+        "المكوّن": { f: "component_code" },
+        "الوحدة": { f: "unit_code" },
+        "الكمية": { f: "qty" },
+        "نسبة التكلفة": { f: "cost_pct" },
+        "أدنى كمية": { f: "min_qty" },
+        "أقصى كمية": { f: "max_qty" },
+        "المخزن الافتراضي": { f: "default_warehouse" },
+        "ملاحظة": { f: "note" }
+      }
+    },
+    {
+      entity: "item_ref_code", panel: "الرقم المرجعي", title: "الأرقام المرجعية",
+      key: "ref_code", keyLabel: "الرقم المرجعي",
+      detailOf: { col: "item_code", from: "code", label: "رقم الصنف" },
+      cols: [
+        { c: "ref_code", t: "الرقم المرجعي" },
+        { c: "item_code", t: "الصنف" }
+      ],
+      fields: {
+        "رقم الصنف": { f: "item_code" },
+        "الرقم المرجعي": { f: "ref_code" }
+      }
+    },
+    {
+      entity: "item_warehouse", panel: "رصيد المخزن", title: "المخازن",
+      key: "warehouse_code", keyCols: ["item_code", "warehouse_code", "unit_code"], keyLabel: "المخزن",
+      detailOf: { col: "item_code", from: "code", label: "رقم الصنف" },
+      noAdd: "الأرصدة تُحسب من الحركة (IV-R105) — لا إضافة يدوية",
+      noDelete: "الأرصدة تُحسب من الحركة (IV-R105) — لا حذف",
+      cols: [
+        { c: "warehouse_code", t: "المخزن" },
+        { c: "warehouse_name", t: "الاسم" },
+        { c: "unit_code", t: "الوحدة" },
+        { c: "available_qty", t: "المتوفر", n: true },
+        { c: "avg_cost", t: "المتوسط", n: true },
+        { c: "primary_cost", t: "التكلفة الأولية", n: true },
+        { c: "inactive", t: "موقوف أمامه", bool: true }
+      ],
+      fields: {
+        "رقم الصنف": { f: "item_code", ro: true },
+        "المخزن": { f: "warehouse_code", ro: true },
+        "الوحدة": { f: "unit_code", ro: true },
+        "الكمية المتوفرة": { f: "available_qty", ro: true },
+        "متوسط التكلفة": { f: "avg_cost", ro: true },
+        "موقوف أمام المخزن": { f: "inactive", bool: true }
+      }
+    }
+  ]};
+
+  /* ═══ op.5.1.2.9 — بيانات المخازن · WAREHOUSE_DETAILS [GO/05-warehouse.md] ═══ */
+  MAP["op.5.1.2.9"] = {
+    entity: "warehouse",
+    key: "code",
+    keyLabel: "رقم المخزن",
+    autoKey: true,
+    addFrom: true,
+    title: "المخازن",
+    cols: [
+      { c: "code", t: "الرقم", n: true },
+      { c: "name_ar", t: "الاسم" },
+      { c: "branch_no", t: "الفرع", n: true },
+      { c: "group_code", t: "المجموعة" },
+      { c: "transfer_account", t: "وسيط التحويل" },
+      { c: "default_price_level", t: "المستوى السعري", n: true },
+      { c: "stock_cost_limit", t: "حد التكلفة", n: true },
+      { c: "item_count", t: "أصناف", n: true },
+      { c: "inactive", t: "موقوف", bool: true }
+    ],
+    fields: {
+      "رقم المخزن": { f: "code" },
+      "اسم المخزن": { f: "name_ar" },
+      "الاسم الأجنبي": { f: "name_en" },
+      "رقم الفرع": { f: "branch_no" },
+      "مجموعة المخازن": { f: "group_code" },
+      "موقف": { f: "inactive", bool: true },
+      "غير قابل للبيع": { f: "no_sale", bool: true },
+      "مخزن رئيسي": { f: "is_main", bool: true },
+      "مخزن مواد تالفة": { f: "is_damaged_goods", bool: true },
+      "مخزن الخدمات الإفتراضي": { f: "is_service_default", bool: true },
+      "وسيط التحويلات المخزنية": { f: "transfer_account" },
+      "الحساب التحليلي": { f: "transfer_analytic" },
+      "المركز الافتراضي": { f: "default_cost_center" },
+      "مستوى التسعيرة": { f: "default_price_level" },
+      "حد تكلفة المخزن": { f: "stock_cost_limit" },
+      "التسلسل": { f: "doc_sequence_key" },
+      "أمين المخزن": { f: "keeper_name" },
+      "رقم الهاتف": { f: "phone" },
+      "الموقع": { f: "location" },
+      "الدولة": { f: "country_no" },
+      "المحافظة": { f: "province_no" },
+      "المدينة": { f: "city_no" },
+      "المنطقة": { f: "region_code" },
+      "العنوان": { f: "address_ar" },
+      "العنوان الأجنبي": { f: "address_en" },
+      "رقم الموقع العالمي GLN": { f: "gln" },
+      "خط العرض": { f: "latitude" },
+      "خط الطول": { f: "longitude" },
+      "أصناف مربوطة": { f: "item_count", ro: true },
+      "تحتاج مراجعة": { f: "needs_review", bool: true, ro: true }
+    }
+  };
+
+  /* ═══ op.4.1.2.2 الصناديق · op.4.1.2.3 البنوك [GO/04-general-ledger.md] — رأس + عملاته ═══ */
+  var RCPT_SEQ = { "عام": "1", "حسب المحصل": "2", "حسب المندوب": "3" };
+  var PASS_LMT = { "—": "", "لا يسمح": "1", "يسمح": "2", "يسمح مع تنبيه": "3" };
+  function treasuryCurrencySet(keyCol, panel) {
+    var fields = {
+      "الرقم": { f: keyCol },
+      "العملة": { f: "currency" },
+      "الحساب": { f: "account_code", ro: true },
+      "افتراضية": { f: "is_default", bool: true },
+      "الرصيد الافتتاحي": { f: "opening_local", ro: true },
+      "الرصيد الحالي": { f: "current_local", ro: true },
+      "أدنى رصيد": { f: "min_balance" },
+      "أعلى رصيد": { f: "max_balance" },
+      "أدنى مبلغ للعملية": { f: "min_txn" },
+      "أعلى مبلغ للعملية": { f: "max_txn" },
+      "تجاوز الحد": { f: "pass_limit", map: PASS_LMT },
+      "موقوفة": { f: "inactive", bool: true }
+    };
+    if (keyCol === "bank_no") fields["رقم الحساب في البنك"] = { f: "bank_account_no" };
+    return {
+      entity: keyCol === "cash_no" ? "cashbox_currency" : "bank_currency", panel: panel, title: "العملات",
+      key: "currency", keyCols: [keyCol, "currency"], keyLabel: "العملة",
+      detailOf: { col: keyCol, from: "no", label: "الرقم" },
+      cols: [
+        { c: "currency", t: "العملة" },
+        { c: "is_default", t: "افتراضية", bool: true },
+        { c: "current_local", t: "الرصيد", n: true },
+        { c: "min_balance", t: "أدنى رصيد", n: true },
+        { c: "max_balance", t: "أعلى رصيد", n: true },
+        { c: "pass_limit", t: "تجاوز الحد", map: { "1": "لا يسمح", "2": "يسمح", "3": "يسمح مع تنبيه" } }
+      ],
+      fields: fields
+    };
+  }
+
+  MAP["op.4.1.2.2"] = { sets: [
+    {
+      entity: "cashbox", panel: "الصندوق", title: "الصناديق",
+      key: "no", keyLabel: "رقم الصندوق", autoKey: true, addFrom: true,
+      cols: [
+        { c: "no", t: "الرقم", n: true },
+        { c: "name_ar", t: "الاسم" },
+        { c: "account_code", t: "الحساب" },
+        { c: "branch_no", t: "الفرع", n: true },
+        { c: "cash_type", t: "النوع", map: { "1": "قبض", "2": "صرف", "3": "قبض وصرف", "4": "بيع وشراء" } },
+        { c: "sequence_group", t: "التسلسل", n: true },
+        { c: "inactive", t: "موقوف", bool: true }
+      ],
+      fields: {
+        "رقم الصندوق": { f: "no" },
+        "الاسم": { f: "name_ar" },
+        "الاسم الأجنبي": { f: "name_en" },
+        "حساب الصندوق": { f: "account_code" },
+        "اسم الحساب": { f: "account_name", ro: true },
+        "الفرع": { f: "branch_no" },
+        "التسلسل": { f: "sequence_group" },
+        "النوع": { f: "cash_type", map: { "قبض وصرف": "3", "قبض": "1", "صرف": "2", "بيع وشراء": "4" } },
+        "تسلسل القبض": { f: "receipt_seq_type", map: RCPT_SEQ },
+        "نوع القبض الافتراضي": { f: "default_receipt_type" },
+        "نوع الصرف الافتراضي": { f: "default_payment_type" },
+        "المجموعة": { f: "group_no" },
+        "صندوق وسيط": { f: "is_mediator", bool: true },
+        "إذن التوريد النقدي": { f: "use_cash_income", bool: true },
+        "نقاط البيع": { f: "pos_sys", bool: true },
+        "مفضل": { f: "favourite", bool: true },
+        "آخر مطابقة": { f: "last_reconciled_at", ro: true },
+        "موقوف": { f: "inactive", bool: true },
+        "سبب التوقيف": { f: "inactive_reason" },
+        "تاريخ التوقيف": { f: "inactive_date", ro: true }
+      }
+    },
+    treasuryCurrencySet("cash_no", "عملة الصندوق")
+  ]};
+
+  MAP["op.4.1.2.3"] = { sets: [
+    {
+      entity: "bank", panel: "البنك", title: "البنوك",
+      key: "no", keyLabel: "رقم البنك", autoKey: true, addFrom: true,
+      cols: [
+        { c: "no", t: "الرقم", n: true },
+        { c: "name_ar", t: "الاسم" },
+        { c: "account_code", t: "حساب الدليل" },
+        { c: "bank_account_no", t: "رقم الحساب في البنك" },
+        { c: "branch_no", t: "الفرع", n: true },
+        { c: "sequence_group", t: "التسلسل", n: true },
+        { c: "is_mediator", t: "وسيط", bool: true },
+        { c: "inactive", t: "موقوف", bool: true }
+      ],
+      fields: {
+        "رقم البنك": { f: "no" },
+        "الاسم": { f: "name_ar" },
+        "الاسم الأجنبي": { f: "name_en" },
+        "حساب البنك في الدليل": { f: "account_code" },
+        "اسم الحساب": { f: "account_name", ro: true },
+        "رقم الحساب في البنك": { f: "bank_account_no" },
+        "صنف البنك": { f: "bank_class", map: { "بنك": "1", "صراف": "2" } },
+        "بنك وسيط": { f: "is_mediator", bool: true },
+        "الفرع": { f: "branch_no" },
+        "التسلسل": { f: "sequence_group" },
+        "تسلسل القبض": { f: "receipt_seq_type", map: RCPT_SEQ },
+        "نوع القبض الافتراضي": { f: "default_receipt_type" },
+        "نوع الصرف الافتراضي": { f: "default_payment_type" },
+        "المجموعة": { f: "group_no" },
+        "رمز البنك": { f: "bank_code" },
+        "الوصف": { f: "description" },
+        "الهاتف": { f: "phone" },
+        "الفاكس": { f: "fax" },
+        "صندوق البريد": { f: "po_box" },
+        "العنوان": { f: "address" },
+        "البريد الإلكتروني": { f: "email" },
+        "الموقع الإلكتروني": { f: "website" },
+        "الدولة": { f: "country_no" },
+        "المدينة": { f: "city_no" },
+        "حساب أوراق القبض": { f: "notes_receivable_account" },
+        "حساب أوراق الدفع": { f: "notes_payable_account" },
+        "وسيط شيكات الصرف": { f: "cheque_intermediary_account" },
+        "رمز الشبكة": { f: "network_code" },
+        "ضريبة العمولة": { f: "commission_vat", bool: true },
+        "التسلسل الآلي للشيكات": { f: "cheque_auto_seq", bool: true },
+        "مفضل": { f: "favourite", bool: true },
+        "آخر مطابقة": { f: "last_reconciled_at", ro: true },
+        "موقوف": { f: "inactive", bool: true },
+        "سبب التوقيف": { f: "inactive_reason" },
+        "تاريخ التوقيف": { f: "inactive_date", ro: true },
+        "الموقِف": { f: "inactive_by", ro: true }
+      }
+    },
+    treasuryCurrencySet("bank_no", "عملة البنك")
+  ]};
+
+  /* ═══ op.5.1.2.14 — تسعيرة الأصناف · IAS_ITEM_PRICE + رقابة الأسعار [GO/05-warehouse.md] ═══ */
+  MAP["op.5.1.2.14"] = { sets: [
+    {
+      entity: "item_price", panel: "السعر", title: "الأسعار",
+      key: "item_code", keyCols: ["price_level", "item_code", "unit_code"], keyLabel: "رقم الصنف",
+      cols: [
+        { c: "price_level", t: "المستوى", n: true },
+        { c: "item_code", t: "الصنف" },
+        { c: "item_name", t: "الاسم" },
+        { c: "unit_code", t: "الوحدة" },
+        { c: "pack_size", t: "العبوة", n: true },
+        { c: "price", t: "السعر", n: true },
+        { c: "min_price", t: "أدنى سعر", n: true },
+        { c: "max_price", t: "أعلى سعر", n: true },
+        { c: "branch_no", t: "الفرع", n: true }
+      ],
+      fields: {
+        "المستوى": { f: "price_level" },
+        "رقم الصنف": { f: "item_code" },
+        "اسم الصنف": { f: "item_name", ro: true },
+        "الوحدة": { f: "unit_code" },
+        "العبوة": { f: "pack_size", ro: true },
+        "السعر": { f: "price" },
+        "أدنى سعر": { f: "min_price" },
+        "أعلى سعر": { f: "max_price" },
+        "الفرع": { f: "branch_no" },
+        "ملاحظة": { f: "note" },
+        "مستورد من إكسل": { f: "imported_from_excel", bool: true, ro: true }
+      }
+    },
+    {
+      entity: "item_price_audit", panel: "حركة الرقابة", title: "رقابة الأسعار",
+      key: "audit_no", keyLabel: "رقم الحركة",
+      noAdd: "رقابة الأسعار تُكتب آلياً مع كل إضافة وتعديل وحذف (IV-R109)",
+      noDelete: "سجل الرقابة للإضافة فقط (IV-R109)",
+      cols: [
+        { c: "audit_no", t: "الحركة", n: true },
+        { c: "action", t: "النوع", map: { "1": "إضافة", "2": "تعديل", "3": "حذف" } },
+        { c: "audited_at", t: "التاريخ" },
+        { c: "audited_by", t: "المستخدم" },
+        { c: "price_level", t: "المستوى", n: true },
+        { c: "item_code", t: "الصنف" },
+        { c: "unit_code", t: "الوحدة" },
+        { c: "prev_price", t: "السعر السابق", n: true },
+        { c: "price", t: "السعر", n: true }
+      ],
+      fields: {
+        "رقم الحركة": { f: "audit_no", ro: true },
+        "النوع": { f: "action", ro: true, map: { "إضافة": "1", "تعديل": "2", "حذف": "3" } },
+        "التاريخ": { f: "audited_at", ro: true },
+        "المستخدم": { f: "audited_by", ro: true },
+        "السعر السابق": { f: "prev_price", ro: true },
+        "السعر الجديد": { f: "price", ro: true },
+        "الأدنى السابق": { f: "prev_min_price", ro: true },
+        "الأدنى": { f: "min_price", ro: true },
+        "الأعلى السابق": { f: "prev_max_price", ro: true },
+        "الأعلى": { f: "max_price", ro: true }
+      }
+    }
+  ]};
+
+  /* ═══ op.7.1.2.4 — بيانات مندوبي المبيعات · SALES_MAN + IAS_CST_SMAN · IAS_PRIV_SMAN · ARS_LOCTN_GEO_SMAN
+     [GO/07-customers-sales.md] — تبويبات أونيكس السبعة؛ الضمانات ونظام التوزيع أعمدة في سجل المندوب نفسه
+     (تعديل جزئي بنفس الرقم)، والباقي تفاصيل تُقرأ برقم المندوب. القوائم من S_FLAGS. ═══ */
+  var REP_OF = { col: "code", from: "code", label: "رقم المندوب" };
+  var REP_DTL = { col: "rep_code", from: "code", label: "رقم المندوب" };
+  var SMAN_SP_TYP = { "مندوب مبيعات": "0", "مندوب علمي": "1", "مندوب مبيعات وعلمي": "2", "مندوب ترويج": "3" };
+  var G_STATUS = { "—": "", "فعال": "1", "غير فعال": "0" };
+  var G_TYPE = { "—": "", "إعتبارية": "1", "تجارية": "2", "بنكية": "3", "عقارية": "4", "لايوجد": "5",
+    "سند لأمر": "6", "ملف من كفيل": "7", "إيصال أمانة": "8", "شيك": "9" };
+  var CHEQ_TYPE_REC = { "تاريخ المستند": "0", "تاريخ الإستحقاق": "1", "توسيط أوراق القبض - ترحيل آلي": "2",
+    "إدخال الإستحقاق يدوياً": "3" };
+  var VST_OPN_TYP = { "يدويا": "1", "باركود العميل": "2", "بواسطة الخريطة لنطاق المنطقة": "3",
+    "بواسطة موقع العميل جي بي اس": "4", "الموقع جي بي اس او الباركود او يدويا": "5" };
+  var LOC_TYP = { "دولة": "1", "محافظة": "2", "مدينة": "3", "منطقة": "4", "خط سير": "5" };
+  var REP_SAME_ROW = "بيانات هذا التبويب جزء من سجل المندوب — أضف المندوب من «البيانات الرئيسية» ثم «تعديل» هنا";
+
+  MAP["op.7.1.2.4"] = { sets: [
+    {
+      entity: "salesman", panel: "المندوب", title: "البيانات الرئيسية",
+      key: "code", keyLabel: "رقم مندوب المبيعات", autoKey: true, addFrom: true,
+      cols: [
+        { c: "code", t: "الرقم", n: true },
+        { c: "name_ar", t: "المندوب" },
+        { c: "parent_code", t: "الرئيسي" },
+        { c: "warehouse_code", t: "المخزن" },
+        { c: "cash_no", t: "الصندوق", n: true },
+        { c: "bank_no", t: "البنك الوسيط", n: true },
+        { c: "last_sale_date", t: "آخر بيع" },
+        { c: "customer_count", t: "عملاء", n: true },
+        { c: "inactive", t: "موقوف", bool: true }
+      ],
+      fields: {
+        "رقم مندوب المبيعات": { f: "code" },
+        "اسم المندوب": { f: "name_ar" },
+        "الاسم الأجنبي": { f: "name_en" },
+        "رقم المندوب الرئيسي": { f: "parent_code" },
+        "اسم المندوب الرئيسي": { f: "parent_name", ro: true },
+        "نوع المندوب": { f: "rep_type" },
+        "التصنيف": { f: "classification", map: SMAN_SP_TYP },
+        "رقم الحساب": { f: "account_code" },
+        "اسم الحساب": { f: "account_name", ro: true },
+        "الحساب التحليلي": { f: "account_analytic" },
+        "عنوانه": { f: "address" },
+        "رقم التلفون": { f: "phone" },
+        "رقم صندوق البريد": { f: "po_box" },
+        "رقم الفاكس": { f: "fax" },
+        "رقم الجوال": { f: "mobile" },
+        "الدولة": { f: "country_no" },
+        "المدينه": { f: "city_no" },
+        "رقم الحي": { f: "region_no" },
+        "نسبة العمولة": { f: "commission_pct" },
+        "خط السير": { f: "route_no" },
+        "ترتيب خط السير": { f: "route_order" },
+        "اخر تاريخ بيع": { f: "last_sale_date", ro: true },
+        "ملاحظات": { f: "notes" },
+        "رقم المخزن": { f: "warehouse_code" },
+        "اسم المخزن": { f: "warehouse_name", ro: true },
+        "رقم الصندوق": { f: "cash_no" },
+        "اسم الصندوق": { f: "cash_name", ro: true },
+        "رقم مركز التكلفه": { f: "cost_center" },
+        "رقم المشروع": { f: "project_no" },
+        "حد الدين بالعملة المحلية": { f: "credit_limit" },
+        "البنك الوسيط": { f: "bank_no" },
+        "اسم البنك": { f: "bank_name", ro: true },
+        "رقم مخطط المبيعات مبالغ": { f: "sales_plan_amount_no" },
+        "رقم الموظف": { f: "employee_no" },
+        "رقم مخطط المبيعات كميات": { f: "sales_plan_qty_no" },
+        "رقم مخطط التحصيل": { f: "collection_plan_no" },
+        "الفريق (مندوبون تابعون)": { f: "team_count", ro: true },
+        "العملاء المربوطون": { f: "customer_count", ro: true },
+        "توقيف": { f: "inactive", bool: true },
+        "المستخدم الموقف": { f: "inactive_by", ro: true },
+        "تاريخ التوقيف": { f: "inactive_date", ro: true },
+        "سبب التوقيف": { f: "inactive_reason" }
+      }
+    },
+    {
+      entity: "salesman", panel: "الضمانة", title: "بيانات الضمانات",
+      key: "code", keyLabel: "رقم المندوب", detailOf: REP_OF,
+      noAdd: REP_SAME_ROW, noDelete: "الضمانة تُفرَّغ بالتعديل — حذف المندوب من «البيانات الرئيسية»",
+      cols: [
+        { c: "code", t: "المندوب", n: true },
+        { c: "g_status", t: "الحالة", map: { "1": "فعال", "0": "غير فعال" } },
+        { c: "g_type", t: "النوع", n: true },
+        { c: "g_expire_date", t: "الانتهاء" },
+        { c: "g_amount", t: "القيمة", n: true }
+      ],
+      fields: {
+        "رقم المندوب": { f: "code" },
+        "حالة الضمانة": { f: "g_status", map: G_STATUS },
+        "نوع الضمانة": { f: "g_type", map: G_TYPE },
+        "تاريخ بدء الضمانة": { f: "g_start_date" },
+        "تاريخ إنتهاء الضمانة": { f: "g_expire_date" },
+        "اسم الضامن": { f: "g_name" },
+        "عنوان الضامن": { f: "g_address" },
+        "طبيعة نشاط الضامن": { f: "g_work" },
+        "المركز المالي": { f: "g_fin_center" },
+        "قيمة الضمانة": { f: "g_amount" },
+        "تاريخ توثيق الضمان": { f: "g_doc_date" },
+        "رقم التسجيل فى المحكمة": { f: "g_court_reg" },
+        "رقم التسجيل بالغرفة التجارية": { f: "g_chamber_reg" },
+        "رقم السجل التجاري للضامن": { f: "g_cr_no" },
+        "رقم تلفون الضامن": { f: "g_phone" },
+        "رقم فاكس الضامن": { f: "g_fax" }
+      }
+    },
+    {
+      entity: "salesman", panel: "نظام التوزيع", title: "نظام التوزيع",
+      key: "code", keyLabel: "رقم المندوب", detailOf: REP_OF,
+      noAdd: REP_SAME_ROW, noDelete: "حذف المندوب من «البيانات الرئيسية»",
+      cols: [
+        { c: "code", t: "المندوب", n: true },
+        { c: "tax_calc_method", t: "الضريبة", n: true },
+        { c: "distribution_group", t: "مجموعة التوزيع" },
+        { c: "app_last_update_at", t: "آخر تحديث للتطبيق" },
+        { c: "app_last_post_at", t: "آخر ترحيل منه" }
+      ],
+      fields: {
+        "رقم المندوب": { f: "code" },
+        "طريقة إحتساب الضريبة": { f: "tax_calc_method" },
+        "مجموعة التوزيع": { f: "distribution_group" },
+        "طريقة ترحيل الشيكات": { f: "cheque_post_type", map: CHEQ_TYPE_REC },
+        "مسافة فتح الزيارة لموقع العميل بالمتر": { f: "visit_open_distance" },
+        "نطاق الحي بالمتر": { f: "district_radius" },
+        "الحد الاعلى للتجاوز فى خط السير": { f: "route_deviation_max" },
+        "الحد الاعلى لادراج عميل فى الخطة": { f: "plan_customer_max" },
+        "حد الصندوق التراكمي بالعملة المحلية": { f: "cash_cumulative_limit" },
+        "حد الصندوق اليومي بالعملة المحلية": { f: "cash_daily_limit" },
+        "طريقة فتح الزيارة": { f: "visit_open_type", map: VST_OPN_TYP },
+        "تاريخ أخر تحديث للتطبيق": { f: "app_last_update_at", ro: true },
+        "تاريخ أخر ترحيل من التطبيق": { f: "app_last_post_at", ro: true },
+        "السماح بتعديل موقع العميل": { f: "allow_edit_customer_location", bool: true },
+        "السماح بالتعامل مع كل الاصناف في المردود": { f: "allow_return_all_items", bool: true },
+        "العمل خارج الخطة": { f: "work_without_plan", bool: true },
+        "السماح بإلغاء الوثائق": { f: "allow_cancel_docs", bool: true },
+        "عدم إمكانية البيع": { f: "no_sale", bool: true },
+        "عدم إمكانية التحصيل": { f: "no_collect", bool: true },
+        "السماح بمشاركة الملفات في التطبيق": { f: "allow_file_share", bool: true },
+        "عدم السماح بالتعامل مع مردود المبيعات": { f: "no_sales_return", bool: true },
+        "إستخدام طلب مردود مبيعات إجباري": { f: "return_request_required", bool: true },
+        "استخدام الإقفال اليومي لحركة المندوب وتحديث البيانات": { f: "daily_close", bool: true },
+        "الطباعة باستخدام تطبيق التميت": { f: "print_by_ultimate_app", bool: true },
+        "السماح بادخال طلبات الصرف والتحويل": { f: "allow_issue_transfer_requests", bool: true },
+        "السماح بإرجاع فواتير مندوب اخر حسب الصلاحيات": { f: "allow_return_other_rep", bool: true },
+        "عدم السماح بالتحديث الجزئي للبيانات في التطبيق": { f: "no_partial_update", bool: true },
+        "توقيف المندوب في حالة عدم الإلتزام بالخطة": { f: "stop_if_plan_missed", bool: true },
+        "السماح بعمل تحويل مخزني مباشر الى اي مخزن اخر": { f: "allow_direct_transfer", bool: true },
+        "استخدام الحجز الالي لطلبات العملاء في التطبيق": { f: "auto_reserve_orders", bool: true },
+        "إغلاق الزيارة بواسطة الجي بي اس": { f: "close_visit_by_gps", bool: true },
+        "السماح باعتماد عميل مستهدف": { f: "allow_approve_target_customer", bool: true },
+        "عدم السماح بالبيع للعملاء خارج المواقع الجغرافية للمندوب": { f: "no_sale_outside_locations", bool: true },
+        "استخدام طلب سند قبض في التطبيق": { f: "receipt_request_in_app", bool: true }
+      }
+    },
+    {
+      entity: "salesman_customer", panel: "ربط العملاء", title: "ربط العملاء بالمندوبين",
+      key: "customer_code", keyCols: ["rep_code", "customer_code"], keyLabel: "رقم العميل", detailOf: REP_DTL,
+      cols: [
+        { c: "customer_code", t: "رقم العميل" },
+        { c: "customer_name", t: "اسم العميل" },
+        { c: "visit_day1", t: "السبت", bool: true },
+        { c: "visit_day2", t: "الأحد", bool: true },
+        { c: "visit_day3", t: "الإثنين", bool: true },
+        { c: "visit_day4", t: "الثلاثاء", bool: true },
+        { c: "visit_day5", t: "الأربعاء", bool: true },
+        { c: "visit_day6", t: "الخميس", bool: true },
+        { c: "visit_day7", t: "الجمعة", bool: true },
+        { c: "other_reps", t: "مندوبون آخرون" },
+        { c: "inactive", t: "موقوف", bool: true }
+      ],
+      fields: {
+        "رقم المندوب": { f: "rep_code" },
+        "رقم العميل": { f: "customer_code" },
+        "اسم العميل": { f: "customer_name", ro: true },
+        "السبت": { f: "visit_day1", bool: true },
+        "الأحد": { f: "visit_day2", bool: true },
+        "الإثنين": { f: "visit_day3", bool: true },
+        "الثلاثاء": { f: "visit_day4", bool: true },
+        "الأربعاء": { f: "visit_day5", bool: true },
+        "الخميس": { f: "visit_day6", bool: true },
+        "الجمعة": { f: "visit_day7", bool: true },
+        "افتراضي": { f: "is_default", bool: true },
+        "مربوط بمندوبين آخرين": { f: "other_reps", ro: true },
+        "موقوف": { f: "inactive", bool: true },
+        "سبب التوقيف": { f: "inactive_reason" },
+        "تاريخ التوقيف": { f: "inactive_date", ro: true }
+      }
+    },
+    {
+      entity: "salesman_location", panel: "المواقع الجغرافية", title: "المواقع الجغرافية",
+      key: "code_no", keyCols: ["rep_code", "loc_type", "code_no"], keyLabel: "رقم الموقع", detailOf: REP_DTL,
+      cols: [
+        { c: "loc_type", t: "نوع الموقع", map: { "1": "دولة", "2": "محافظة", "3": "مدينة", "4": "منطقة", "5": "خط سير" } },
+        { c: "code_no", t: "رقم الموقع", n: true }
+      ],
+      fields: {
+        "رقم المندوب": { f: "rep_code" },
+        "نوع الموقع": { f: "loc_type", map: LOC_TYP },
+        "رقم الموقع": { f: "code_no" }
+      }
+    },
+    {
+      entity: "salesman_user", panel: "الصلاحيات", title: "الصلاحيات",
+      key: "user_id", keyCols: ["rep_code", "user_id"], keyLabel: "رقم المستخدم", detailOf: REP_DTL,
+      cols: [
+        { c: "user_id", t: "رقم المستخدم", n: true },
+        { c: "can_add", t: "إضافه", bool: true },
+        { c: "can_view", t: "عرض", bool: true }
+      ],
+      fields: {
+        "رقم المندوب": { f: "rep_code" },
+        "رقم المستخدم": { f: "user_id" },
+        "إضافه": { f: "can_add", bool: true },
+        "عرض": { f: "can_view", bool: true }
+      }
+    },
+    {
+      entity: "salesman_operation", panel: "العمليات", title: "العمليات",
+      key: "doc_no", keyCols: ["rep_code", "op_kind", "doc_no"], keyLabel: "رقم الفاتورة", detailOf: REP_DTL,
+      noAdd: "العمليات استعلام من فواتير المندوب ومردوداتها (IAS_V_SM_MOVE) — لا إضافة",
+      noDelete: "العمليات استعلام — لا حذف",
+      cols: [
+        { c: "op_kind_name", t: "النوع" },
+        { c: "doc_no", t: "رقم الفاتورة" },
+        { c: "doc_type_name", t: "نوع الفاتورة" },
+        { c: "doc_date", t: "التاريخ" },
+        { c: "customer_name", t: "اسم العميل" },
+        { c: "amount", t: "مبلغ الفاتورة", n: true },
+        { c: "commission", t: "مبلغ العمولة", n: true },
+        { c: "currency", t: "العملة" }
+      ],
+      fields: {
+        "رقم المندوب": { f: "rep_code", ro: true },
+        "النوع": { f: "op_kind_name", ro: true },
+        "رقم الفاتورة": { f: "doc_no", ro: true },
+        "نوع الفاتورة": { f: "doc_type_name", ro: true },
+        "التاريخ": { f: "doc_date", ro: true },
+        "رقم العميل": { f: "customer_code", ro: true },
+        "اسم العميل": { f: "customer_name", ro: true },
+        "العملة": { f: "currency", ro: true },
+        "مبلغ الفاتورة": { f: "amount", ro: true },
+        "مبلغ العمولة": { f: "commission", ro: true }
+      }
+    }
+  ]};
+
+  /* ═══ op.7.1.2.8 — بيانات العملاء · CUSTOMER + CUSTOMER_CURR · IAS_AC_CC_LMT · IAS_CST_ACCNT · IAS_PRIV_CUSTOMER ·
+     IAS_CST_LMT_SAL · IAS_CST_SMAN · IAS_CST_DRVR [GO/07-customers-sales.md] — تبويبات أونيكس؛ «بيانات أخرى»
+     والعنوان الوطني والشخصية والإضافية والضمانات ومكان التسليم أعمدة في سجل العميل نفسه (تعديل جزئي بنفس الرقم)،
+     والباقي تفاصيل تُقرأ برقم العميل. القوائم من S_FLAGS. ═══ */
+  var CST_OF = { col: "code", from: "code", label: "رقم العميل" };
+  var CST_DTL = { col: "customer_code", from: "code", label: "رقم العميل" };
+  var C_CLASS_VAT = { "شخصي": "1", "أعمال": "2", "شركات أجنبية": "3", "ضريبة مؤجلة الإستحقاق": "4", "جهة حكومية": "5" };
+  var PRIV_LEVEL = { "لا يسمح": "0", "يسمح": "1", "يسمح مع التنبيه": "2" };
+  var AUTO_SEND = { "عدم ارسال": "0", "ارسال تلقائي": "1", "ارسال اختياري": "3" };
+  var CST_RGSTR_TYP = { "—": "", "منتظم": "1", "مستهلك": "2", "غير مسجل": "3", "غير معروف": "4" };
+  var CST_SCTR_TYP = { "—": "", "حكومي": "1", "خاص": "2" };
+  var CUST_GNDR = { "—": "", "ذكر": "1", "أنثى": "2" };
+  var VST_OPN_TYP_CST = { "—": "", "يدوي": "1", "باركود العميل": "2", "باركود ويدوي": "3", "باركود مع التحقق من الجي بي اس": "4" };
+  var LMT_ITM_QTY = { "غير مستخدم": "0", "على مستوى العميل": "1", "على مستوى الأصناف": "2" };
+  var LOW_PRICE = { "لا يسمح": "1", "يسمح": "2", "يسمح مع التنبيه": "3" };
+  var DR_CR = { "مدين": "1", "دائن": "2", "مدين ودائن": "3" };
+  var CST_ACCNT_TYP = { "عام": "1", "وسيط استلام المبيعات": "2", "دفعة مقدمة": "3", "تأمين عقار": "4",
+    "وديعة صيانة بيع العقار": "5", "نقدية معلقة": "6", "إيراد مؤجل الدفع": "7", "عمولات مستحقة": "8" };
+  var USAGE = { "عادي": "regular", "مبيعات نقدية": "cash_sales", "كميات مجانية": "free_qty", "مبالغ غير معروفة": "unallocated",
+    "تحصيل متعثر": "doubtful", "عميل عام": "general" };
+  var CST_SAME_ROW = "بيانات هذا التبويب جزء من سجل العميل — أضف العميل من «البيانات الرئيسية» ثم «تعديل» هنا";
+  var CST_Q = "استعلام من القيود والمستندات — لا إضافة ولا حذف";
+  function cstRow(panel, fields, cols) {
+    return {
+      entity: "customer", panel: panel, title: panel, key: "code", keyLabel: "رقم العميل", detailOf: CST_OF,
+      noAdd: CST_SAME_ROW, noDelete: "حذف العميل من «البيانات الرئيسية»",
+      cols: [{ c: "code", t: "رقم العميل" }, { c: "name_ar", t: "اسم العميل" }].concat(cols),
+      fields: Object.assign({ "رقم العميل": { f: "code" } }, fields)
+    };
+  }
+  var CST_EXTRA = {};
+  for (var fx = 1; fx <= 20; fx++) CST_EXTRA["حقل إضافي" + fx] = { f: "field" + fx };
+
+  /* ═══ op.6.1.2.2 — بيانات الموردين · V_DETAILS + IAS_VENDOR_BANK · IAS_VNDR_ACCNT · IAS_PRIV_VENDOR [GO/06]
+     تبويبات أونيكس (APSI002): الأساسية · الرئيسية · بيانات أخرى · بيانات إضافية؛ «حقول إضافية» 1–10 خلف مركز الميزات (GO §٣).
+     «الرصيد والحركات» قراءة (GO §٦). الحساب من المجموعة دائماً (AP_AC_LINK_TYPE = 2). ═══ */
+  var VND_OF = { col: "code", from: "code", label: "رقم المورد" };
+  var VND_DTL = { col: "vendor_code", from: "code", label: "رقم المورد" };
+  var VAT_PRICE = { "السعر بدون ضريبة": "1", "السعر شامل الضريبة": "2" };
+  var VAT_BASE = { "—": "", "السعر": "1", "السعر - الخصم": "2", "السعر + الضريبة": "3", "السعر - الخصم + الضريبة": "4" };
+  var VND_SAME_ROW = "بيانات هذا التبويب جزء من سجل المورد — أضف المورد من «البيانات الرئيسية» ثم «تعديل» هنا";
+  var VND_Q = "استعلام من القيود — لا إضافة ولا حذف";
+  function vndRow(panel, fields, cols) {
+    return {
+      entity: "vendor", panel: panel, title: panel, key: "code", keyLabel: "رقم المورد", detailOf: VND_OF,
+      noAdd: VND_SAME_ROW, noDelete: "حذف المورد من «البيانات الرئيسية»",
+      cols: [{ c: "code", t: "رقم المورد" }, { c: "name_ar", t: "اسم المورد" }].concat(cols),
+      fields: Object.assign({ "رقم المورد": { f: "code" } }, fields)
+    };
+  }
+
+  MAP["op.6.1.2.2"] = { sets: [
+    {
+      entity: "vendor", panel: "المورد", title: "البيانات الرئيسية",
+      key: "code", keyLabel: "رقم المورد", addFrom: true,
+      autoCode: { groupLabel: "المجموعة", codeLabel: "رقم المورد", server: "vendor" },
+      cols: [
+        { c: "code", t: "رقم المورد" },
+        { c: "name_ar", t: "اسم المورد" },
+        { c: "group_no", t: "المجموعة", n: true },
+        { c: "branch_no", t: "الفرع", n: true },
+        { c: "vat_no", t: "الرقم الضريبي" },
+        { c: "item_count", t: "أصناف", n: true },
+        { c: "purchase_inactive", t: "موقف شراء", bool: true },
+        { c: "inactive", t: "موقوف", bool: true }
+      ],
+      fields: {
+        "المجموعة": { f: "group_no" },
+        "اسم المجموعة": { f: "group_name", ro: true },
+        "رقم المورد": { f: "code" },
+        "اسم المورد": { f: "name_ar" },
+        "الاسم الأجنبي": { f: "name_en" },
+        "رقم الحساب": { f: "account_code", ro: true },
+        "اسم الحساب": { f: "account_name", ro: true },
+        "الدرجة/النوع": { f: "vendor_class" },
+        "رقم الدرجة": { f: "degree_no" },
+        "مركز التكلفة": { f: "cost_center" },
+        "رقم المركز": { f: "cost_center_no", ro: true },
+        "الفرع": { f: "branch_no" },
+        "اسم الفرع": { f: "branch_name", ro: true },
+        "توقيف": { f: "inactive", bool: true },
+        "موقف من الشراء": { f: "purchase_inactive", bool: true },
+        "ضمن القائمة السوداء": { f: "blacklisted", bool: true },
+        "سبب دخول القائمة السوداء": { f: "blacklist_reason" },
+        "الرقم الضريبي": { f: "vat_no" },
+        "عليه ضريبة": { f: "is_taxpayer", bool: true },
+        "طريقة إحتساب الضريبة": { f: "tax_calc_method" },
+        "نوع السعر": { f: "price_vat_type", map: VAT_PRICE },
+        "طريقة إحتساب ضريبة القيمة المضافة": { f: "vat_base", map: VAT_BASE },
+        "رقم السجل التجاري": { f: "cr_no" },
+        "النشاط": { f: "activity_name" },
+        "فترة الائتمان": { f: "credit_days" },
+        "المورد الرئيسي": { f: "parent_code" },
+        "اسم المورد الرئيسي": { f: "parent_name", ro: true },
+        "رقم المندوب": { f: "purchaser_code" },
+        "اسم المندوب": { f: "purchaser_name", ro: true },
+        "الحسابات المفضلة": { f: "is_favorite", bool: true },
+        "الأصناف المربوطة": { f: "item_count", ro: true },
+        "التسلسل": { f: "seq_no", ro: true }
+      }
+    },
+    vndRow("بيانات أخرى", {
+      "العنوان": { f: "address" },
+      "الدولة": { f: "country_no" },
+      "رقم المحافظة": { f: "province_no" },
+      "المدينه": { f: "city_no" },
+      "رقم المنطقه": { f: "region_no" },
+      "صندوق البريد": { f: "po_box" },
+      "الهاتف": { f: "phone" },
+      "الفاكس": { f: "fax" },
+      "الجوال": { f: "mobile" },
+      "البريد الإلكتروني": { f: "email" },
+      "الموقع الإلكتروني": { f: "website" },
+      "عن طريق": { f: "referred_by" },
+      "تاريخ التعامل": { f: "since" },
+      "ملاحظات": { f: "notes" },
+      "تاريخ آخر مطابقة": { f: "last_reconciled_on" }
+    }, [{ c: "phone", t: "الهاتف" }, { c: "mobile", t: "الجوال" }]),
+    vndRow("بيانات إضافية", {
+      "الرقم الأحصائي": { f: "statistical_no" },
+      "المادة الضريبية": { f: "tax_article" },
+      "رأس المال": { f: "capital" }
+    }, [{ c: "statistical_no", t: "الرقم الأحصائي" }]),
+    {
+      entity: "vendor_bank", panel: "الحسابات البنكية", title: "الحسابات البنكية",
+      key: "line_no", keyLabel: "رقم السطر", serverKey: true, detailOf: VND_DTL,
+      cols: [
+        { c: "bank_name", t: "اسم البنك" },
+        { c: "iban", t: "الآيبان" },
+        { c: "bank_account", t: "رقم الحساب" },
+        { c: "swift_code", t: "رمز البنك" },
+        { c: "currency", t: "العملة" }
+      ],
+      fields: {
+        "رقم المورد": { f: "vendor_code" },
+        "رقم السطر": { f: "line_no" },
+        "رقم البنك": { f: "bank_no" },
+        "اسم البنك": { f: "bank_name" },
+        "رقم الحساب في البنك": { f: "bank_account" },
+        "الآيبان": { f: "iban" },
+        "رمز البنك": { f: "swift_code" },
+        "اسم المستفيد": { f: "beneficiary_name" },
+        "مفتاح البنك": { f: "bank_key" },
+        "الدولة": { f: "country_no" },
+        "المدينه": { f: "city_no" },
+        "العملة": { f: "currency" }
+      }
+    },
+    {
+      entity: "vendor_account", panel: "الحسابات", title: "الحسابات",
+      key: "rcrd_no", keyLabel: "م", serverKey: true, detailOf: VND_DTL,
+      cols: [
+        { c: "rcrd_no", t: "م", n: true },
+        { c: "account_code", t: "رقم الحساب" },
+        { c: "account_name", t: "اسم الحساب" },
+        { c: "account_type", t: "نوع الحساب", n: true },
+        { c: "inactive", t: "موقف", bool: true }
+      ],
+      fields: {
+        "رقم المورد": { f: "vendor_code" },
+        "م": { f: "rcrd_no" },
+        "رقم الحساب": { f: "account_code" },
+        "اسم الحساب": { f: "account_name", ro: true },
+        "نوع الحساب": { f: "account_type" },
+        "موقف": { f: "inactive", bool: true },
+        "المستخدم الموقف": { f: "inactive_by", ro: true },
+        "تاريخ التوقيف": { f: "inactive_date", ro: true },
+        "سبب التوقيف": { f: "inactive_reason" }
+      }
+    },
+    {
+      entity: "vendor_user", panel: "الصلاحيات", title: "الصلاحيات",
+      key: "user_id", keyCols: ["vendor_code", "user_id", "currency"], keyLabel: "رقم المستخدم", detailOf: VND_DTL,
+      cols: [
+        { c: "user_id", t: "رقم المستخدم", n: true },
+        { c: "currency", t: "رمز العملة" },
+        { c: "can_add", t: "إضافه", bool: true },
+        { c: "can_view", t: "تقرير", bool: true }
+      ],
+      fields: {
+        "رقم المورد": { f: "vendor_code" },
+        "رقم المستخدم": { f: "user_id" },
+        "رمز العملة": { f: "currency" },
+        "إضافه": { f: "can_add", bool: true },
+        "تقرير": { f: "can_view", bool: true }
+      }
+    },
+    {
+      entity: "vendor_ledger", panel: "الرصيد والحركات", title: "الرصيد والحركات",
+      key: "doc_no", keyCols: ["vendor_code", "doc_type", "doc_no"], keyLabel: "رقم المستند", detailOf: VND_DTL,
+      noAdd: VND_Q, noDelete: VND_Q,
+      cols: [
+        { c: "doc_no", t: "رقم المستند" },
+        { c: "doc_date", t: "التاريخ" },
+        { c: "doc_type_name", t: "نوع المستند" },
+        { c: "description", t: "البيان" },
+        { c: "debit", t: "مدين", n: true },
+        { c: "credit", t: "دائن", n: true },
+        { c: "balance", t: "الرصيد", n: true }
+      ],
+      fields: {
+        "رقم المورد": { f: "vendor_code", ro: true },
+        "رقم المستند": { f: "doc_no", ro: true },
+        "التاريخ": { f: "doc_date", ro: true },
+        "نوع المستند": { f: "doc_type_name", ro: true },
+        "البيان": { f: "description", ro: true },
+        "مدين": { f: "debit", ro: true },
+        "دائن": { f: "credit", ro: true },
+        "الرصيد": { f: "balance", ro: true }
+      }
+    },
+    {
+      entity: "vendor_stats", panel: "إحصائيات", title: "إحصائيات",
+      key: "vendor_code", keyLabel: "رقم المورد", detailOf: VND_DTL,
+      noAdd: VND_Q, noDelete: VND_Q,
+      cols: [
+        { c: "opening_balance", t: "الرصيد الإفتتاحي", n: true },
+        { c: "current_balance", t: "الرصيد الحالي", n: true },
+        { c: "purchases", t: "المشتريات", n: true },
+        { c: "payments", t: "سندات الصرف", n: true }
+      ],
+      fields: {
+        "رقم المورد": { f: "vendor_code", ro: true },
+        "الرصيد الإفتتاحي": { f: "opening_balance", ro: true },
+        "الرصيد الحالي": { f: "current_balance", ro: true },
+        "فواتير المشتريات": { f: "purchases", ro: true },
+        "مردود المشتريات": { f: "purchase_returns", ro: true },
+        "سندات الصرف": { f: "payments", ro: true },
+        "آخر تاريخ شراء": { f: "last_purchase_date", ro: true },
+        "آخر تاريخ سداد": { f: "last_payment_date", ro: true }
+      }
+    }
+  ]};
+
+  /* ═══ op.1.2.8 — بيانات الموظفين · S_EMP [GO/01 §op.1.2.8 · GENS012]
+     تبويبات أونيكس المستخدمة: الرئيسية · التعيين · الشخصية · الاتصال · المالية. الرواتب والحضور والتأمين والتذاكر (148 عموداً)
+     محفوظة خلف مركز الميزات (SY-R54) وتبويبات التفاصيل فارغة في أونيكس. «حركة الموظف» قراءة من سطور التحليلي 7. ═══ */
+  var EMP_OF = { col: "code", from: "code", label: "رقم الموظف" };
+  var EMP_DTL = { col: "employee_code", from: "code", label: "رقم الموظف" };
+  var EMP_SAME_ROW = "بيانات هذا التبويب جزء من سجل الموظف — أضف الموظف من «البيانات الرئيسية» ثم «تعديل» هنا";
+  var EMP_Q = "استعلام من القيود — لا إضافة ولا حذف";
+  /* قوائم الترميزات العامة المعبّأة (S_EMP_CODE_DTL · GENS017) */
+  var EMP_GENDER = { "—": "", "ذكر": "1", "أنثى": "2" };
+  var EMP_JOB_ST = { "—": "", "مواصل": "1", "ترك الخدمة": "2", "تقاعد": "3" };
+  var EMP_CUR_ST = { "—": "", "عادي": "1", "مجاز دراسيا": "2", "منتدب": "3", "معار": "4", "إجازة بدون راتب": "5", "منقطع": "6",
+    "فترة تجربه": "7", "غير مستكمل الإجراءات": "8", "إجازة تحتاج لمباشرة": "9", "موفد داخلي": "10", "موفد خارجي": "11" };
+  var EMP_SAL_ST = { "—": "", "جاري": "1", "موقف": "2" };
+  function empRow(panel, fields, cols) {
+    return {
+      entity: "employee", panel: panel, title: panel, key: "code", keyLabel: "رقم الموظف", detailOf: EMP_OF,
+      noAdd: EMP_SAME_ROW, noDelete: "حذف الموظف من «البيانات الرئيسية»",
+      cols: [{ c: "code", t: "رقم الموظف" }, { c: "name_ar", t: "اسم الموظف" }].concat(cols),
+      fields: Object.assign({ "رقم الموظف": { f: "code" } }, fields)
+    };
+  }
+
+  MAP["op.1.2.8"] = { sets: [
+    {
+      entity: "employee", panel: "الموظف", title: "البيانات الرئيسية",
+      key: "code", keyLabel: "رقم الموظف", autoKey: true, addFrom: true,
+      cols: [
+        { c: "code", t: "رقم الموظف" },
+        { c: "name_ar", t: "اسم الموظف" },
+        { c: "branch_no", t: "الفرع", n: true },
+        { c: "hierarchy_name", t: "الهيكل الإداري" },
+        { c: "hired_on", t: "تاريخ التعيين" },
+        { c: "rep_code", t: "مندوب" },
+        { c: "inactive", t: "موقوف", bool: true }
+      ],
+      fields: {
+        "رقم الموظف": { f: "code" },
+        "الاسم الأول": { f: "first_ar" },
+        "الاسم الثاني": { f: "second_ar" },
+        "الاسم الثالث": { f: "third_ar" },
+        "الاسم الأخير": { f: "last_ar" },
+        "الاسم الكامل": { f: "name_ar", ro: true },
+        "الاسم الأول (أجنبي)": { f: "first_en" },
+        "الاسم الثاني (أجنبي)": { f: "second_en" },
+        "الاسم الثالث (أجنبي)": { f: "third_en" },
+        "الاسم الأخير (أجنبي)": { f: "last_en" },
+        "الاسم الأجنبي": { f: "name_en", ro: true },
+        "الفرع": { f: "branch_no" },
+        "اسم الفرع": { f: "branch_name", ro: true },
+        "الشركة": { f: "company_no", ro: true },
+        "العملة": { f: "currency" },
+        "الهيكل الإداري": { f: "hierarchy_no" },
+        "اسم الهيكل": { f: "hierarchy_name", ro: true },
+        "المسئول المباشر": { f: "manager_no" },
+        "اسم المسئول": { f: "manager_name", ro: true },
+        "المسئول المباشر 2": { f: "manager2_no" },
+        "تاريخ التعيين": { f: "hired_on" },
+        "تاريخ الوظيفة الحالية": { f: "current_job_on" },
+        "تاريخ العودة للخدمة": { f: "reinstated_on" },
+        "رقم المندوب المرتبط": { f: "rep_code", ro: true },
+        "توقيف": { f: "inactive", bool: true },
+        "المستخدم الموقف": { f: "inactive_by", ro: true },
+        "تاريخ التوقيف": { f: "inactive_date", ro: true },
+        "سبب التوقيف": { f: "inactive_reason" }
+      }
+    },
+    empRow("بيانات التعيين", {
+      "المسمى الوظيفي": { f: "job_title_no" },
+      "المسمى الإداري": { f: "admin_title_no" },
+      "الدرجة": { f: "grade_no" },
+      "الفئة": { f: "category_no" },
+      "المستوى": { f: "level_no" },
+      "التصنيف": { f: "class_no" },
+      "المجموعة": { f: "group_no" },
+      "نوع الوظيفة": { f: "employment_type" },
+      "الموقف الوظيفي": { f: "job_status", map: EMP_JOB_ST },
+      "الوضع الحالي للموظف": { f: "current_status", map: EMP_CUR_ST },
+      "المؤهل الحالي": { f: "qualification_no" },
+      "التخصص": { f: "major_no" },
+      "موقع العمل": { f: "work_location_no" },
+      "نوع الدوام": { f: "work_period_type" }
+    }, [{ c: "job_status", t: "الموقف", n: true }, { c: "current_status", t: "الوضع", n: true }]),
+    empRow("البيانات الشخصية", {
+      "الجنس": { f: "gender", map: EMP_GENDER },
+      "الجنسية": { f: "nationality_no" },
+      "المواطنة": { f: "citizenship" },
+      "الحالة الإجتماعية": { f: "marital_status" },
+      "الديانة": { f: "religion_no" },
+      "فصيلة الدم": { f: "blood_type" },
+      "اللغة": { f: "language_no" },
+      "تاريخ الميلاد": { f: "birth_date" },
+      "تاريخ الميلاد هجري": { f: "birth_date_hijri" },
+      "مكان الميلاد": { f: "birth_place" },
+      "نوع الهوية": { f: "id_type" },
+      "رقم الهوية": { f: "id_no" },
+      "الرقم الوطني": { f: "national_no" },
+      "مكان الإصدار": { f: "id_issue_place" },
+      "تاريخ الإصدار": { f: "id_issue_date" },
+      "تاريخ الانتهاء": { f: "id_expiry_date" },
+      "رقم الحدود": { f: "border_no" },
+      "يستخدم الخدمة الذاتية": { f: "self_service", bool: true },
+      "ملاحظات": { f: "notes" }
+    }, [{ c: "gender", t: "الجنس", n: true }, { c: "id_no", t: "رقم الهوية" }]),
+    empRow("بيانات الاتصال", {
+      "الجوال": { f: "mobile" },
+      "الهاتف": { f: "phone" },
+      "الفاكس": { f: "fax" },
+      "البريد الإلكتروني": { f: "email" },
+      "الموقع الإلكتروني": { f: "website" },
+      "صندوق البريد": { f: "po_box" },
+      "العنوان": { f: "address" },
+      "الدولة": { f: "country_no" },
+      "رقم المحافظة": { f: "province_no" },
+      "المدينه": { f: "city_no" },
+      "رقم المنطقه": { f: "region_no" }
+    }, [{ c: "mobile", t: "الجوال" }, { c: "email", t: "البريد" }]),
+    empRow("البيانات المالية", {
+      "رقم الحساب": { f: "account_code" },
+      "اسم الحساب": { f: "account_name", ro: true },
+      "حساب البنك": { f: "bank_account_code" },
+      "مركز التكلفة": { f: "cost_center" },
+      "رقم المشروع": { f: "project_no" },
+      "رقم النشاط": { f: "activity_no" },
+      "طريقة الدفع": { f: "pay_method" },
+      "طريقة صرف الراتب": { f: "salary_pay_way" },
+      "حالة الراتب": { f: "salary_status", map: EMP_SAL_ST },
+      "خاضع للضريبة": { f: "taxable", bool: true },
+      "رقم التأمينات الاجتماعية": { f: "social_insurance_no" },
+      "أيام العمل في الشهر": { f: "work_days_month" },
+      "ساعات العمل في اليوم": { f: "work_hours_day" },
+      "ساعات العمل في الشهر": { f: "work_hours_month" },
+      "ساعات العمل في السنة": { f: "work_hours_year" },
+      "أيام العمل في السنة": { f: "work_days_year" }
+    }, [{ c: "account_code", t: "الحساب" }, { c: "salary_status", t: "حالة الراتب", n: true }]),
+    {
+      entity: "employee_ledger", panel: "حركة الموظف", title: "حركة الموظف",
+      key: "doc_no", keyCols: ["employee_code", "doc_type", "doc_no"], keyLabel: "رقم المستند", detailOf: EMP_DTL,
+      noAdd: EMP_Q, noDelete: EMP_Q,
+      cols: [
+        { c: "doc_no", t: "رقم المستند" },
+        { c: "doc_date", t: "التاريخ" },
+        { c: "doc_type_name", t: "نوع المستند" },
+        { c: "account_code", t: "الحساب" },
+        { c: "account_name", t: "اسم الحساب" },
+        { c: "description", t: "البيان" },
+        { c: "debit", t: "مدين", n: true },
+        { c: "credit", t: "دائن", n: true },
+        { c: "balance", t: "الرصيد", n: true }
+      ],
+      fields: {
+        "رقم الموظف": { f: "employee_code", ro: true },
+        "رقم المستند": { f: "doc_no", ro: true },
+        "التاريخ": { f: "doc_date", ro: true },
+        "نوع المستند": { f: "doc_type_name", ro: true },
+        "الحساب": { f: "account_code", ro: true },
+        "اسم الحساب": { f: "account_name", ro: true },
+        "البيان": { f: "description", ro: true },
+        "مدين": { f: "debit", ro: true },
+        "دائن": { f: "credit", ro: true },
+        "الرصيد": { f: "balance", ro: true }
+      }
+    },
+    {
+      entity: "employee_stats", panel: "إحصائيات", title: "إحصائيات",
+      key: "employee_code", keyLabel: "رقم الموظف", detailOf: EMP_DTL,
+      noAdd: EMP_Q, noDelete: EMP_Q,
+      cols: [
+        { c: "opening_balance", t: "الرصيد الإفتتاحي", n: true },
+        { c: "total_debit", t: "مدين", n: true },
+        { c: "total_credit", t: "دائن", n: true },
+        { c: "current_balance", t: "الرصيد الحالي", n: true }
+      ],
+      fields: {
+        "رقم الموظف": { f: "employee_code", ro: true },
+        "الرصيد الإفتتاحي": { f: "opening_balance", ro: true },
+        "إجمالي المدين": { f: "total_debit", ro: true },
+        "إجمالي الدائن": { f: "total_credit", ro: true },
+        "الرصيد الحالي": { f: "current_balance", ro: true },
+        "عدد السطور": { f: "line_count", ro: true },
+        "آخر حركة": { f: "last_move_date", ro: true }
+      }
+    }
+  ]};
+
+  /* ═══ op.4.1.2.10 — الأرصدة الافتتاحية · OPEN_BAL [GO/04 §op.4.1.2.10 · GLSI011_14]
+     + نسختاها بنوع رصيد ثابت: op.7.1.2.10 العملاء (3) · op.6.1.2.4 الموردون (4) — نفس السطور ونفس القواعد.
+     الحفظ غير المتوازن مسموح (GL-R30) والفرق يظهر في «التوازن» لكل شركة؛ أول فترة مقفلة ⇒ لا تعديل (OB-R5). ═══ */
+  var OB_TYPE = { "عام": "0", "صندوق": "1", "بنك": "2", "عميل": "3", "مورد": "4", "مدينة أخرى": "5", "دائنة أخرى": "6", "موظف": "7" };
+  function obLines(entity, title, partyLabel) {
+    return {
+      entity: entity, panel: "السطر", title: title,
+      key: "doc_sequence", keyLabel: "رقم السطر", serverKey: true,
+      cols: [
+        { c: "branch_id", t: "الفرع", n: true },
+        { c: "account_code", t: "رقم الحساب" },
+        { c: "analytic_code", t: partyLabel },
+        { c: "analytic_name", t: "الاسم" },
+        { c: "currency", t: "العملة" },
+        { c: "debit", t: "مدين", n: true },
+        { c: "credit", t: "دائن", n: true },
+        { c: "cost_center", t: "المركز" }
+      ],
+      fields: {
+        "رقم السطر": { f: "doc_sequence", ro: true },
+        "الفرع": { f: "branch_id" },
+        "اسم الفرع": { f: "branch_name", ro: true },
+        "الشركة": { f: "company_id", ro: true },
+        "رقم الحساب": { f: "account_code" },
+        "اسم الحساب": { f: "account_name", ro: true },
+        "نوع التحليلي": { f: "analytic_type", ro: true, map: OB_TYPE },
+        "الحساب التحليلي": { f: "analytic_code" },
+        "اسم التحليلي": { f: "analytic_name", ro: true },
+        "العملة": { f: "currency" },
+        "سعر التحويل": { f: "fx_rate" },
+        "مدين": { f: "debit" },
+        "دائن": { f: "credit" },
+        "مدين أجنبي": { f: "debit_fc" },
+        "دائن أجنبي": { f: "credit_fc" },
+        "رقم المركز": { f: "cost_center" },
+        "اسم المركز": { f: "cost_center_name", ro: true },
+        "رقم المشروع": { f: "project_no" },
+        "رقم النشاط": { f: "activity_no" },
+        "رقم المندوب": { f: "rep_code" },
+        "رقم المحصل": { f: "collector_no" },
+        "رقم المرجع": { f: "ref_no" },
+        "البيان": { f: "description" },
+        "تاريخ": { f: "value_date" }
+      }
+    };
+  }
+  var OB_SUMMARY = {
+    entity: "opening_balance_summary", panel: "التوازن", title: "التوازن",
+    key: "company_id", keyCols: ["company_id", "analytic_type"], keyLabel: "الشركة",
+    noAdd: "لوحة محسوبة من السطور — لا إضافة", noDelete: "لوحة محسوبة من السطور — لا حذف",
+    cols: [
+      { c: "company_id", t: "الشركة", n: true },
+      { c: "analytic_type_name", t: "النوع" },
+      { c: "line_count", t: "سطور", n: true },
+      { c: "debit", t: "مدين", n: true },
+      { c: "credit", t: "دائن", n: true },
+      { c: "net", t: "الفرق", n: true }
+    ],
+    fields: {
+      "الشركة": { f: "company_id", ro: true },
+      "النوع": { f: "analytic_type_name", ro: true },
+      "عدد السطور": { f: "line_count", ro: true },
+      "إجمالي المدين": { f: "debit", ro: true },
+      "إجمالي الدائن": { f: "credit", ro: true },
+      "الفارق": { f: "net", ro: true }
+    }
+  };
+  MAP["op.4.1.2.10"] = { sets: [obLines("opening_balance", "الأرصدة الافتتاحية", "التحليلي"), OB_SUMMARY] };
+  MAP["op.7.1.2.10"] = { sets: [obLines("opening_balance_customer", "أرصدة العملاء الافتتاحية", "رقم العميل"), OB_SUMMARY] };
+  MAP["op.6.1.2.4"] = { sets: [obLines("opening_balance_vendor", "أرصدة الموردين الافتتاحية", "رقم المورد"), OB_SUMMARY] };
+
+  /* ═══ op.5.1.2.15 — المخزون الافتتاحي · IAS_OPEN_STOCK [GO/05 §op.5.1.2.15 · INVI011]
+     الوحدة من وحدات الصنف والعبوة منها (IV-R122) · التكلفة = «التكلفة الأولية» للصنف (IV-R121) · لا قيد محاسبي (IV-R120)
+     و«المطابقة» تقارن القيمة بحسابات المخزون في الأستاذ بالفرع. ═══ */
+  MAP["op.5.1.2.15"] = { sets: [
+    {
+      entity: "opening_stock", panel: "السطر", title: "المخزون الافتتاحي",
+      key: "doc_sequence", keyLabel: "رقم السطر", serverKey: true,
+      cols: [
+        { c: "item_code", t: "رقم الصنف" },
+        { c: "item_name", t: "اسم الصنف" },
+        { c: "unit_code", t: "الوحدة" },
+        { c: "warehouse_code", t: "المخزن" },
+        { c: "qty", t: "الكمية", n: true },
+        { c: "unit_cost", t: "التكلفة", n: true },
+        { c: "line_value", t: "القيمة", n: true },
+        { c: "carried_forward", t: "مرحّل", bool: true }
+      ],
+      fields: {
+        "رقم السطر": { f: "doc_sequence", ro: true },
+        "رقم الصنف": { f: "item_code" },
+        "اسم الصنف": { f: "item_name", ro: true },
+        "الوحدة": { f: "unit_code" },
+        "العبوة": { f: "pack_size", ro: true },
+        "الكمية": { f: "qty" },
+        "الكمية بالأساس": { f: "base_qty", ro: true },
+        "المخزن": { f: "warehouse_code" },
+        "اسم المخزن": { f: "warehouse_name", ro: true },
+        "مجموعة المخازن": { f: "warehouse_group", ro: true },
+        "التكلفة الأولية": { f: "unit_cost", ro: true },
+        "القيمة": { f: "line_value", ro: true },
+        "الفرع": { f: "branch_id", ro: true },
+        "الشركة": { f: "company_id", ro: true },
+        "مرحّل من السنة السابقة": { f: "carried_forward", ro: true, bool: true },
+        "رقم السجل": { f: "line_no", ro: true }
+      }
+    },
+    {
+      entity: "opening_stock_recon", panel: "المطابقة", title: "المطابقة",
+      key: "branch_key", keyLabel: "الفرع",
+      noAdd: "لوحة محسوبة — لا إضافة", noDelete: "لوحة محسوبة — لا حذف",
+      cols: [
+        { c: "branch_key", t: "الفرع" },
+        { c: "branch_name", t: "اسم الفرع" },
+        { c: "line_count", t: "سطور", n: true },
+        { c: "stock_value", t: "قيمة المخزون", n: true },
+        { c: "gl_value", t: "حسابات المخزون", n: true },
+        { c: "difference", t: "الفرق", n: true }
+      ],
+      fields: {
+        "الفرع": { f: "branch_key", ro: true },
+        "اسم الفرع": { f: "branch_name", ro: true },
+        "عدد السطور": { f: "line_count", ro: true },
+        "قيمة المخزون الافتتاحي": { f: "stock_value", ro: true },
+        "رصيد حسابات المخزون": { f: "gl_value", ro: true },
+        "الفرق": { f: "difference", ro: true }
+      }
+    }
+  ]};
+
+  MAP["op.7.1.2.8"] = { sets: [
+    {
+      entity: "customer", panel: "العميل", title: "البيانات الرئيسية",
+      key: "code", keyLabel: "رقم العميل", addFrom: true,
+      autoCode: { groupLabel: "المجموعة", codeLabel: "رقم العميل", server: "customer" },
+      cols: [
+        { c: "code", t: "رقم العميل" },
+        { c: "name_ar", t: "اسم العميل" },
+        { c: "group_no", t: "المجموعة", n: true },
+        { c: "mobile", t: "الجوال" },
+        { c: "vat_no", t: "الرقم الضريبي" },
+        { c: "vat_class", t: "النوع الضريبي", map: { "1": "شخصي", "2": "أعمال", "3": "شركات أجنبية", "4": "مؤجلة", "5": "حكومية" } },
+        { c: "rep_count", t: "مندوبون", n: true },
+        { c: "sales_inactive", t: "موقف بيع", bool: true },
+        { c: "inactive", t: "موقوف", bool: true }
+      ],
+      fields: {
+        "المجموعة": { f: "group_no" },
+        "اسم المجموعة": { f: "group_name", ro: true },
+        "رقم العميل": { f: "code" },
+        "اسم العميل": { f: "name_ar" },
+        "أنواع العملاء": { f: "customer_type" },
+        "رقم الحساب": { f: "account_code" },
+        "اسم الحساب": { f: "account_name", ro: true },
+        "رقم العميل الرئيسي": { f: "parent_code" },
+        "اسم العميل الرئيسي": { f: "parent_name", ro: true },
+        "الاسم الأجنبي": { f: "name_en" },
+        "التصنيف": { f: "classification" },
+        "رقم المستخدم": { f: "portal_user" },
+        "كلمة السر معيّنة": { f: "has_portal_secret", ro: true, bool: true },
+        "نوع الاستخدام": { f: "usage_kind", map: USAGE },
+        "رقم الدرجة": { f: "grade_no" },
+        "مركز التكلفة": { f: "cost_center" },
+        "مرتبط برقم مورد": { f: "linked_vendor" },
+        "اسم المورد المرتبط": { f: "linked_vendor_name", ro: true },
+        "الرقم الضريبي": { f: "vat_no" },
+        "رقم النوع الضريبي": { f: "vat_class", map: C_CLASS_VAT },
+        "الفرع المرتبط بالعميل": { f: "branch_no" },
+        "مندوب": { f: "is_rep", bool: true },
+        "رقم المندوب": { f: "rep_code" },
+        "اسم المندوب": { f: "rep_name", ro: true },
+        "رقم المحصل": { f: "collector_no" },
+        "وكيل": { f: "is_agent", bool: true },
+        "فترة الائتمان": { f: "credit_days" },
+        "فترة الائتمان للنقدية المعلقة": { f: "pending_cash_credit_days" },
+        "خط السير": { f: "route_no" },
+        "ترتيب خط السير": { f: "route_order" },
+        "رقم المسوق": { f: "marketer_code" },
+        "رقم الموظف": { f: "employee_no" },
+        "التسلسل": { f: "seq_no", ro: true }
+      }
+    },
+    {
+      entity: "customer_currency", panel: "العملات", title: "العملات",
+      key: "currency", keyCols: ["customer_code", "currency"], keyLabel: "العملة", detailOf: CST_DTL,
+      cols: [
+        { c: "currency", t: "العملة" },
+        { c: "currency_name", t: "اسم العملة" },
+        { c: "price_level_credit_name", t: "مستوى البيع الآجل" },
+        { c: "price_level_cash_name", t: "مستوى البيع النقدي" },
+        { c: "is_default", t: "افتراضية", bool: true },
+        { c: "inactive", t: "توقيف", bool: true },
+        { c: "sales_inactive", t: "توقيف المبيعات", bool: true }
+      ],
+      fields: {
+        "رقم العميل": { f: "customer_code" },
+        "العملة": { f: "currency" },
+        "اسم العملة": { f: "currency_name", ro: true },
+        "مستوى التسعيرة للبيع الآجل": { f: "price_level_credit" },
+        "مستوى التسعيرة للبيع النقدي": { f: "price_level_cash" },
+        "العملة الافتراضية": { f: "is_default", bool: true },
+        "توقيف": { f: "inactive", bool: true },
+        "توقيف المبيعات": { f: "sales_inactive", bool: true }
+      }
+    },
+    cstRow("بيانات أخرى", {
+      "العنوان": { f: "address" },
+      "رقم التلفون": { f: "phone" },
+      "رقم الجوال": { f: "mobile" },
+      "رقم الجوال الوتس اب": { f: "whatsapp_no" },
+      "اسم مجموعة الواتس اب": { f: "whatsapp_group" },
+      "رقم صندوق البريد": { f: "po_box" },
+      "رقم الفاكس": { f: "fax" },
+      "البريد الالكتروني": { f: "email" },
+      "الموقع على الانترنت": { f: "website" },
+      "أعلى نسبة خصم": { f: "max_discount_pct" },
+      "تاريخ فتح الحساب": { f: "opened_on" },
+      "نسبة الخصم الإفتراضية": { f: "default_discount_pct" },
+      "عن طريق": { f: "referred_by" },
+      "GPS": { f: "gps" },
+      "تاريخ أخر مطابقة": { f: "last_reconciled_on" },
+      "ملاحظات": { f: "notes" },
+      "توقيف العميل": { f: "inactive", bool: true },
+      "توقيف المبيعات": { f: "sales_inactive", bool: true },
+      "تاريخ التوقيف": { f: "inactive_date", ro: true },
+      "فترة السماح بعد تاريخ الإستحقاق": { f: "grace_days" },
+      "سبب التوقيف": { f: "inactive_reason" },
+      "تفعيل العميل خلال الفترة من تاريخ": { f: "active_from" },
+      "من تاريخ هـ": { f: "active_from_h" },
+      "إلى تاريخ": { f: "active_to" },
+      "إلى تاريخ هـ": { f: "active_to_h" },
+      "القائمة السوداء": { f: "blacklisted", bool: true },
+      "تاريخ الإضافة للقائمة السوداء": { f: "blacklisted_at", ro: true },
+      "ارسال رسالة تحقق للعميل للفواتير الأجلة": { f: "verify_msg_credit", bool: true },
+      "السماح بالبيع للعميل بوجود مديونية سابقة غير مسددة": { f: "allow_sale_with_debt", map: PRIV_LEVEL },
+      "السبب": { f: "blacklist_reason" },
+      "رقم الترخيص": { f: "license_no" },
+      "مالك الترخيص": { f: "license_owner" },
+      "الشخص المسؤول": { f: "responsible_person" },
+      "الشخص المخول بالتوقيع": { f: "authorized_signatory" },
+      "إستخدام التنبيهات للإيميل والجوال": { f: "notify_channel", map: AUTO_SEND },
+      "الحسابات المفضلة": { f: "is_favorite", bool: true },
+      "مستثنى من العروض الترويجية": { f: "exclude_promotions", bool: true },
+      "إرسال تنبيه إستحقاق أقساط العملاء": { f: "notify_installments", bool: true },
+      "تقسيط آلي للمبيعات الآجلة": { f: "auto_installments", bool: true },
+      "كيف سمعت عنا ؟": { f: "lead_source" }
+    }, [{ c: "phone", t: "التلفون" }, { c: "mobile", t: "الجوال" }, { c: "opened_on", t: "فتح الحساب" }]),
+    cstRow("العنوان الوطني", {
+      "رقم المبنى": { f: "building_no" },
+      "الشارع": { f: "street" },
+      "الحي": { f: "district_name" },
+      "الدولة": { f: "country_no" },
+      "رقم المنطقة": { f: "province_no" },
+      "المدينه": { f: "city_no" },
+      "رقم الحي": { f: "region_no" },
+      "الرمز البريدي": { f: "postal_code" },
+      "الرقم الاضافي": { f: "additional_no" },
+      "رقم السجل التجاري": { f: "cr_no" },
+      "الاسم التجاري محلي": { f: "trade_name_ar" },
+      "الاسم التجاري أجنبي": { f: "trade_name_en" },
+      "العنوان المختصر": { f: "short_address" },
+      "نوع المعرف": { f: "id_scheme" },
+      "المعرف": { f: "id_value" }
+    }, [{ c: "building_no", t: "المبنى" }, { c: "street", t: "الشارع" }, { c: "postal_code", t: "الرمز البريدي" }]),
+    cstRow("البيانات الشخصية", {
+      "نوع الهوية": { f: "id_type" },
+      "رقم الهوية": { f: "id_no" },
+      "تاريخ الاصدار - م": { f: "id_issue_date" },
+      "تاريخ الاصدار - هـ": { f: "id_issue_date_h" },
+      "المهنة": { f: "profession" },
+      "تاريخ الميلاد_م": { f: "birth_date" },
+      "مكان الميلاد": { f: "birth_place" },
+      "جهة العمل": { f: "employer" },
+      "مصادر الدخل": { f: "income_source" },
+      "مكان الأصدار": { f: "id_issue_place" },
+      "تاريخ الانتهاء - م": { f: "id_expiry_date" },
+      "تاريخ الانتهاء - هـ": { f: "id_expiry_date_h" },
+      "الحالة الإجتماعية": { f: "marital_status" },
+      "تاريخ الميلاد_هـ": { f: "birth_date_h" },
+      "عنوان العمل": { f: "work_address" },
+      "الجنس": { f: "gender", map: CUST_GNDR },
+      "معدل الدخل الشهري": { f: "monthly_income" },
+      "الجنسية": { f: "nationality" }
+    }, [{ c: "id_no", t: "رقم الهوية" }]),
+    cstRow("بيانات إضافية", {
+      "طريقة إحتساب الضريبة": { f: "tax_calc_method" },
+      "النشاط": { f: "activity_name" },
+      "نوع التسجيل": { f: "registration_type", map: CST_RGSTR_TYP },
+      "الرقم الأحصائي": { f: "statistical_no" },
+      "المادة الضريبية": { f: "tax_article" },
+      "رأس المال": { f: "capital" },
+      "عميل مجلس التعاون الخليجي": { f: "is_gcc", bool: true },
+      "عميل مجموعة ضريبية": { f: "is_vat_group", bool: true },
+      "القطاع": { f: "sector", map: CST_SCTR_TYP },
+      "رقم الباركود": { f: "barcode" },
+      "طريقة فتح الزيارة": { f: "visit_open_type", map: VST_OPN_TYP_CST },
+      "رقم الموقع العالمي": { f: "gln_code" },
+      "استخدام المزامنة الالية بين العميل والمورد": { f: "auto_sync_vendor", bool: true },
+      "نوع السقف لمبيعات الأصناف": { f: "item_cap_type", map: LMT_ITM_QTY }
+    }, [{ c: "tax_calc_method", t: "الضريبة", n: true }]),
+    cstRow("حقول إضافية", CST_EXTRA, [{ c: "field1", t: "حقل إضافي1" }]),
+    {
+      entity: "customer_limit", panel: "حد الدين", title: "حد الدين",
+      key: "rcrd_sq", keyLabel: "رقم السجل", serverKey: true,
+      detailOf: { col: "analytic_code", from: "code", label: "رقم العميل" },
+      cols: [
+        { c: "currency", t: "العملة" },
+        { c: "balance_min", t: "الحد الأدنى", n: true },
+        { c: "balance_max", t: "الحد الأعلى", n: true },
+        { c: "txn_min", t: "أدنى حد للعملية", n: true },
+        { c: "txn_max", t: "أعلى حد للعملية", n: true },
+        { c: "overrun_policy", t: "تجاوز حدود الحسابات", map: { "1": "لا يسمح", "2": "يسمح", "3": "يسمح مع التنبيه" } },
+        { c: "overrun_pct", t: "نسبة التجاوز", n: true },
+        { c: "overrun_possible", t: "اعلى حد متاح", n: true },
+        { c: "branch_no", t: "الفرع", n: true }
+      ],
+      fields: {
+        "رقم العميل": { f: "analytic_code" },
+        "رقم السجل": { f: "rcrd_sq" },
+        "العملة": { f: "currency" },
+        "الحد الأدنى": { f: "balance_min" },
+        "الحد الأعلى": { f: "balance_max" },
+        "أدنى حد للعملية": { f: "txn_min" },
+        "أعلى حد للعملية": { f: "txn_max" },
+        "تجاوز حدود الحسابات": { f: "overrun_policy", map: LOW_PRICE },
+        "نسبة التجاوز": { f: "overrun_pct" },
+        "اعلى حد متاح": { f: "overrun_possible", ro: true },
+        "النوع": { f: "side", map: DR_CR },
+        "مركز التكلفة": { f: "cost_center" },
+        "الفرع": { f: "branch_no" },
+        "موقف": { f: "inactive", bool: true }
+      }
+    },
+    {
+      entity: "customer_account", panel: "الحسابات", title: "الحسابات",
+      key: "rcrd_no", keyLabel: "م", serverKey: true, detailOf: CST_DTL,
+      cols: [
+        { c: "rcrd_no", t: "م", n: true },
+        { c: "account_code", t: "رقم الحساب" },
+        { c: "account_name", t: "اسم الحساب" },
+        { c: "account_type", t: "نوع الحساب", n: true },
+        { c: "inactive", t: "موقف", bool: true }
+      ],
+      fields: {
+        "رقم العميل": { f: "customer_code" },
+        "م": { f: "rcrd_no" },
+        "رقم الحساب": { f: "account_code" },
+        "اسم الحساب": { f: "account_name", ro: true },
+        "نوع الحساب": { f: "account_type", map: CST_ACCNT_TYP },
+        "موقف": { f: "inactive", bool: true },
+        "المستخدم الموقف": { f: "inactive_by", ro: true },
+        "تاريخ التوقيف": { f: "inactive_date", ro: true },
+        "سبب التوقيف": { f: "inactive_reason" }
+      }
+    },
+    {
+      entity: "customer_user", panel: "الصلاحيات", title: "الصلاحيات",
+      key: "user_id", keyCols: ["customer_code", "user_id", "currency"], keyLabel: "رقم المستخدم", detailOf: CST_DTL,
+      cols: [
+        { c: "user_id", t: "رقم المستخدم", n: true },
+        { c: "currency", t: "رمز العملة" },
+        { c: "can_add", t: "إضافه", bool: true },
+        { c: "can_view", t: "تقرير", bool: true }
+      ],
+      fields: {
+        "رقم العميل": { f: "customer_code" },
+        "رقم المستخدم": { f: "user_id" },
+        "رمز العملة": { f: "currency" },
+        "إضافه": { f: "can_add", bool: true },
+        "تقرير": { f: "can_view", bool: true }
+      }
+    },
+    {
+      entity: "customer_sales_cap", panel: "حدود مبيعات العملاء", title: "حدود مبيعات العملاء",
+      key: "rcrd_no", keyLabel: "م", serverKey: true, detailOf: CST_DTL,
+      cols: [
+        { c: "rcrd_no", t: "م", n: true },
+        { c: "from_date", t: "من تاريخ" },
+        { c: "to_date", t: "إلى تاريخ" },
+        { c: "amount", t: "المبلغ المحلي", n: true },
+        { c: "note", t: "البيان" }
+      ],
+      fields: {
+        "رقم العميل": { f: "customer_code" },
+        "م": { f: "rcrd_no" },
+        "من تاريخ": { f: "from_date" },
+        "إلى تاريخ": { f: "to_date" },
+        "المبلغ المحلي": { f: "amount" },
+        "البيان": { f: "note" }
+      }
+    },
+    {
+      entity: "salesman_customer", panel: "ربط المندوبين", title: "ربط العملاء بالمندوبين",
+      key: "rep_code", keyCols: ["rep_code", "customer_code"], keyLabel: "رقم المندوب", detailOf: CST_DTL,
+      cols: [
+        { c: "rep_code", t: "رقم المندوب" },
+        { c: "visit_day1", t: "السبت", bool: true },
+        { c: "visit_day2", t: "الأحد", bool: true },
+        { c: "visit_day3", t: "الإثنين", bool: true },
+        { c: "visit_day4", t: "الثلاثاء", bool: true },
+        { c: "visit_day5", t: "الأربعاء", bool: true },
+        { c: "visit_day6", t: "الخميس", bool: true },
+        { c: "visit_day7", t: "الجمعة", bool: true },
+        { c: "is_default", t: "الإفتراضي", bool: true },
+        { c: "inactive", t: "موقف", bool: true }
+      ],
+      fields: {
+        "رقم العميل": { f: "customer_code" },
+        "رقم المندوب": { f: "rep_code" },
+        "السبت": { f: "visit_day1", bool: true },
+        "الأحد": { f: "visit_day2", bool: true },
+        "الإثنين": { f: "visit_day3", bool: true },
+        "الثلاثاء": { f: "visit_day4", bool: true },
+        "الأربعاء": { f: "visit_day5", bool: true },
+        "الخميس": { f: "visit_day6", bool: true },
+        "الجمعة": { f: "visit_day7", bool: true },
+        "الإفتراضي": { f: "is_default", bool: true },
+        "موقف": { f: "inactive", bool: true },
+        "المستخدم الموقف": { f: "inactive_by", ro: true },
+        "تاريخ التوقيف": { f: "inactive_date", ro: true }
+      }
+    },
+    {
+      entity: "customer_driver", panel: "ربط السائقين", title: "ربط العملاء بالسائقين",
+      key: "driver_no", keyCols: ["customer_code", "driver_no"], keyLabel: "رقم السائق", detailOf: CST_DTL,
+      cols: [
+        { c: "driver_no", t: "رقم السائق", n: true },
+        { c: "is_default", t: "الافتراضي", bool: true },
+        { c: "inactive", t: "موقف", bool: true }
+      ],
+      fields: {
+        "رقم العميل": { f: "customer_code" },
+        "رقم السائق": { f: "driver_no" },
+        "الافتراضي": { f: "is_default", bool: true },
+        "موقف": { f: "inactive", bool: true },
+        "المستخدم الموقف": { f: "inactive_by", ro: true },
+        "تاريخ التوقيف": { f: "inactive_date", ro: true }
+      }
+    },
+    cstRow("بيانات الضمانات", {
+      "حالة الضمانة": { f: "g_status", map: G_STATUS },
+      "نوع الضمانة": { f: "g_type", map: G_TYPE },
+      "تاريخ بدء الضمانة": { f: "g_start_date" },
+      "تاريخ إنتهاء الضمانة": { f: "g_expire_date" },
+      "اسم الضامن": { f: "g_name" },
+      "عنوان الضامن": { f: "g_address" },
+      "طبيعة نشاط الضامن": { f: "g_work" },
+      "المركز المالي": { f: "g_fin_center" },
+      "قيمة الضمانة": { f: "g_amount" },
+      "تاريخ توثيق الضمان": { f: "g_doc_date" },
+      "رقم التسجيل فى المحكمة": { f: "g_court_reg" },
+      "رقم التسجيل بالغرفة التجارية": { f: "g_chamber_reg" },
+      "رقم السجل التجاري للضامن": { f: "g_cr_no" },
+      "رقم تلفون الضامن": { f: "g_phone" },
+      "رقم فاكس الضامن": { f: "g_fax" }
+    }, [{ c: "g_type", t: "نوع الضمانة", n: true }]),
+    cstRow("مكان التسليم", {
+      "المدينة": { f: "dlvr_city_no" },
+      "رقم المنطقة": { f: "dlvr_province_no" },
+      "رقم الحي": { f: "dlvr_region_no" },
+      "رقم التلفون": { f: "dlvr_phone" },
+      "العنوان": { f: "dlvr_address" },
+      "رقم الفاكس": { f: "dlvr_fax" },
+      "البريد الألكتروني": { f: "dlvr_email" },
+      "الشخص المسؤول": { f: "dlvr_person" },
+      "رقم الجوال": { f: "dlvr_mobile" }
+    }, [{ c: "dlvr_address", t: "العنوان" }]),
+    {
+      entity: "customer_ledger", panel: "العمليات", title: "العمليات",
+      key: "doc_no", keyCols: ["customer_code", "doc_type", "doc_no"], keyLabel: "رقم المستند", detailOf: CST_DTL,
+      noAdd: CST_Q, noDelete: CST_Q,
+      cols: [
+        { c: "doc_no", t: "رقم المستند" },
+        { c: "doc_date", t: "التاريخ" },
+        { c: "doc_type_name", t: "نوع المستند" },
+        { c: "description", t: "البيان" },
+        { c: "debit", t: "مدين", n: true },
+        { c: "credit", t: "دائن", n: true },
+        { c: "currency", t: "العملة" },
+        { c: "branch_no", t: "رقم الفرع", n: true },
+        { c: "balance", t: "الرصيد", n: true }
+      ],
+      fields: {
+        "رقم العميل": { f: "customer_code", ro: true },
+        "رقم المستند": { f: "doc_no", ro: true },
+        "التاريخ": { f: "doc_date", ro: true },
+        "نوع المستند": { f: "doc_type_name", ro: true },
+        "البيان": { f: "description", ro: true },
+        "مدين": { f: "debit", ro: true },
+        "دائن": { f: "credit", ro: true },
+        "الرصيد": { f: "balance", ro: true }
+      }
+    },
+    {
+      entity: "customer_sales_doc", panel: "وثائق المبيعات", title: "وثائق المبيعات",
+      key: "doc_no", keyCols: ["customer_code", "doc_kind", "doc_no"], keyLabel: "رقم المستند", detailOf: CST_DTL,
+      noAdd: CST_Q, noDelete: CST_Q,
+      cols: [
+        { c: "doc_no", t: "رقم المستند" },
+        { c: "doc_date", t: "التاريخ" },
+        { c: "doc_kind_name", t: "نوع المستند" },
+        { c: "description", t: "البيان" },
+        { c: "total", t: "مبلغ الوثيقة", n: true },
+        { c: "currency", t: "العملة" },
+        { c: "ref_no", t: "رقم المرجع" },
+        { c: "due_date", t: "تاريخ الإستحقاق" },
+        { c: "branch_name", t: "اسم الفرع" }
+      ],
+      fields: {
+        "رقم العميل": { f: "customer_code", ro: true },
+        "رقم المستند": { f: "doc_no", ro: true },
+        "التاريخ": { f: "doc_date", ro: true },
+        "نوع المستند": { f: "doc_kind_name", ro: true },
+        "البيان": { f: "description", ro: true },
+        "مبلغ الوثيقة": { f: "total", ro: true },
+        "العملة": { f: "currency", ro: true },
+        "رقم المرجع": { f: "ref_no", ro: true },
+        "تاريخ الإستحقاق": { f: "due_date", ro: true }
+      }
+    },
+    {
+      entity: "customer_stats", panel: "إحصائيات", title: "إحصائيات",
+      key: "customer_code", keyLabel: "رقم العميل", detailOf: CST_DTL,
+      noAdd: CST_Q, noDelete: CST_Q,
+      cols: [
+        { c: "opening_balance", t: "الرصيد الإفتتاحي", n: true },
+        { c: "current_balance", t: "الرصيد الحالي", n: true },
+        { c: "net_sales", t: "صافي المبيعات", n: true },
+        { c: "receipts", t: "سندات القبض", n: true },
+        { c: "last_sale_date", t: "اخر تاريخ بيع" }
+      ],
+      fields: {
+        "رقم العميل": { f: "customer_code", ro: true },
+        "الرصيد الإفتتاحي": { f: "opening_balance", ro: true },
+        "الرصيد الحالي": { f: "current_balance", ro: true },
+        "فاتورة المبيعات": { f: "sales", ro: true },
+        "مردود المبيعات": { f: "returns", ro: true },
+        "صافي الخصم": { f: "net_discount", ro: true },
+        "صافي المبيعات": { f: "net_sales", ro: true },
+        "سندات القبض": { f: "receipts", ro: true },
+        "مبلغ الشيكات الغير مستحقة": { f: "cheques_not_due", ro: true },
+        "مبلغ التسويات": { f: "settlements", ro: true },
+        "اخر تاريخ بيع": { f: "last_sale_date", ro: true },
+        "آخر تاريخ سداد": { f: "last_payment_date", ro: true }
+      }
+    }
+  ]};
+
+  var st = { ref: null, cfg: null, set: 0, rows: [], idx: -1, h: null, q: "", master: null, groups: null };
 
   /* إعداد الجدول النشط: الشاشة نفسها أو المجموعة المختارة من sets */
   function entry(ref) {
@@ -865,6 +2508,8 @@
   }
 
   function switchSet(i) {
+    /* الرأس المعروض يبقى مرجع تبويبات التفصيل (وحدات الصنف …) */
+    if (st.cfg && !st.cfg.detailOf) st.master = cur();
     st.set = i;
     st.cfg = entry(st.ref);
     st.q = "";
@@ -904,6 +2549,7 @@
     paintAudit(row);
     paintState(row);
     st.h.applyMode();
+    lockFixed();
   }
 
   function paintAudit(row) {
@@ -969,8 +2615,23 @@
     bind(cur());
   }
 
+  /* مفتاح الرأس لتبويب تفصيل — «» إن لا رأس معروض */
+  function masterKey() {
+    var d = st.cfg.detailOf;
+    return d && st.master && st.master[d.from] != null ? String(st.master[d.from]) : "";
+  }
+
   function load(selectKey) {
-    var q = st.q ? "?q=" + encodeURIComponent(st.q) : "";
+    var d = st.cfg.detailOf;
+    if (d && !masterKey()) {
+      st.rows = [];
+      select(-1);
+      st.h.note("اختر سجلاً من تبويب «" + MAP[st.ref].sets[0].title + "» أولاً");
+      return Promise.resolve({ rows: [] });
+    }
+    /* الحد 5000: شاشة الأصناف 2,228 وربطها الضريبي 2,228 — الافتراضي 500 كان يُخفي الباقي */
+    var q = "?limit=5000" + (st.q ? "&q=" + encodeURIComponent(st.q) : "") +
+      (d ? "&eq." + d.col + "=" + encodeURIComponent(masterKey()) : "");
     return api().masters(st.cfg.entity, q).then(function (j) {
       st.rows = j.rows || [];
       var i = 0;
@@ -991,6 +2652,7 @@
     Object.keys(cfg.fields).forEach(function (label) {
       var fc = cfg.fields[label];
       if (fc.ro) return;
+      if (fc.addOnly && st.h.st.mode !== "add") return;
       var box = fieldBox(label);
       if (!box) return;
       var sel = box.querySelector("select");
@@ -1013,16 +2675,105 @@
       if (sel) sel.selectedIndex = 0;
       else if (inp) inp.value = "";
     });
-    if (cfg.autoKey) {
+    if (cfg.serverKey) serverNext("", cfg.keyLabel);
+    else if (cfg.autoKey) {
       var max = 0;
       st.rows.forEach(function (r) { max = Math.max(max, Number(r[cfg.key]) || 0); });
       var box = fieldBox(cfg.keyLabel);
       var inp = box && box.querySelector("input");
       if (inp) inp.value = String(max + 1);
     }
+    if (cfg.detailOf) {
+      var dBox = fieldBox(cfg.detailOf.label);
+      var dInp = dBox && dBox.querySelector("input");
+      if (dInp) dInp.value = masterKey();
+    }
     paintAudit(null);
     paintState(null);
     st.h.rec(0, st.rows.length);
+  }
+
+  /* حقل الإضافة فقط (الوحدة الرئيسية للصنف الجديد) ومفتاح الرأس في التفصيل — لا يُعدَّلان يدوياً */
+  function lockFixed() {
+    var cfg = st.cfg, mode = st.h.st.mode;
+    Object.keys(cfg.fields).forEach(function (label) {
+      var fc = cfg.fields[label];
+      var isMasterKey = cfg.detailOf && label === cfg.detailOf.label;
+      if (!fc.addOnly && !isMasterKey) return;
+      var box = fieldBox(label);
+      var inp = box && box.querySelector("input");
+      if (!inp || mode === "view") return;
+      var fixed = isMasterKey || (fc.addOnly && mode !== "add");
+      inp.readOnly = fixed;
+      if (fixed) inp.removeAttribute("data-lock");
+    });
+  }
+
+  /* IV-R75 · IV-R95 — رقم الصنف: بادئة المجموعة + (أكبر رقم بنفس البادئة والطول الغالب + 1) [مستنتج للتفصيل].
+     مجموعة بلا بادئة ⇒ لا رقم مقترح، ويُكتب يدوياً (أونيكس يسمح بالحروف والتعديل اليدوي) */
+  function nextItemCode(group) {
+    var g = null;
+    (st.groups || []).forEach(function (r) { if (String(r.code) === group) g = r; });
+    var pre = g && g.item_code_prefix ? String(g.item_code_prefix) : "";
+    if (!pre) return "";
+    var lens = {}, best = 0, bestLen = 0;
+    st.rows.forEach(function (r) {
+      var c = String(r.code || "");
+      if (c.indexOf(pre) === 0 && /^[0-9]+$/.test(c)) lens[c.length] = (lens[c.length] || 0) + 1;
+    });
+    Object.keys(lens).forEach(function (L) { if (lens[L] > best) { best = lens[L]; bestLen = Number(L); } });
+    if (!bestLen) return "";
+    var max = 0;
+    st.rows.forEach(function (r) {
+      var c = String(r.code || "");
+      if (c.length === bestLen && c.indexOf(pre) === 0 && /^[0-9]+$/.test(c)) max = Math.max(max, Number(c.slice(pre.length)) || 0);
+    });
+    var seq = String(max + 1);
+    while (seq.length < bestLen - pre.length) seq = "0" + seq;
+    return pre + seq;
+  }
+
+  /* الرقم المقترح من الخادم (GET /api/masters/<كيان>/next) — قاعدته في تعريف الكيان (رقم العميل = المجموعة + تسلسل
+     بطول CUST_LENGTH · رقم سجل حد الدين = الأكبر في الجدول كله + 1) لا في المتصفح */
+  function serverNext(query, label) {
+    if (!api()) return;
+    var ent = st.cfg.entity;
+    api().masters(ent + "/next", query).then(function (j) {
+      if (st.cfg.entity !== ent || st.h.st.mode !== "add") return;
+      var box = fieldBox(label);
+      var inp = box && box.querySelector("input");
+      if (inp && j && j.next) inp.value = String(j.next);
+    }).catch(function () {});
+  }
+
+  function wireAutoCode() {
+    var ac = st.cfg.autoCode;
+    if (!ac) return;
+    if (ac.server) {
+      var gBox = fieldBox(ac.groupLabel);
+      var gInp = gBox && gBox.querySelector("input");
+      if (!gInp || gInp.getAttribute("data-autocode") === "1") return;
+      gInp.setAttribute("data-autocode", "1");
+      gInp.addEventListener("change", function () {
+        if (st.h.st.mode !== "add") return;
+        serverNext("?group=" + encodeURIComponent(gInp.value.trim()), ac.codeLabel);
+      });
+      return;
+    }
+    if (!st.groups && api()) {
+      api().masters("item_group", "?limit=5000").then(function (j) { st.groups = j.rows || []; }).catch(function () { st.groups = []; });
+    }
+    var box = fieldBox(ac.groupLabel);
+    var inp = box && box.querySelector("input");
+    if (!inp || inp.getAttribute("data-autocode") === "1") return;
+    inp.setAttribute("data-autocode", "1");
+    inp.addEventListener("change", function () {
+      if (st.h.st.mode !== "add") return;
+      var codeBox = fieldBox(ac.codeLabel);
+      var codeInp = codeBox && codeBox.querySelector("input");
+      var next = nextItemCode(inp.value.trim());
+      if (codeInp && next) codeInp.value = next;
+    });
   }
 
   /* SY-R25 — رقم الحساب آلي: رقم الأب + تسلسل بطول المستوى */
@@ -1102,11 +2853,14 @@
   function save() {
     var mode = st.h.st.mode === "add" ? "add" : "edit";
     var values = collect();
+    if (mode === "add" && st.copyFrom) values.copy_from = st.copyFrom;
     var key = valuesKey(values);
     return api().saveMaster(st.cfg.entity, mode, values).then(function (j) {
+      st.copyFrom = null;
       st.h.setMode("view");
       return load(j.saved ? rowKey(j.saved) : key).then(function () {
-        st.h.note("حُفظ — " + st.cfg.keyLabel + " " + (j.saved ? j.saved[st.cfg.key] : key));
+        var warn = j.warnings && j.warnings.length ? " · تنبيه: " + j.warnings.join(" · ") : "";
+        st.h.note("حُفظ — " + st.cfg.keyLabel + " " + (j.saved ? j.saved[st.cfg.key] : key) + warn);
       });
     }).catch(function (e) {
       st.h.note(errText(e));
@@ -1131,19 +2885,29 @@
     switch (id) {
       case "add":
         if (st.cfg.noAdd) { h.note(st.cfg.noAdd); return true; }
+        if (st.cfg.detailOf && !masterKey()) {
+          h.note("اختر سجلاً من تبويب «" + MAP[st.ref].sets[0].title + "» أولاً");
+          return true;
+        }
+        st.copyFrom = null;
         h.setMode("add");
         blank();
+        h.applyMode();
+        lockFixed();
         h.note("سجل جديد — الحقول فاضية");
         return true;
       case "edit":
         if (!cur()) { h.note("لا سجل معروض للتعديل"); return true; }
         h.setMode("edit");
+        h.applyMode();
+        lockFixed();
         h.note("تعديل السجل " + cur()[st.cfg.key]);
         return true;
       case "save":
         save();
         return true;
       case "cancelEntry":
+        st.copyFrom = null;
         h.setMode("view");
         bind(cur());
         h.note("تم التراجع");
@@ -1165,9 +2929,31 @@
       case "openReport":
         h.note("الطباعة لهذه الشاشة غير مبنيّة بعد — لا عدّاد طباعة ولا قالب");
         return true;
-      case "addFrom":
-        h.note("«إضافة من» لا تنطبق على جدول رموز — استخدم «إضافة»");
+      case "addFrom": {
+        /* T1 — نسخ السجل المعروض إلى سجل جديد برقم جديد، قابل للتعديل قبل الحفظ */
+        if (!st.cfg.addFrom) { h.note("«إضافة من» لا تنطبق على جدول رموز — استخدم «إضافة»"); return true; }
+        var src = cur();
+        if (!src) { h.note("اعرض السجل المراد النسخ منه أولاً"); return true; }
+        h.setMode("add");
+        bind(src);
+        var cBox = fieldBox(st.cfg.keyLabel);
+        var cInp = cBox && cBox.querySelector("input");
+        var next = "";
+        if (st.cfg.autoCode && st.cfg.autoCode.server) serverNext("?group=" + encodeURIComponent(String(src.group_no || "")), st.cfg.keyLabel);
+        else if (st.cfg.autoCode) next = nextItemCode(String(src.group_code || ""));
+        else if (st.cfg.autoKey) {
+          var mx = 0;
+          st.rows.forEach(function (r) { mx = Math.max(mx, Number(r[st.cfg.key]) || 0); });
+          next = String(mx + 1);
+        }
+        if (cInp) cInp.value = next;
+        st.copyFrom = String(src[st.cfg.key]);
+        paintAudit(null);
+        paintState(null);
+        h.rec(0, st.rows.length);
+        h.note("إضافة من " + st.copyFrom + (st.cfg.autoCode ? (st.cfg.autoCode.server ? " — العملات تُنسخ مع الحفظ" : " — الوحدات تُنسخ مع الحفظ") : "") + "؛ عدّل ثم احفظ");
         return true;
+      }
       default:
         return false;
     }
@@ -1186,6 +2972,9 @@
     renderTable();
     wireQuick();
     wireParent();
+    wireAutoCode();
+    st.master = null;
+    st.copyFrom = null;
     load();
   }
 

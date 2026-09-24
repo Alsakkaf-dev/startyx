@@ -9,14 +9,19 @@
   },
   "scripts": {
     "start": "node --experimental-strip-types src/presentation/http-server.ts",
-    "test": "node --experimental-strip-types --test tests/engines.test.ts tests/posting.test.ts tests/masters.test.ts tests/masters-render.test.ts",
+    "test": "node --experimental-strip-types --test tests/engines.test.ts tests/posting.test.ts tests/masters.test.ts tests/masters-render.test.ts tests/docs-render.test.ts",
     "load": "node --experimental-strip-types migration/load-2026.ts",
     "accept:api": "node --experimental-strip-types migration/accept-live-api.ts",
     "accept:masters": "node --experimental-strip-types migration/accept-masters.ts",
     "accept:layer1": "node --experimental-strip-types migration/accept-layer1.ts",
     "verify:layer1": "node --experimental-strip-types migration/verify-layer1-records.ts",
+    "accept:layer2": "node --experimental-strip-types migration/accept-layer2.ts",
+    "verify:layer2": "node --experimental-strip-types migration/verify-layer2-records.ts",
     "backup": "powershell -ExecutionPolicy Bypass -File tools/backup.ps1",
-    "accept:foundation": "node --experimental-strip-types migration/accept-foundation.ts"
+    "accept:foundation": "node --experimental-strip-types migration/accept-foundation.ts",
+    "verify:layer3": "node --experimental-strip-types migration/verify-layer3-records.ts",
+    "accept:layer3": "node --experimental-strip-types migration/accept-layer3.ts",
+    "accept:layer4": "node --experimental-strip-types migration/accept-layer4.ts"
   },
   "dependencies": {
     "@electric-sql/pglite": "^0.3.14",

@@ -43,16 +43,6 @@
       amount: "المبلغ",
       partyType: "customer"
     },
-    "op.7.1.2.10": {
-      kind: "opening_balance",
-      shape: "opening",
-      dateCol: "تاريخ الاعتماد",
-      partyType: "customer",
-      accCol: "رقم الحساب",
-      partyCol: "الحساب التحليلي",
-      drCol: "مدين",
-      crCol: "دائن"
-    },
     "op.6.2.3.8": {
       kind: "purchase_invoice",
       shape: "items",
@@ -82,15 +72,6 @@
       cash: "الصندوق / البنك",
       amount: "المبلغ",
       partyType: "vendor"
-    },
-    "op.6.1.2.4": {
-      kind: "opening_balance",
-      shape: "opening",
-      partyType: "vendor",
-      accCol: "رقم الحساب",
-      partyCol: "المورد",
-      drCol: "مدين",
-      crCol: "دائن"
     },
     "op.5.1.3.16": {
       kind: "stock_receipt",

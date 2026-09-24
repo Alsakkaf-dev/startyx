@@ -301,3 +301,135 @@ test("op.1.2.4: شاشة ربط — لا إضافة ولا حذف، والتعد
   assert.match(sent[0]!.url, /\/api\/masters\/general_flow$/);
   assert.equal((sent[0]!.body as { mode: string }).mode, "edit");
 });
+
+/* ═══ الطبقة ٢ — op.5.1.2.10 بيانات الأصناف: رأس + تفاصيل الصنف المعروض ═══ */
+const ITEMS = [
+  { code: "04001", name_ar: "زيت فحص", group_code: "004", main_unit: "حبة", units: "حبة ← كرتون × 12", is_kit: false, inactive: false, created_by: "1", created_at: null, update_count: 0 },
+  { code: "04002", name_ar: "زيت فحص ٢", group_code: "004", main_unit: "حبة", units: "حبة", is_kit: false, inactive: false, created_by: "1", created_at: null, update_count: 0 },
+];
+const GROUPS = [{ code: "004", name_ar: "زيوت", item_code_prefix: "04" }];
+const UNITS = [
+  { item_code: "04001", unit_code: "حبة", pack_size: "1", level_no: 1, is_main: true, is_sale: true, created_by: "1", created_at: null, update_count: 0 },
+  { item_code: "04001", unit_code: "كرتون", pack_size: "12", level_no: 2, is_main: false, is_sale: false, created_by: "1", created_at: null, update_count: 0 },
+];
+
+function itemCtx(sent: Call[]) {
+  return boot((url, body) => {
+    if (body) { sent.push({ url, body }); return { saved: { ...ITEMS[0], ...(body.values as object) }, warnings: [] }; }
+    if (url.indexOf("/api/masters/item_group") >= 0) return { rows: GROUPS, total: 1 };
+    if (url.indexOf("/api/masters/item_unit") >= 0) return { rows: UNITS, total: UNITS.length };
+    if (url.indexOf("/api/masters/item?") >= 0 || /\/api\/masters\/item$/.test(url)) return { rows: ITEMS, total: ITEMS.length };
+    return { rows: [], total: 0 };
+  });
+}
+
+test("op.5.1.2.10: تبويب الوحدات يطلب وحدات الصنف المعروض فقط، والإضافة تثبّت رقمه", async () => {
+  const sent: Call[] = [];
+  const ctx = itemCtx(sent);
+  const host = render(ctx, "op.5.1.2.10", "بيانات الأصناف");
+  await tick();
+  await tick();
+  assert.equal(fieldValue(host, "رقم الصنف"), "04001");
+  assert.ok(ctx.calls.some((c) => /\/api\/masters\/item\?limit=5000/.test(c.url)), "الأصناف تُقرأ كاملة (2,228 > 500)");
+  const tabs = Array.from(host.querySelectorAll(".msets button")) as HTMLButtonElement[];
+  assert.deepEqual(tabs.map((b) => b.textContent), ["الأصناف", "الوحدات", "الموردون", "المكونات", "الأرقام المرجعية", "المخازن"]);
+  tabs[1]!.click();
+  await tick();
+  await tick();
+  const unitCall = ctx.calls.filter((c) => c.url.indexOf("/api/masters/item_unit") >= 0).pop()!;
+  assert.match(decodeURIComponent(unitCall.url), /eq\.item_code=04001/);
+  assert.equal(host.querySelectorAll(".scr__col .tblwrap tbody tr[data-i]").length, 2);
+  cmd(host, "إضافة").click();
+  const unitPanel = Array.from(host.querySelectorAll(".scr__col .pnl")).find((x) => x.querySelector("header h2")?.textContent === "وحدة الصنف")!;
+  const key = unitPanel.querySelector('.fld[data-k="رقم الصنف"] input') as HTMLInputElement;
+  assert.equal(key.value, "04001", "رقم الصنف من الرأس");
+  assert.equal(key.readOnly, true, "رقم الرأس لا يُعدَّل في التفصيل");
+});
+
+test("op.5.1.2.10: «إضافة من» تنسخ الصنف برقم جديد من بادئة المجموعة وترسل copy_from", async () => {
+  const sent: Call[] = [];
+  const ctx = itemCtx(sent);
+  const host = render(ctx, "op.5.1.2.10", "بيانات الأصناف");
+  await tick();
+  await tick();
+  cmd(host, "إضافة من").click();
+  assert.equal(fieldValue(host, "رقم الصنف"), "04003", "IV-R95: البادئة 04 + (أكبر + 1) بالطول الغالب");
+  assert.equal(fieldValue(host, "اسم الصنف"), "زيت فحص", "الحقول منسوخة وقابلة للتعديل");
+  assert.equal(fieldValue(host, "الوحدة الرئيسية"), "حبة");
+  cmd(host, "حفظ").click();
+  await tick();
+  await tick();
+  assert.equal(sent.length, 1);
+  const b = sent[0]!.body as { mode: string; values: Record<string, unknown> };
+  assert.equal(b.mode, "add");
+  assert.equal(b.values.copy_from, "04001");
+  assert.equal(b.values.code, "04003");
+  assert.equal(b.values.main_unit, "حبة");
+});
+
+test("op.5.1.2.10: الوحدة الرئيسية تُرسل عند الإضافة فقط", async () => {
+  const sent: Call[] = [];
+  const ctx = itemCtx(sent);
+  const host = render(ctx, "op.5.1.2.10", "بيانات الأصناف");
+  await tick();
+  await tick();
+  cmd(host, "تعديل").click();
+  const mu = host.querySelector('.fld[data-k="الوحدة الرئيسية"] input') as HTMLInputElement;
+  assert.equal(mu.readOnly, true, "لا تُعدَّل من الرأس بعد الإضافة — من تبويب الوحدات");
+  cmd(host, "حفظ").click();
+  await tick();
+  await tick();
+  const v = (sent[0]!.body as { values: Record<string, unknown> }).values;
+  assert.equal("main_unit" in v, false);
+});
+
+/* ═══ الطبقة ٢ — op.7.1.2.4 بيانات مندوبي المبيعات: ٧ تبويبات، الضمانات والتوزيع على سجل المندوب نفسه ═══ */
+const REPS = [
+  { code: "10004", name_ar: "يونس ابوفارس", parent_code: "10001", classification: 0, warehouse_code: "101", g_status: null,
+    g_type: null, cheque_post_type: 0, visit_open_type: 1, inactive: false, created_by: "1", created_at: null, update_count: 0 },
+];
+
+test("op.7.1.2.4: تبويب الضمانات يقرأ المندوب المعروض ويحفظ حقوله فقط برقمه، والعمليات لا تُضاف", async () => {
+  const sent: Call[] = [];
+  const ctx = boot((url, body) => {
+    if (body) { sent.push({ url, body }); return { saved: { ...REPS[0], ...(body.values as object) }, warnings: [] }; }
+    if (url.indexOf("/api/masters/salesman?") >= 0) return { rows: REPS, total: REPS.length };
+    return { rows: [], total: 0 };
+  });
+  const host = render(ctx, "op.7.1.2.4", "بيانات مندوبي المبيعات");
+  await tick();
+  await tick();
+  assert.equal(fieldValue(host, "رقم مندوب المبيعات"), "10004");
+  assert.equal(fieldValue(host, "التصنيف"), "مندوب مبيعات", "CONN_SP_SMAN 0 ⇐ S_FLAGS");
+  const tabs = Array.from(host.querySelectorAll(".msets button")) as HTMLButtonElement[];
+  assert.deepEqual(tabs.map((b) => b.textContent),
+    ["البيانات الرئيسية", "بيانات الضمانات", "نظام التوزيع", "ربط العملاء بالمندوبين", "المواقع الجغرافية", "الصلاحيات", "العمليات"]);
+  tabs[1]!.click();
+  await tick();
+  await tick();
+  const call = ctx.calls.filter((c) => c.url.indexOf("/api/masters/salesman?") >= 0).pop()!;
+  assert.match(decodeURIComponent(call.url), /eq\.code=10004/);
+  cmd(host, "تعديل").click();
+  const panel = Array.from(host.querySelectorAll(".scr__col .pnl")).find((x) => x.querySelector("header h2")?.textContent === "الضمانة")!;
+  const key = panel.querySelector('.fld[data-k="رقم المندوب"] input') as HTMLInputElement;
+  assert.equal(key.readOnly, true, "رقم المندوب لا يُعدَّل من تبويب الضمانات");
+  const status = panel.querySelector('.fld[data-k="حالة الضمانة"] select') as HTMLSelectElement;
+  status.value = Array.from(status.options).find((o) => o.text === "فعال")!.value;
+  cmd(host, "حفظ").click();
+  await tick();
+  await tick();
+  assert.equal(sent.length, 1);
+  const b = sent[0]!.body as { mode: string; values: Record<string, unknown> };
+  assert.match(sent[0]!.url, /\/api\/masters\/salesman$/);
+  assert.equal(b.mode, "edit");
+  assert.equal(b.values.code, "10004");
+  assert.equal(String(b.values.g_status), "1");
+  assert.equal("name_ar" in b.values, false, "تعديل جزئي — الرئيسية لا تُرسل من تبويب الضمانات");
+  tabs[6]!.click();
+  await tick();
+  await tick();
+  const opsCall = ctx.calls.filter((c) => c.url.indexOf("/api/masters/salesman_operation") >= 0).pop()!;
+  assert.match(decodeURIComponent(opsCall.url), /eq\.rep_code=10004/);
+  cmd(host, "إضافة").click();
+  assert.equal(sent.length, 1, "العمليات استعلام — «إضافة» لا ترسل شيئاً");
+});

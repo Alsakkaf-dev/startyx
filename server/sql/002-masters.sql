@@ -80,10 +80,9 @@ CREATE SEQUENCE IF NOT EXISTS erp.branch_id_seq;
 SELECT setval('erp.branch_id_seq', GREATEST(1, (SELECT COALESCE(max(id), 0) FROM erp.branch)));
 ALTER TABLE erp.branch ALTER COLUMN id SET DEFAULT nextval('erp.branch_id_seq');
 
--- «لا اختراع»: فرع 6 «انشطة شقيقة» بلا شركة في أي مصدر (GO/01-system-setup.md §١ يسجّلها «—»،
--- ولا صف واحد في المستخرج يقرن BRN_NO=6 بـ CMP_NO). كان الكود يثبّت 1 من فراغ.
+-- الشركة قد تكون مجهولة لفرع أُدخل بلا مصدر. فرع 6 «انشطة شقيقة» كان NULL لأن S_BRN لم يُقرأ (LOB)؛
+-- بعد تصحيح القارئ صار مصدره S_BRN.CMP_NO = 1 وتملؤه المزامنة (masters-sync.ts) — لا تحديث هنا يعيده NULL كل إقلاع.
 ALTER TABLE erp.branch ALTER COLUMN company_id DROP NOT NULL;
-UPDATE erp.branch SET company_id = NULL WHERE no = 6 AND company_id = 1 AND update_count = 0;
 
 -- ONYX-2143 «هذا الكود موجود مسبقا» — كان يُقبل رمز عملة مكرر برقم مختلف
 CREATE UNIQUE INDEX IF NOT EXISTS currency_code_uq ON erp.currency (code);

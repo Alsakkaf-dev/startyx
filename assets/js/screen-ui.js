@@ -488,37 +488,6 @@
     var N = st.accNames || {};
     return N[code] ? code + " · " + N[code] : String(code);
   }
-  function applyRecon(j) {
-    if (!st.host || !j) return;
-    var AR = { general: "عام", cash: "صندوق", bank: "بنك", customer: "عميل", vendor: "مورد", employee: "موظف" };
-    var box = st.host.querySelector(".recon");
-    if (box && j.imbalance != null) {
-      var cls = j.allPass ? "warn" : "bad";
-      box.innerHTML =
-        '<div class="' + cls + '"><span>مجموع الصافي (من النسخة)</span><b>' + esc(j.imbalance) + "</b></div>" +
-        '<div class=""><span>شركة 1</span><b>' + esc((j.companies && j.companies["1"]) || "") + "</b></div>" +
-        '<div class=""><span>شركة 2</span><b>' + esc((j.companies && j.companies["2"]) || "") + "</b></div>" +
-        '<div class=""><span>المطابقة مع GO</span><b>' + (j.allPass ? "مطابق — الفرق منقول كما هو" : "انحراف") + "</b></div>" +
-        '<div class="warn"><span>مخزون↔أستاذ (IV-Q17)</span><b>0.23</b></div>' +
-        '<div class="warn"><span>زوج الشركتين</span><b>2,099.90</b></div>';
-    }
-    if (st.ref === "op.4.1.2.10" && j.types && j.types.length) {
-      var tb = st.host.querySelector(".scr__col table tbody");
-      if (tb) {
-        tb.innerHTML = j.types.map(function (t) {
-          return "<tr><td>" + esc(AR[t.name] || t.name) + '</td><td class="n">' + esc(String(t.rows)) +
-            '</td><td class="n">' + esc(t.net) + "</td></tr>";
-        }).join("");
-      }
-    }
-    var note = st.host.querySelector(".scr__side .scrnote");
-    if (note) {
-      note.innerHTML = "<strong>GL-D4:</strong> فرق " + esc(j.imbalance) +
-        " يُنقل كما هو ولا يُصفَّر. مخزون↔أستاذ 0.23 · زوج 2,099.90. " +
-        (j.allPass ? "مطابقة استخراج 2026 نجحت." : "راجع تشغيل المطابقة.bat");
-    }
-  }
-
   function applyPosted(result) {
     st.lastPost = result;
     if (!st.host || !result) return;
@@ -595,6 +564,9 @@
     };
   }
   function masters() {
+    /* شاشات المستندات الحيّة (الطبقة ٤) لها إطارها — نفس الجسر */
+    var D = root.StartyxDocs;
+    if (D && D.handles(st.ref)) return D;
     var M = root.StartyxMasters;
     return M && M.handles(st.ref) ? M : null;
   }
@@ -1292,9 +1264,6 @@
       root.StartyxApi.ping().then(function (h) {
         st.apiOk = !!h;
         renderState();
-        if (h && root.StartyxApi.recon && /op\.(4\.1\.2\.10|7\.1\.2\.10|6\.1\.2\.4)$/.test(st.ref || "")) {
-          root.StartyxApi.recon().then(applyRecon).catch(function () {});
-        }
       });
     }
     return true;

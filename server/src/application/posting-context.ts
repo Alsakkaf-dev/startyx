@@ -162,7 +162,7 @@ function t(v: unknown): string {
 const CUSTOMER_KINDS = new Set(["sales_invoice", "sales_return", "receipt_voucher"]);
 const VENDOR_KINDS = new Set(["purchase_invoice", "purchase_return", "payment_voucher"]);
 
-/** حساب الطرف: العميل ⇒ حساب مجموعته (V-R6) · المورد ⇒ الحساب في بطاقته */
+/** حساب الطرف من بطاقته: العميل ⇒ C_A_CODE (يُورث من المجموعة عند الإضافة — CU-R2) · المورد ⇒ V_A_CODE */
 async function partyAccount(db: Db, req: PostDocumentRequest): Promise<string> {
   const pm = req.paymentMethod ?? "credit";
   const partyNeeded = pm === "credit" || pm === "to_account" || req.docKind.endsWith("_voucher");
@@ -171,7 +171,7 @@ async function partyAccount(db: Db, req: PostDocumentRequest): Promise<string> {
   if (CUSTOMER_KINDS.has(req.docKind)) {
     const c = await one(
       db,
-      `SELECT c.code, g.account_code FROM erp.customer c LEFT JOIN erp.customer_group g ON g.no = c.group_no WHERE c.code = $1`,
+      `SELECT code, account_code FROM erp.customer WHERE code = $1`,
       [code],
     );
     if (!c) throw new DomainError("ONYX-4559", `${onyxError(4559).message} — العميل ${code} غير موجود (op.7.1.2.8)`);
@@ -230,7 +230,80 @@ async function transferClearing(db: Db, req: PostDocumentRequest): Promise<strin
   return t(r?.transfer_account);
 }
 
+/**
+ * الصندوق/البنك (op.4.1.2.2/3): حساب النقدية من بطاقة الصندوق أو البنك نفسها لا من الطلب.
+ * GL-R19 — الصندوق في فرعه فقط (`CSHBNK_CONN_BRN` ☑ ⇒ 4902؛ البنوك غير مقيّدة `BNK_CONN_BRN` = 0)
+ * GL-R20 — نوع الصندوق يقيّد السند: «قبض» لا يُصرف منه و«صرف» لا يُقبض فيه (6294).
+ */
+async function treasuryAccount(db: Db, req: PostDocumentRequest): Promise<string> {
+  const pm = req.paymentMethod ?? "credit";
+  const voucher = req.docKind === "receipt_voucher" || req.docKind === "payment_voucher";
+  if (!voucher && pm !== "cash" && pm !== "bank") return req.cashAccount;
+  if (req.cashAnalyticId == null) return "";
+  const isBank = pm === "bank";
+  const box = await one(
+    db,
+    isBank
+      ? `SELECT account_code, branch_no, inactive, NULL::integer cash_type FROM erp.bank WHERE no = $1`
+      : `SELECT account_code, branch_no, inactive, cash_type FROM erp.cashbox WHERE no = $1`,
+    [req.cashAnalyticId],
+  );
+  if (!box) throw onyxError(5093);
+  if (!isBank && box.branch_no != null && Number(box.branch_no) !== req.branchId) throw onyxError(4902);
+  const ct = box.cash_type == null ? 3 : Number(box.cash_type);
+  if (!isBank && req.docKind === "payment_voucher" && ct === 1) throw onyxError(6294);
+  if (!isBank && req.docKind === "receipt_voucher" && ct === 2) throw onyxError(6294);
+  return t(box.account_code);
+}
+
+/** التحليلي ⇒ بطاقته وحسابها (GL-R37 · AP-R28): 18,790/18,790 سطر قيد يومية في أونيكس يطابقها */
+const ANALYTIC_CARD: Partial<Record<string, { sql: string; label: string; screen: string; account: boolean }>> = {
+  cash: { sql: `SELECT account_code, branch_no FROM erp.cashbox WHERE no = $1`, label: "الصندوق", screen: "op.4.1.2.2", account: true },
+  bank: { sql: `SELECT account_code, NULL::integer branch_no FROM erp.bank WHERE no = $1`, label: "البنك", screen: "op.4.1.2.3", account: true },
+  customer: { sql: `SELECT account_code, NULL::integer branch_no FROM erp.customer WHERE code = CAST($1 AS text)`, label: "العميل", screen: "op.7.1.2.8", account: true },
+  vendor: { sql: `SELECT account_code, NULL::integer branch_no FROM erp.vendor WHERE code = CAST($1 AS text)`, label: "المورد", screen: "op.6.1.2.2", account: true },
+  employee: { sql: `SELECT NULL::text account_code, NULL::integer branch_no FROM erp.employee WHERE code = CAST($1 AS text)`, label: "الموظف", screen: "op.1.2.8", account: false },
+};
+
+/**
+ * قيد اليومية op.4.1.3.14 [GO/04 §op.4.1.3.14]:
+ * نوع القيد من JV_TYPES وترقيمه لكل فرع ومجموعة تسلسل النوع (GL-R7 · SEQUENCED) · البيان إلزامي على كل سطر (REQUEST_DESC_GL ☑)
+ * ويرث بيان الرأس إن فرغ · التحليلي موجود وحساب السطر = حساب بطاقته، والصندوق في فرع القيد (GL-R37).
+ */
+async function resolveJournal(db: Db, req: PostDocumentRequest): Promise<PostDocumentRequest> {
+  if (req.jvType == null) throw new DomainError("ONYX-4048", `${onyxError(4048).message} — نوع القيد`);
+  const jv = await one(db, `SELECT "SEQUENCED" seq FROM extract."JV_TYPES" WHERE "JV_TYPE" = $1`, [String(req.jvType)]);
+  if (!jv) throw new DomainError("ONYX-5093", `${onyxError(5093).message} — نوع القيد ${req.jvType} (op.4.1.1.6)`);
+  const seq = Number(t(jv.seq) || req.jvType);
+  const descRequired = (await one(db, `SELECT "REQUEST_DESC_GL" v FROM extract."IAS_PARA_GL" LIMIT 1`, []))?.v !== "0";
+  for (const ln of req.lines) {
+    /* نوع التحليلي من الحساب نفسه (AC_DTL_TYP) — الشاشة ترسل الحساب ورقم التحليلي فقط كما في أونيكس */
+    if (ln.analyticType === "general" && ln.accountCode.trim()) {
+      const acc = await one(db, `SELECT analytic_type FROM erp.account WHERE code = $1`, [ln.accountCode.trim()]);
+      if (acc) ln.analyticType = ANALYTIC_OF[Number(t(acc.analytic_type) || 0)] ?? "general";
+      /* حساب بلا تحليلي: الحقل مقفول في أونيكس — رقم مُرسَل يُرفض لا يُحفظ صامتاً */
+      if (ln.analyticType === "general" && ln.analyticId != null) throw onyxError(5114);
+    }
+    if (!ln.description) ln.description = req.description || "";
+    if (descRequired && !t(ln.description)) throw new DomainError("ONYX-4048", `${onyxError(4048).message} — البيان`);
+    const card = ANALYTIC_CARD[ln.analyticType];
+    if (!card || ln.analyticId == null) continue;
+    const row = await one(db, card.sql, [ln.analyticId]);
+    if (!row) throw new DomainError("ONYX-5093", `${onyxError(5093).message} — ${card.label} ${ln.analyticId} (${card.screen})`);
+    if (card.account && t(row.account_code) && t(row.account_code) !== ln.accountCode.trim()) {
+      throw new DomainError("ONYX-5114", `${onyxError(5114).message} — ${ln.accountCode} ≠ حساب ${card.label} ${ln.analyticId} (${t(row.account_code)})`);
+    }
+    if (ln.analyticType === "cash" && row.branch_no != null && Number(row.branch_no) !== req.branchId) throw onyxError(4902);
+  }
+  return {
+    ...req,
+    numbering: { entity: req.docKind, scope: { kind: "per_branch_year_type", branchId: req.branchId, fiscalYearId: 0, docTypeId: seq } },
+  };
+}
+
 export async function resolvePosting(db: Db, req: PostDocumentRequest): Promise<PostDocumentRequest> {
+  if (req.docKind === "manual_journal") req = await resolveJournal(db, req);
+  req = { ...req, cashAccount: await treasuryAccount(db, req) };
   const brn = await one(db, `SELECT * FROM erp.branch_posting_accounts WHERE branch_no = $1`, [req.branchId]);
   const accounts: PostingAccounts = blankAccounts({
     party: await partyAccount(db, req),

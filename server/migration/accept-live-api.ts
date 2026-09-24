@@ -13,7 +13,8 @@ const tax = { taxTypeId: 1, pct: "0.15", zatcaCategory: "S" };
 const cases: { id: string; want: "posted" | RegExp; body: Record<string, unknown> }[] = [
   {
     id: "sales",
-    want: /op\.7\.1\.2\.2/,
+    /* كان يُرفض INV-8 (حساب العميل) حتى البند 34 op.7.1.2.8 — الحساب الآن من بطاقة العميل */
+    want: "posted",
     body: {
       docKind: "sales_invoice", screenRef: "op.7.5.3.6", branchId: 1, docDate: "2026-09-20",
       paymentMethod: "credit", skipIcv: true, partyAnalyticId: 1, costCenter: "031",
@@ -22,7 +23,7 @@ const cases: { id: string; want: "posted" | RegExp; body: Record<string, unknown
   },
   {
     id: "sales-return",
-    want: /op\.7\.1\.2\.2/,
+    want: "posted",
     body: {
       docKind: "sales_return", screenRef: "op.7.5.3.7", branchId: 1, docDate: "2026-09-20",
       paymentMethod: "credit", skipIcv: true, partyAnalyticId: 1, costCenter: "031",
@@ -52,7 +53,7 @@ const cases: { id: string; want: "posted" | RegExp; body: Record<string, unknown
     want: "posted",
     body: {
       docKind: "receipt_voucher", screenRef: "op.7.1.3.4", branchId: 1, docDate: "2026-09-20",
-      paymentMethod: "cash", cashAccount: "1201010001", cashAnalyticId: 1, skipIcv: true, partyAnalyticId: 1,
+      paymentMethod: "cash", cashAnalyticId: 100, skipIcv: true, partyAnalyticId: 1,
       lines: [{ amount: "50", accountCode: "1203010001", analyticType: "customer", analyticId: 1 }],
     },
   },
@@ -61,7 +62,7 @@ const cases: { id: string; want: "posted" | RegExp; body: Record<string, unknown
     want: "posted",
     body: {
       docKind: "payment_voucher", screenRef: "op.6.1.3.3", branchId: 1, docDate: "2026-09-20",
-      paymentMethod: "cash", cashAccount: "1201010001", cashAnalyticId: 1, skipIcv: true, partyAnalyticId: 1,
+      paymentMethod: "cash", cashAnalyticId: 100, skipIcv: true, partyAnalyticId: 1,
       lines: [{ amount: "40", accountCode: "2202020001", analyticType: "vendor", analyticId: 1 }],
     },
   },
@@ -70,7 +71,7 @@ const cases: { id: string; want: "posted" | RegExp; body: Record<string, unknown
     want: /غير متوافق مع الحساب التحليلي/,
     body: {
       docKind: "payment_voucher", screenRef: "op.6.1.3.3", branchId: 1, docDate: "2026-09-20",
-      paymentMethod: "cash", cashAccount: "1201010001", cashAnalyticId: 1, skipIcv: true, partyAnalyticId: 1,
+      paymentMethod: "cash", cashAnalyticId: 100, skipIcv: true, partyAnalyticId: 1,
       lines: [{ amount: "40", accountCode: "2101010001", analyticType: "vendor", analyticId: 1 }],
     },
   },
@@ -134,6 +135,15 @@ async function main() {
     const pass = c.want === "posted" ? r.ok && j.status === "posted" && Number(j.glEntryId) > 0 : r.status === 400 && c.want.test(String(j.message));
     checks.push({ id: c.id, pass, got, want: String(c.want), note: c.body.screenRef as string });
     posted[c.id] = r.ok ? { status: j.status, glEntryId: j.glEntryId, documentNumber: j.documentNumber } : { rejected: j.message };
+  }
+  /* البند 34: حساب العميل من بطاقته (C_A_CODE = 1203010001) — كان يتوقف INV-8 حتى op.7.1.2.8 */
+  for (const id of ["sales", "sales-return"]) {
+    const p = posted[id] as { glEntryId?: number } | undefined;
+    const doc = p?.glEntryId ? await get("/api/documents/" + p.glEntryId) : {};
+    const lines = ((doc as { lines?: { accountCode?: string; account_code?: string; analyticType?: string; analyticId?: unknown }[] }).lines ?? []);
+    const cust = lines.filter((l) => String(l.analyticType ?? "") === "customer").map((l) => String(l.accountCode ?? l.account_code));
+    checks.push({ id: id + "-customer-account", pass: cust.length > 0 && cust.every((c) => c === "1203010001"), got: cust.join(",") || "∅",
+      want: "1203010001", note: "customer card account (CU-R2)" });
   }
   const facts = await get("/api/migration/facts");
   const counts = await get("/api/masters/counts");

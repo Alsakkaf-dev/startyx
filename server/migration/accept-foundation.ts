@@ -80,12 +80,17 @@ ok("SY-R39: مركز التكلفة محفوظ على السطر", e1.cost_cente
 await rejects("SY-R39: حساب مركزه إجباري بلا مركز يُرفض", () => postLive(db, mj({ costCenter: "" }), ledger), /مركز التكلفة/);
 await rejects("INV-5: حساب رئيسي يُرفض", () => postLive(db, mj({ lines: [{ accountCode: "3101", side: "debit", amount: "1" }, { accountCode: "3201010032", side: "credit", amount: "1" }] }), ledger), /رقم الحساب غير صحيح/);
 await rejects("GL-R37: حساب عملاء بلا عميل يُرفض", () => postLive(db, mj({ lines: [{ accountCode: "1203010001", side: "debit", amount: "1" }, { accountCode: "3201010032", side: "credit", amount: "1" }] }), ledger), /ادخل الحساب التحليلي|غير متوافق/);
-await rejects("INV-8: فاتورة مبيعات لعميل بلا مجموعة مربوطة تتوقف وتسمّي الشاشة", async () => {
-  const c = await scalar(`SELECT code FROM erp.customer WHERE code ~ '^[0-9]+$' LIMIT 1`);
-  const it = await scalar(`SELECT code FROM erp.item WHERE group_code = '001' LIMIT 1`);
-  const wh = await scalar(`SELECT code FROM erp.warehouse LIMIT 1`);
-  return postLive(db, { docKind: "sales_invoice", branchId: 1, docDate: "2026-09-20", partyAnalyticId: c.code, costCenter: "031", lines: [{ itemCode: it.code, warehouseCode: wh.code, qty: "1", price: "100", currentAvg: "40" }] }, ledger);
-}, /op\.7\.1\.2\.2/);
+/* INV-8 للعميل أُغلق بالبند 34 (op.7.1.2.8): حساب الذمم من بطاقة العميل (يورث من مجموعته — CU-R2)، وعميل غير موجود يتوقف ويسمّي الشاشة */
+const cust = await scalar(`SELECT code, account_code FROM erp.customer WHERE code = '1000000016'`);
+const salesIt = await scalar(`SELECT code FROM erp.item WHERE group_code = '001' LIMIT 1`);
+const salesWh = await scalar(`SELECT code FROM erp.warehouse WHERE code = '100'`);
+const sale = (party: string) => ({ docKind: "sales_invoice", branchId: 1, docDate: "2026-09-20", partyAnalyticId: party, costCenter: "031",
+  lines: [{ itemCode: salesIt.code, warehouseCode: salesWh.code, qty: "1", price: "100", currentAvg: "40" }] });
+const rs = (await postLive(db, sale(cust.code), ledger)) as { status: string; glEntryId: number };
+const ar = await scalar(`SELECT account_code, analytic_type, analytic_id::text a FROM erp.gl_entry_line WHERE entry_id = $1 AND debit > 0 ORDER BY line_no LIMIT 1`, [rs.glEntryId]);
+ok("INV-8: فاتورة مبيعات تأخذ حساب الذمم من بطاقة العميل", rs.status === "posted" && ar.account_code === cust.account_code && ar.analytic_type === "customer",
+  `${rs.status} · ${ar.account_code}/${ar.analytic_type}/${ar.a}`);
+await rejects("INV-8: عميل غير موجود يتوقف ويسمّي الشاشة", () => postLive(db, sale("88888888"), ledger), /op.7.1.2.8/);
 await rejects("FX: العملة المحلية بسعر ≠ 1 تُرفض", () => postLive(db, mj({ fxRate: "3.75" }), ledger), /سعر صرف العملة المحلية/);
 await rejects("بلا فرع يُرفض (لا افتراضي صامت)", () => postLive(db, mj({ branchId: undefined }), ledger), /الفرع/);
 
@@ -143,7 +148,7 @@ const dup = await tryTx([[`INSERT INTO erp.live_document (document_number, doc_k
 ok("قاعدة INV-10: رقم مكرر في نفس النطاق مرفوض", /duplicate|unique/i.test(dup), dup);
 
 const after = await scalar(`SELECT count(*)::int c FROM erp.gl_entry`);
-ok("قيد واحد فقط أُضيف (الرفوض لم تكتب شيئاً)", Number(after.c) === Number(before.c) + 1, `${before.c} ⇒ ${after.c}`);
+ok("قيدان فقط أُضيفا — اليومية والفاتورة (الرفوض لم تكتب شيئاً)", Number(after.c) === Number(before.c) + 2, `${before.c} ⇒ ${after.c}`);
 
 await db.close();
 fs.rmSync(COPY, { recursive: true, force: true });

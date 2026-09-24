@@ -36,11 +36,25 @@ const LAYER1 = [
   "op.3.2", "op.5.1.1.2", "op.5.1.2.1", "op.5.1.2.8", "op.1.2.11", "op.1.2.4", "op.3.4", "op.3.5",
   "op.5.1.2.16", "op.7.1.2.2", "op.6.1.2.1", "op.1.1.13", "op.1.2.1", "op.1.2.9", "op.4.1.2.8",
 ];
+/* الطبقة ٢ — البيانات الأساسية (تُضاف شاشاتها مع كل بند يُغلق) */
+const LAYER2 = ["op.5.1.2.10", "op.5.1.2.9", "op.4.1.2.2", "op.4.1.2.3", "op.5.1.2.14", "op.7.1.2.4", "op.7.1.2.8", "op.6.1.2.2", "op.1.2.8"];
+/* جداول الطبقة ٢: الأصناف 6 (رأس + 5 تفاصيل) · المخازن 1 · الصناديق 2 · البنوك 2 · التسعيرة 2 ·
+   المندوبون 7 (الرئيسية · الضمانات · التوزيع على سجل المندوب + العملاء · المواقع · الصلاحيات · العمليات) ·
+   العملاء 18 (8 تبويبات على سجل العميل: الرئيسية · أخرى · العنوان الوطني · الشخصية · الإضافية · الحقول الإضافية ·
+   الضمانات · مكان التسليم + 7 تفاصيل: العملات · حد الدين · الحسابات · الصلاحيات · حدود المبيعات · المندوبون · السائقون
+   + 3 استعلام: العمليات · وثائق المبيعات · الإحصائيات) · الموردون 8 (الرئيسية · أخرى · إضافية · البنوك · الحسابات ·
+   الصلاحيات · الرصيد والحركات · إحصائيات) · الموظفون 7 (الرئيسية · التعيين · الشخصية · الاتصال · المالية على سجل
+   الموظف + حركة الموظف · إحصائيات) */
+const LAYER2_TABLES = 6 + 1 + 2 + 2 + 2 + 7 + 18 + 8 + 7;
+/* الطبقة ٣ — الأرصدة الافتتاحية: العامة + نسختا العملاء والموردين، لكل منها السطور + «التوازن» */
+const LAYER3 = ["op.4.1.2.10", "op.7.1.2.10", "op.6.1.2.4", "op.5.1.2.15"];
+/* المخزون الافتتاحي: السطور + «المطابقة» */
+const LAYER3_TABLES = 3 * 2 + 2;
 
 test("masters ui: every screen binds to a known entity", () => {
   const names = entityNames() as string[];
   const all = bindings();
-  assert.equal(all.length, 7 + 23, "الطبقة ٠ = 7 جداول · الطبقة ١ = 23 جدولاً على 15 شاشة");
+  assert.equal(all.length, 7 + 23 + LAYER2_TABLES + LAYER3_TABLES, "الطبقة ٠ = 7 جداول · الطبقة ١ = 23 جدولاً على 15 شاشة · الطبقة ٢ حسب بنودها");
   for (const b of all) assert.ok(names.includes(b.cfg.entity), `${b.ref} → كيان مجهول ${b.cfg.entity}`);
 });
 
@@ -52,9 +66,9 @@ test("masters ui: every bound column exists on the server", () => {
   }
 });
 
-test("masters ui: layers 0 and 1 are wired — 22 screens", () => {
+test("masters ui: layers 0–3 are wired", () => {
   const refs = Object.keys(load().MAP).sort();
-  assert.deepEqual(refs, [...LAYER0, ...LAYER1].sort());
+  assert.deepEqual(refs, [...LAYER0, ...LAYER1, ...LAYER2, ...LAYER3].sort());
 });
 
 test("masters ui: every bound field label exists on its screen definition (inside its own panel)", () => {
@@ -75,9 +89,9 @@ test("masters ui: every bound field label exists on its screen definition (insid
   }
 });
 
-test("masters ui: layer-1 screens carry no sample values", () => {
+test("masters ui: layer-1 and layer-2 screens carry no sample values", () => {
   const { SCREENS } = load();
-  for (const ref of LAYER1) {
+  for (const ref of [...LAYER1, ...LAYER2]) {
     for (const b of SCREENS[ref]!.blocks) {
       for (const g of b.grid ?? []) assert.equal((g as { value?: string }).value, undefined, `${ref}: «${g.label}» فيه قيمة مثال`);
       if (b.kind === "table") assert.equal(((b as { rows?: unknown[] }).rows ?? []).length, 0, `${ref}: جدول بصفوف أمثلة`);
