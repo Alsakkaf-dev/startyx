@@ -17,7 +17,7 @@
    ```
 3. Open a **new** terminal (PATH changed), then:
    ```powershell
-   cd C:\SCSE3203\week02-demo
+   cd C:\Users\GIGIABYTE\Desktop\Storage\week02-demo
    code .
    .\mvnw.cmd spring-boot:run
    ```
@@ -32,7 +32,7 @@
 ## Do the remaining lab steps by hand (they are the graded learning)
 - **G2 (port change):** in `application.properties`, uncomment `server.port=8081`, restart, check `http://localhost:8081/`, then comment the line out again.
 - **G3 (JAR):** run `.\mvnw.cmd clean package`, then `java -jar target\week02-demo-0.0.1-SNAPSHOT.jar`.
-- **Evidence:** take screenshots of the three pages, and keep `C:\SCSE3203\evidence\week02-evidence-*.txt` as your version proof.
+- **Evidence:** take screenshots of the three pages, and keep `C:\Users\GIGIABYTE\Desktop\Storage\evidence\week02-evidence-*.txt` as your version proof.
 
 ## If something fails
 | Symptom | Fix |

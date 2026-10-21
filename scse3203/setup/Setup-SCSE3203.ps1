@@ -12,7 +12,7 @@
 #>
 [CmdletBinding()]
 param(
-    [string]$Workspace = 'C:\SCSE3203',
+    [string]$Workspace = 'C:\Users\GIGIABYTE\Desktop\Storage',
     [string]$GitName,
     [string]$GitEmail,
     [string]$RepoUrl,
@@ -150,6 +150,14 @@ if ((Test-Path $ProjectDir) -and -not $Force) {
     Remove-Item (Join-Path $ProjectDir 'target') -Recurse -Force -ErrorAction SilentlyContinue
     Ok "Copied to $ProjectDir"
 }
+
+# Keep the group-project plan and the kit README alongside the lab project.
+$KitRoot = Split-Path $PSScriptRoot -Parent
+$PlanDir = Join-Path $Workspace 'project'
+New-Item -ItemType Directory -Force -Path $PlanDir | Out-Null      # copy contents, so re-runs don't nest project\project
+Copy-Item (Join-Path $KitRoot 'project\*') $PlanDir -Recurse -Force -ErrorAction SilentlyContinue
+Copy-Item (Join-Path $KitRoot 'README.md') $Workspace -Force -ErrorAction SilentlyContinue
+Ok "Project plan + README copied to $Workspace"
 
 Push-Location $ProjectDir
 try {

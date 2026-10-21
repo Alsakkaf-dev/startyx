@@ -6,7 +6,7 @@
 
 | Check | How to prove it | Status |
 |---|---|---|
-| `java -version` / `javac -version` show 21 | `C:\SCSE3203\evidence\week02-evidence-*.txt` | ☐ |
+| `java -version` / `javac -version` show 21 | `C:\Users\GIGIABYTE\Desktop\Storage\evidence\week02-evidence-*.txt` | ☐ |
 | VS Code extensions installed | same log, `code --list-extensions` section | ☐ |
 | `mvnw.cmd -version` works | same log | ☐ |
 | Spring Boot starts | terminal shows `Tomcat started on port 8080` | ☐ |
